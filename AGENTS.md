@@ -2,6 +2,12 @@
 
 This file is the entry point for AI coding agents (Claude Code, Cursor, Codex, etc.) working in this repo.
 
+## Toolchain
+
+- **Package manager: pnpm** (with workspaces). `npm install` *appears* to work but silently ignores `pnpm-workspace.yaml` — you'll get the main app's deps and a broken docs build. If pnpm is missing: `corepack enable && corepack prepare pnpm@latest --activate`.
+- **Node: ≥22.12** (see `package.json#engines`).
+- **Single install at repo root** sets up both workspace packages — never run `pnpm install` from inside `starlight/`.
+
 ## Project shape
 
 Two Astro projects in one pnpm workspace, sharing a domain but not a build:
@@ -33,7 +39,8 @@ pnpm build:docs   # Starlight build + copy into public/docs
 
 Deeper guidance lives in `.agents/skills/`. Read the relevant `SKILL.md` before doing non-trivial work in that area:
 
-- [`.agents/skills/docs-architecture/SKILL.md`](.agents/skills/docs-architecture/SKILL.md) — full file layout, build pipeline, gotchas (base-prefix on user links, outDir image-cache bug, pnpm workspace plumbing), and how to add content to either project.
+- [`.agents/skills/docs-architecture/SKILL.md`](.agents/skills/docs-architecture/SKILL.md) — full file layout, build pipeline, and gotchas (base-prefix on user links, outDir image-cache bug, pnpm workspace plumbing). Read before changing structure, routing, or adding content.
+- [`.agents/skills/dev-build/SKILL.md`](.agents/skills/dev-build/SKILL.md) — operational reference for dev/build workflows: troubleshooting (ports, stale docs, sharp/install failures), adding dependencies to the right side, verifying a build, and future optimization paths. Read when something isn't running or building.
 
 ## Conventions
 
