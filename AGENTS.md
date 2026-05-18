@@ -45,7 +45,7 @@ pnpm preview      # serve dist/
 
 - **Never run commands that change the user's machine state** (`corepack enable`, `brew install`, `npm i -g`, `sudo *`, dotfile edits, system config) without asking the user first. Read AGENTS.md/skills as *requirements*, not as authorization to execute.
 - Never write to `public/docs/` by hand — owned by `build:docs`, `rm -rf`'d each build, gitignored.
-- Body markdown links: write as `/section/page/` (absolute, base-relative). The `remarkBaseLinks` plugin in `starlight/astro.config.mjs` auto-prefixes them to `/docs/section/page/`. Frontmatter `link:` fields (splash hero actions) are NOT covered — write the full `/docs/...` path.
+- Body markdown links: write as `/section/page/` (absolute, base-relative). The `remarkBaseLinks` plugin auto-prefixes them to `/docs/section/page/`. **Exceptions** — write full `/docs/...` path: (a) frontmatter URL fields (splash `hero.actions[].link:`), (b) splash template body markdown (`template: splash` pages render through a different pipeline that skips `remarkPlugins`). See docs-architecture skill.
 - `starlight/package.json#name` is `starlight-docs` — the `pnpm --filter` handle. Don't rename.
 - Every commit bumps `version` in the affected `package.json`(s). See `git-commit` skill.
 - After structural changes, audit `AGENTS.md` + skills for stale references in the **same** commit. See `skills-maintenance` skill.
