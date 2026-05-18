@@ -48,6 +48,16 @@ pnpm --filter starlight-docs add <pkg>      # Starlight
 
 Always `pnpm install` from repo root.
 
+## Local pre-push
+
+Before pushing a branch (especially before opening a PR), run:
+
+```bash
+pnpm check && pnpm build
+```
+
+Both run on CI; failing locally avoids burning CI minutes and the slow round-trip. See `branch-pr-workflow` skill for the rest of the flow.
+
 ## Verify a build
 
 ```

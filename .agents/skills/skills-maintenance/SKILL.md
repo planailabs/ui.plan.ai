@@ -30,7 +30,9 @@ For each changed file, check whether docs reference it:
 | `site:` in either `astro.config.mjs` | `deployment` skill, `README.md` |
 | `trailingSlash` / `build.format` in either `astro.config.mjs` | `AGENTS.md` hard rule, `deployment` skill |
 | `.node-version` / `packageManager` field | `deployment` skill, CI workflow |
-| `.github/workflows/*` | Mention in `AGENTS.md` if behavior visible to agents |
+| `.github/workflows/*` | `AGENTS.md` hard rules, `branch-pr-workflow` skill if trigger/policy changes |
+| `.github/pull_request_template.md` | `branch-pr-workflow` skill (PR section) |
+| Branch-protection settings (CF/GH dashboard) | `branch-pr-workflow` skill — flagged as dashboard-only |
 | `_headers` / `_redirects` (new) | `deployment` skill |
 | `public/robots.txt` | `deployment` skill; sitemap URL inside must match `site:` |
 | `public/favicon.svg` ↔ `starlight/public/favicon.svg` | Keep byte-identical (AGENTS.md hard rule) |

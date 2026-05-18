@@ -37,6 +37,7 @@ pnpm preview      # serve dist/
 - `.agents/skills/git-commit/SKILL.md` — commit procedure incl. mandatory version bump. Read before every commit.
 - `.agents/skills/skills-maintenance/SKILL.md` — prevents skill drift. Read before committing any change that touches paths, names, ports, scripts, or configs referenced in docs.
 - `.agents/skills/deployment/SKILL.md` — Cloudflare Pages config, headers/redirects, sitemap, `site:` URL. Read before changing build outputs, Node/pnpm version, or anything user-visible in prod.
+- `.agents/skills/branch-pr-workflow/SKILL.md` — GitHub Flow + rebase merge + preview branch. Read before starting any change, opening a PR, or pushing to `preview`.
 
 ## Hard rules
 
@@ -49,6 +50,8 @@ pnpm preview      # serve dist/
 - **Trailing slash on all page URL paths** (`/docs/`, `/docs/tldr/start/`, `/about/`). File URLs do NOT (`.svg`, `.ico`, `.xml`, `_astro/*.css`). Enforced via `trailingSlash: 'always'` + `build.format: 'directory'` in both `astro.config.mjs`s. Redirect destinations and `_redirects` rows must follow.
 - **Favicons stay in sync.** `public/favicon.svg` and `starlight/public/favicon.svg` are byte-identical (visitors hop between `/` and `/docs/`). Same goes for any future favicon variants.
 - **Astro versions stay aligned.** Both `package.json`s pin the same caret range (`astro: ^6.3.5`) so the lockfile resolves to one version.
+- **All work via feature branch → PR → rebase merge to `main`.** Never push directly to `main` (branch protection enforces this). Preview deploys use the `preview` branch when needed. See `branch-pr-workflow` skill.
+- **CI on PRs is auto; CI on main is manual** (`workflow_dispatch`). Intentional: PR CI gates merges; main CI is opt-in re-verification.
 
 ## Known absent (don't search for these — they don't exist by design or yet)
 
@@ -57,6 +60,7 @@ pnpm preview      # serve dist/
 - No `_headers` file (no custom headers needed yet). `public/_redirects` and `public/robots.txt` exist — see `deployment` skill.
 - No `.npmrc` — pnpm defaults.
 - No Prettier / ESLint / `.editorconfig` — formatting is by-hand consistency for now.
+- No `CODEOWNERS` — solo repo for now.
 - No LICENSE — defaults to "all rights reserved" until decided.
 - No shared styling/theme between main app and docs (independent branding chosen).
 - No `/` → `/docs/` redirect (intentional).

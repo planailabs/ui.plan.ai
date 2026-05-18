@@ -5,6 +5,8 @@ description: Procedure for every commit in this repo — including the mandatory
 
 # Commit procedure
 
+Commits happen on **feature branches**, never directly on `main` (branch protection enforces this). Rebase-merge into main preserves each commit individually — so each commit must comply with this skill on its own. See `branch-pr-workflow`.
+
 ## 1. Version bump (mandatory)
 
 Every commit bumps `version` in the affected `package.json`(s). Pre-1.0 (`0.x.y`):

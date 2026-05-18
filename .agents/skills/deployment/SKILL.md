@@ -5,7 +5,11 @@ description: How this repo is built and served in production (Cloudflare Pages).
 
 # Deployment
 
-Cloudflare Pages, GitHub-connected. CF watches `main` and rebuilds on push.
+Cloudflare Pages, GitHub-connected.
+
+- **Production**: CF deploys `main` to `ui.plan.ai`.
+- **Preview**: CF deploys the `preview` branch to a preview URL. Use only when you need to visually/manually verify a change before opening the PR — push your feature branch into `preview` (force-allowed; it's disposable). See `branch-pr-workflow` skill.
+- Other branches are *not* configured for preview deploys (set in CF dashboard) so feature branches don't burn deploy minutes.
 
 ## CF Pages dashboard settings (not in repo)
 
