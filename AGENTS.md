@@ -34,6 +34,7 @@ pnpm preview      # serve dist/
 - `.agents/skills/docs-architecture/SKILL.md` — layout, build pipeline, gotchas. Read before structural/routing changes.
 - `.agents/skills/dev-build/SKILL.md` — running, troubleshooting, deps, verification. Read when something won't run or build.
 - `.agents/skills/git-commit/SKILL.md` — commit procedure incl. mandatory version bump. Read before every commit.
+- `.agents/skills/skills-maintenance/SKILL.md` — prevents skill drift. Read before committing any change that touches paths, names, ports, scripts, or configs referenced in docs.
 
 ## Hard rules
 
@@ -42,3 +43,13 @@ pnpm preview      # serve dist/
 - User-written links in MDX don't get `base` prefix. Use Starlight slug links or write `/docs/...` explicitly.
 - `starlight/package.json#name` is `starlight-docs` — the `pnpm --filter` handle. Don't rename.
 - Every commit bumps `version` in the affected `package.json`(s). See `git-commit` skill.
+- After structural changes, audit `AGENTS.md` + skills for stale references in the **same** commit. See `skills-maintenance` skill.
+
+## Known absent (don't search for these — they don't exist by design or yet)
+
+- No tests, no test runner, no CI workflows (`.github/workflows/`).
+- No deployment config (no Vercel/Netlify/Cloudflare files yet).
+- No `.npmrc` — pnpm defaults.
+- No shared styling/theme between main app and docs (independent branding chosen).
+- No `/` → `/docs/` redirect (intentional).
+- No `CHANGELOG.md` — `git log` + version bumps in `package.json` are the record.
