@@ -40,9 +40,11 @@ Both Astro configs set `trailingSlash: 'always'` + `build.format: 'directory'`. 
 
 Set in both `astro.config.mjs`s as `https://ui.plan.ai`. Drives sitemap URLs and Starlight's canonical link tags. If the domain changes, update both + the README + this skill.
 
-## Sitemap
+## Sitemap & robots
 
-Starlight generates `sitemap-index.xml` at `/docs/sitemap-index.xml` (because `base: '/docs'`). Submit to Search Console at that URL; or later add a root `sitemap.xml` and reference it from `robots.txt`. Neither exists yet.
+- Starlight generates `sitemap-index.xml` at `/docs/sitemap-index.xml` (because `base: '/docs'`).
+- `public/robots.txt` allows all and references that sitemap. Submit to Search Console at the sitemap URL.
+- No root `sitemap.xml` today. If the main app gains real content, add one (or extend robots.txt with multiple `Sitemap:` lines).
 
 ## Absent by design
 

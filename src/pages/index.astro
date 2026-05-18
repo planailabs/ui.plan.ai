@@ -1,4 +1,7 @@
 ---
+const title = 'ui.plan.ai';
+const description = 'ui.plan.ai';
+const url = 'https://ui.plan.ai/';
 ---
 
 <html lang="en">
@@ -8,9 +11,16 @@
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>ui.plan.ai</title>
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={url} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta name="twitter:card" content="summary" />
 	</head>
 	<body>
-		<h1>ui.plan.ai</h1>
+		<h1>{title}</h1>
 	</body>
 </html>

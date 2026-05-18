@@ -2,8 +2,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "command": "./node_modules/.bin/astro dev",
-      "name": "Development server",
+      "command": "pnpm dev",
+      "name": "Dev (app + docs)",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "pnpm dev:app",
+      "name": "Dev: main app only",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "pnpm dev:docs",
+      "name": "Dev: docs only",
       "request": "launch",
       "type": "node-terminal"
     }

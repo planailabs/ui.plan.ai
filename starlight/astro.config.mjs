@@ -23,7 +23,8 @@ export default defineConfig({
 	},
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: 'ui.plan.ai',
+			description: 'ui.plan.ai documentation',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
 			sidebar: [
 				{

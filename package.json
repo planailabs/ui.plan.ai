@@ -1,7 +1,7 @@
 {
   "name": "ui.plan.ai",
   "type": "module",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "packageManager": "pnpm@11.1.2",
   "engines": {
     "node": ">=22.12.0"
@@ -14,12 +14,17 @@
     "build:app": "astro build",
     "build:docs": "pnpm --filter starlight-docs build && rm -rf public/docs && cp -R starlight/dist public/docs",
     "preview": "astro preview",
+    "check": "pnpm check:docs && pnpm check:app",
+    "check:app": "astro check",
+    "check:docs": "pnpm --filter starlight-docs check",
     "astro": "astro"
   },
   "dependencies": {
     "astro": "^6.3.5"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "@astrojs/check": "^0.9.4",
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3"
   }
 }

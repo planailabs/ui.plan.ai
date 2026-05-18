@@ -32,6 +32,11 @@ For each changed file, check whether docs reference it:
 | `.node-version` / `packageManager` field | `deployment` skill, CI workflow |
 | `.github/workflows/*` | Mention in `AGENTS.md` if behavior visible to agents |
 | `_headers` / `_redirects` (new) | `deployment` skill |
+| `public/robots.txt` | `deployment` skill; sitemap URL inside must match `site:` |
+| `public/favicon.svg` ↔ `starlight/public/favicon.svg` | Keep byte-identical (AGENTS.md hard rule) |
+| `src/pages/404.astro` (or its removal) | `AGENTS.md` Known-absent section |
+| `tsconfig.json` excludes | If a new top-level dir is added, ensure `astro check` doesn't traverse generated content (`public/docs`, `dist`, `starlight`) |
+| Astro version range in either `package.json` | Bump both so they resolve to the same version (AGENTS.md hard rule) |
 | New convention or non-obvious pattern | Add to relevant skill or create a new one |
 | Any file in `.agents/skills/*` | Cross-refs in other skills + `AGENTS.md` pointers |
 

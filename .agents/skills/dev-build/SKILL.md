@@ -31,6 +31,9 @@ pnpm dev:docs     # Starlight only
 pnpm build        # ordered: docs → main
 pnpm build:docs   # docs only (rebuild + re-copy into public/docs)
 pnpm build:app    # main only
+pnpm check        # astro check on both (CI runs this before build)
+pnpm check:app    # main only
+pnpm check:docs   # Starlight only
 pnpm preview      # serve dist/
 ```
 

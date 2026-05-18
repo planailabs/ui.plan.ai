@@ -23,8 +23,9 @@ Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main 
 ```bash
 pnpm dev          # both (concurrently)
 pnpm build        # ordered: docs → main
+pnpm check        # astro check, both projects (used by CI)
 pnpm preview      # serve dist/
-# Per-side: dev:app, dev:docs, build:app, build:docs
+# Per-side: dev:app, dev:docs, build:app, build:docs, check:app, check:docs
 ```
 
 **Dev server: run via backgrounded Bash, not inline.** See `dev-build` skill.
@@ -46,14 +47,18 @@ pnpm preview      # serve dist/
 - Every commit bumps `version` in the affected `package.json`(s). See `git-commit` skill.
 - After structural changes, audit `AGENTS.md` + skills for stale references in the **same** commit. See `skills-maintenance` skill.
 - **Trailing slash on all page URL paths** (`/docs/`, `/docs/tldr/start/`, `/about/`). File URLs do NOT (`.svg`, `.ico`, `.xml`, `_astro/*.css`). Enforced via `trailingSlash: 'always'` + `build.format: 'directory'` in both `astro.config.mjs`s. Redirect destinations and `_redirects` rows must follow.
+- **Favicons stay in sync.** `public/favicon.svg` and `starlight/public/favicon.svg` are byte-identical (visitors hop between `/` and `/docs/`). Same goes for any future favicon variants.
+- **Astro versions stay aligned.** Both `package.json`s pin the same caret range (`astro: ^6.3.5`) so the lockfile resolves to one version.
 
 ## Known absent (don't search for these — they don't exist by design or yet)
 
 - No tests, no test runner.
 - No `wrangler.toml` — Cloudflare Pages config lives in the CF dashboard. See `deployment` skill.
-- No `_headers` file (no custom headers needed yet). `public/_redirects` exists — see `deployment` skill.
+- No `_headers` file (no custom headers needed yet). `public/_redirects` and `public/robots.txt` exist — see `deployment` skill.
 - No `.npmrc` — pnpm defaults.
+- No Prettier / ESLint / `.editorconfig` — formatting is by-hand consistency for now.
+- No LICENSE — defaults to "all rights reserved" until decided.
 - No shared styling/theme between main app and docs (independent branding chosen).
 - No `/` → `/docs/` redirect (intentional).
 - No `CHANGELOG.md` — `git log` + version bumps in `package.json` are the record.
-- No `robots.txt` / root `sitemap.xml` yet (Starlight's `/docs/sitemap-index.xml` is the only sitemap).
+- No root `sitemap.xml`. Starlight's `/docs/sitemap-index.xml` is the only sitemap; `public/robots.txt` references it.
