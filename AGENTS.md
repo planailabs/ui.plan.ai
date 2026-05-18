@@ -50,7 +50,7 @@ pnpm preview      # serve dist/
 
 - No tests, no test runner.
 - No `wrangler.toml` — Cloudflare Pages config lives in the CF dashboard. See `deployment` skill.
-- No `_headers` / `_redirects` files yet (add to root `public/` when needed).
+- No `_headers` file (no custom headers needed yet). `public/_redirects` exists — see `deployment` skill.
 - No `.npmrc` — pnpm defaults.
 - No shared styling/theme between main app and docs (independent branding chosen).
 - No `/` → `/docs/` redirect (intentional).

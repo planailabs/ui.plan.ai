@@ -14,11 +14,20 @@ export default defineConfig({
 	server: {
 		port: 4322,
 	},
+	redirects: {
+		// Source resolves relative to `base` ('/' → '/docs/'),
+		// but destination is NOT auto-prefixed — write the full path.
+		'/': '/docs/tldr/start/',
+	},
 	integrations: [
 		starlight({
 			title: 'My Docs',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
 			sidebar: [
+				{
+					label: 'TL;DR',
+					items: [{ label: 'Start', slug: 'tldr/start' }],
+				},
 				{
 					label: 'Guides',
 					items: [

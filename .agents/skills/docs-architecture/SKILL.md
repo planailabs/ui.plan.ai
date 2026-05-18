@@ -51,9 +51,10 @@ Sequential — main consumes `public/docs/`. Don't parallelize without restructu
 ## Gotchas
 
 - User-written links (MDX frontmatter `link: /guides/example/`) **don't** get the `base` prefix. Use Starlight slug links or write `/docs/...`.
+- Astro `redirects` config: *source* gets `base` applied (so `/` resolves to `/docs/`), but *destination* does **not** — write the full path (`/docs/tldr/start/`, not `/tldr/start`).
 - `pnpm install` from inside `starlight/` walks up to workspace root anyway — always install from repo root.
 - `build:docs` uses `rm -rf` + `cp -R` — Unix-only.
-- No link from `/` → `/docs/` by design.
+- No link from `/` → `/docs/` by design. `/docs/` itself redirects to `/docs/tldr/start/` (see `deployment` skill).
 
 ## Adding content
 
