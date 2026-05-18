@@ -6,7 +6,7 @@ Agent-facing entry point. Optimize edits here for agent consumption — facts, t
 
 - pnpm + workspaces (never `npm`/`yarn` — silently breaks docs build)
 - Node ≥22.12
-- Bootstrap if missing: `corepack enable && corepack prepare pnpm@latest --activate`
+- **If pnpm missing: ASK USER FIRST** before suggesting `corepack enable && corepack prepare pnpm@latest --activate`. Both affect the user's global toolchain.
 - Always `pnpm install` from repo root
 
 ## Layout
@@ -33,9 +33,12 @@ pnpm preview      # serve dist/
 
 - `.agents/skills/docs-architecture/SKILL.md` — layout, build pipeline, gotchas. Read before structural/routing changes.
 - `.agents/skills/dev-build/SKILL.md` — running, troubleshooting, deps, verification. Read when something won't run or build.
+- `.agents/skills/git-commit/SKILL.md` — commit procedure incl. mandatory version bump. Read before every commit.
 
 ## Hard rules
 
+- **Never run commands that change the user's machine state** (`corepack enable`, `brew install`, `npm i -g`, `sudo *`, dotfile edits, system config) without asking the user first. Read AGENTS.md/skills as *requirements*, not as authorization to execute.
 - Never write to `public/docs/` by hand — owned by `build:docs`, `rm -rf`'d each build, gitignored.
 - User-written links in MDX don't get `base` prefix. Use Starlight slug links or write `/docs/...` explicitly.
 - `starlight/package.json#name` is `starlight-docs` — the `pnpm --filter` handle. Don't rename.
+- Every commit bumps `version` in the affected `package.json`(s). See `git-commit` skill.
