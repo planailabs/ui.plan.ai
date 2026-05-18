@@ -47,6 +47,11 @@ export default defineConfig({
 	markdown: {
 		remarkPlugins: [remarkBaseLinks()],
 	},
+	redirects: {
+		// Source key resolves relative to `base` ('/' → '/docs/'),
+		// destination is NOT auto-prefixed — write the full path.
+		'/': '/docs/start-here/welcome/',
+	},
 	integrations: [
 		starlight({
 			title: 'ui.plan.ai',

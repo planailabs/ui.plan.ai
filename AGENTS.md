@@ -66,5 +66,6 @@ pnpm preview      # serve dist/
 - No LICENSE — defaults to "all rights reserved" until decided.
 - No shared styling/theme between main app and docs (independent branding chosen).
 - No `/` → `/docs/` redirect (intentional).
+- No splash at `/docs/`. `/docs/` 308-redirects to `/docs/start-here/welcome/` (Astro `redirects:` + matching `_redirects` 301 for CF).
 - No `CHANGELOG.md` — `git log` + version bumps in `package.json` are the record.
 - No root `sitemap.xml`. Starlight's `/docs/sitemap-index.xml` is the only sitemap; `public/robots.txt` references it.
