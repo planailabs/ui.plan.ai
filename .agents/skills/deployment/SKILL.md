@@ -32,7 +32,11 @@ CF serves `dist/` at the domain root. `build:docs` copies Starlight output into 
 
 CF Pages reads `_headers` and `_redirects` from build output if present. Source lives in root `public/` (copied to `dist/` by main `astro build`). **Never put in `public/docs/`** — owned by `build:docs`, wiped each build.
 
-Current: `public/_redirects` is empty (placeholder). The Starlight `redirects:` config in `starlight/astro.config.mjs` is also empty — `/docs/` serves the splash landing (`starlight/src/content/docs/index.md`) directly. No `_headers` today.
+Current: `/docs` and `/docs/` 301 → `/docs/start-here/welcome/`. Implemented in two layers:
+- `public/_redirects`: CF Pages server-side 301 (no flash in prod).
+- Starlight `redirects: { '/': '/docs/start-here/welcome/' }`: meta-refresh HTML for `astro preview` and as a fallback.
+
+There is no `index.md` in `starlight/src/content/docs/` — Astro file-based routes take precedence over `redirects:` config, so the file's absence is required for the redirect to fire. No `_headers` today.
 
 ## Trailing slashes
 

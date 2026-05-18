@@ -62,7 +62,7 @@ If you add a new frontmatter field that contains a URL path, write it base-prefi
 
 ## Other gotchas
 
-- Astro `redirects` config: *source* gets `base` applied (so `/` resolves to `/docs/`), but *destination* does **not** — write the full path (`/docs/foo/`, not `/foo/`). Currently no redirects configured; `/docs/` is the splash.
+- Astro `redirects` config: *source* gets `base` applied (so `/` resolves to `/docs/`), but *destination* does **not** — write the full path (`/docs/foo/`, not `/foo/`). Current: `/` → `/docs/start-here/welcome/`. **File-based routes take precedence over `redirects:`** — keeping `index.md` would silence the redirect, so the splash file was removed.
 - `pnpm install` from inside `starlight/` walks up to workspace root anyway — always install from repo root.
 - `build:docs` uses `rm -rf` + `cp -R` — Unix-only.
 - No link from `/` → `/docs/` by design.

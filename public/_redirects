@@ -1,2 +1,2 @@
-# Reserved for production redirects. None active —
-# /docs/ is the splash landing (starlight/src/content/docs/index.md).
+/docs    /docs/start-here/welcome/    301
+/docs/   /docs/start-here/welcome/    301
