@@ -28,6 +28,7 @@ For each changed file, check whether docs reference it:
 | `.gitignore` rules for `public/docs`/`dist` | `docs-architecture` Layout, `dev-build` Verify |
 | Root `package.json` scripts (`dev`, `build:docs`, …) | `AGENTS.md`, `dev-build` |
 | `site:` in either `astro.config.mjs` | `deployment` skill, `README.md` |
+| `trailingSlash` / `build.format` in either `astro.config.mjs` | `AGENTS.md` hard rule, `deployment` skill |
 | `.node-version` / `packageManager` field | `deployment` skill, CI workflow |
 | `.github/workflows/*` | Mention in `AGENTS.md` if behavior visible to agents |
 | `_headers` / `_redirects` (new) | `deployment` skill |

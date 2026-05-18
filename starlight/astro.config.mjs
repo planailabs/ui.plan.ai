@@ -11,6 +11,8 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	site: 'https://ui.plan.ai',
 	base: '/docs',
+	trailingSlash: 'always',
+	build: { format: 'directory' },
 	server: {
 		port: 4322,
 	},

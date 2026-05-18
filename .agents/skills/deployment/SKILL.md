@@ -32,6 +32,10 @@ Current: `public/_redirects` 301s `/docs` and `/docs/` → `/docs/tldr/start/`. 
 
 No `_headers` today.
 
+## Trailing slashes
+
+Both Astro configs set `trailingSlash: 'always'` + `build.format: 'directory'`. The build emits `page/index.html` files and Astro generates URLs with a trailing slash. CF Pages defaults to serving `page/index.html` for both `/page` and `/page/`; if cross-domain links arrive without slashes and you want a 301 instead of silent serve, set CF dashboard → Trailing slash → "Always add". Not currently set.
+
 ## `site:` URL
 
 Set in both `astro.config.mjs`s as `https://ui.plan.ai`. Drives sitemap URLs and Starlight's canonical link tags. If the domain changes, update both + the README + this skill.

@@ -45,6 +45,7 @@ pnpm preview      # serve dist/
 - `starlight/package.json#name` is `starlight-docs` — the `pnpm --filter` handle. Don't rename.
 - Every commit bumps `version` in the affected `package.json`(s). See `git-commit` skill.
 - After structural changes, audit `AGENTS.md` + skills for stale references in the **same** commit. See `skills-maintenance` skill.
+- **Trailing slash on all page URL paths** (`/docs/`, `/docs/tldr/start/`, `/about/`). File URLs do NOT (`.svg`, `.ico`, `.xml`, `_astro/*.css`). Enforced via `trailingSlash: 'always'` + `build.format: 'directory'` in both `astro.config.mjs`s. Redirect destinations and `_redirects` rows must follow.
 
 ## Known absent (don't search for these — they don't exist by design or yet)
 
