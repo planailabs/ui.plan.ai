@@ -27,6 +27,10 @@ For each changed file, check whether docs reference it:
 | Top-level dir add/move/remove | `docs-architecture` Layout tree |
 | `.gitignore` rules for `public/docs`/`dist` | `docs-architecture` Layout, `dev-build` Verify |
 | Root `package.json` scripts (`dev`, `build:docs`, …) | `AGENTS.md`, `dev-build` |
+| `site:` in either `astro.config.mjs` | `deployment` skill, `README.md` |
+| `.node-version` / `packageManager` field | `deployment` skill, CI workflow |
+| `.github/workflows/*` | Mention in `AGENTS.md` if behavior visible to agents |
+| `_headers` / `_redirects` (new) | `deployment` skill |
 | New convention or non-obvious pattern | Add to relevant skill or create a new one |
 | Any file in `.agents/skills/*` | Cross-refs in other skills + `AGENTS.md` pointers |
 

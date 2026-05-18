@@ -35,6 +35,7 @@ pnpm preview      # serve dist/
 - `.agents/skills/dev-build/SKILL.md` — running, troubleshooting, deps, verification. Read when something won't run or build.
 - `.agents/skills/git-commit/SKILL.md` — commit procedure incl. mandatory version bump. Read before every commit.
 - `.agents/skills/skills-maintenance/SKILL.md` — prevents skill drift. Read before committing any change that touches paths, names, ports, scripts, or configs referenced in docs.
+- `.agents/skills/deployment/SKILL.md` — Cloudflare Pages config, headers/redirects, sitemap, `site:` URL. Read before changing build outputs, Node/pnpm version, or anything user-visible in prod.
 
 ## Hard rules
 
@@ -47,9 +48,11 @@ pnpm preview      # serve dist/
 
 ## Known absent (don't search for these — they don't exist by design or yet)
 
-- No tests, no test runner, no CI workflows (`.github/workflows/`).
-- No deployment config (no Vercel/Netlify/Cloudflare files yet).
+- No tests, no test runner.
+- No `wrangler.toml` — Cloudflare Pages config lives in the CF dashboard. See `deployment` skill.
+- No `_headers` / `_redirects` files yet (add to root `public/` when needed).
 - No `.npmrc` — pnpm defaults.
 - No shared styling/theme between main app and docs (independent branding chosen).
 - No `/` → `/docs/` redirect (intentional).
 - No `CHANGELOG.md` — `git log` + version bumps in `package.json` are the record.
+- No `robots.txt` / root `sitemap.xml` yet (Starlight's `/docs/sitemap-index.xml` is the only sitemap).

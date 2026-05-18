@@ -1,43 +1,27 @@
-# Astro Starter Kit: Minimal
+# ui.plan.ai
+
+Two Astro projects in one pnpm workspace:
+
+- **Main app** (`/`) — served at `ui.plan.ai/`
+- **Starlight docs** (`starlight/`) — served at `ui.plan.ai/docs/`
+
+The main app's `astro build` sweeps the docs build into a single merged `dist/`.
+
+## Quickstart
 
 ```sh
-pnpm create astro@latest -- --template minimal
+pnpm install        # one install at root sets up both
+pnpm dev            # main on :4321, docs on :4322/docs/
+pnpm build          # ordered: docs → main; produces dist/
+pnpm preview        # serves merged dist/
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Requires Node ≥22.12 and pnpm.
 
-## 🚀 Project Structure
+## Deployment
 
-Inside of your Astro project, you'll see the following folders and files:
+Cloudflare Pages, GitHub-connected. Build command `pnpm build`, output dir `dist`.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## For AI agents
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+See [`AGENTS.md`](./AGENTS.md). Detailed skills in [`.agents/skills/`](.agents/skills/).

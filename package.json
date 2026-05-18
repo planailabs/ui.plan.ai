@@ -1,7 +1,8 @@
 {
-  "name": "",
+  "name": "ui.plan.ai",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
+  "packageManager": "pnpm@11.1.2",
   "engines": {
     "node": ">=22.12.0"
   },
