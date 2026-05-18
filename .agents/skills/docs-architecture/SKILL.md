@@ -48,13 +48,23 @@ Sequential — main consumes `public/docs/`. Don't parallelize without restructu
 | `pnpm-workspace.yaml` | `allowBuilds: { sharp, esbuild }` | Required for postinstall |
 | `.gitignore` | `/public/docs/` | Build artifact |
 
-## Gotchas
+## Link prefixing
 
-- User-written links (MDX frontmatter `link: /guides/example/`) **don't** get the `base` prefix. Use Starlight slug links or write `/docs/...`.
-- Astro `redirects` config: *source* gets `base` applied (so `/` resolves to `/docs/`), but *destination* does **not** — write the full path (`/docs/tldr/start/`, not `/tldr/start`).
+Starlight does **not** auto-prefix absolute-path markdown links with `base`. We fix this via a `remarkBaseLinks()` remark plugin defined inline in `starlight/astro.config.mjs` and wired into `markdown.remarkPlugins`. It walks every body markdown link node — if `url` starts with `/` and doesn't already start with `/docs/`, it prepends `/docs`. Covers all `.md`/`.mdx` content; idempotent.
+
+What it does NOT cover (frontmatter is not part of the markdown AST):
+- Splash `hero.actions[].link:` — write the full `/docs/...` path manually (only `index.md` uses this).
+- Any future custom frontmatter URL field.
+
+If you add a new frontmatter field that contains a URL path, either (a) write it base-prefixed, or (b) extend the plugin / schema to normalize it.
+
+## Other gotchas
+
+- Astro `redirects` config: *source* gets `base` applied (so `/` resolves to `/docs/`), but *destination* does **not** — write the full path (`/docs/foo/`, not `/foo/`). Currently no redirects configured; `/docs/` is the splash.
 - `pnpm install` from inside `starlight/` walks up to workspace root anyway — always install from repo root.
 - `build:docs` uses `rm -rf` + `cp -R` — Unix-only.
-- No link from `/` → `/docs/` by design. `/docs/` itself redirects to `/docs/tldr/start/` (see `deployment` skill).
+- No link from `/` → `/docs/` by design.
+- Content schema is extended (`starlight/src/content.config.ts`) for custom keys: `stability` (`stable` | `working` | `experimental`), `last_synced_with` (string), `sources` (array of strings). Required by the migrated content. Removing these is a breaking change.
 
 ## Adding content
 

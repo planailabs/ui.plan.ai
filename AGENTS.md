@@ -18,6 +18,8 @@ Agent-facing entry point. Optimize edits here for agent consumption — facts, t
 
 Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential.
 
+Docs content: 52 markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 9 sections: `start-here`, `foundations`, `process`, `v1-plan`, `specifications`, `reference` (+ `reference/schemas/`), `api-reference`, `roadmap-and-open-questions`, `archive`. `index.md` is the splash landing at `/docs/`.
+
 ## Commands
 
 ```bash
@@ -43,11 +45,11 @@ pnpm preview      # serve dist/
 
 - **Never run commands that change the user's machine state** (`corepack enable`, `brew install`, `npm i -g`, `sudo *`, dotfile edits, system config) without asking the user first. Read AGENTS.md/skills as *requirements*, not as authorization to execute.
 - Never write to `public/docs/` by hand — owned by `build:docs`, `rm -rf`'d each build, gitignored.
-- User-written links in MDX don't get `base` prefix. Use Starlight slug links or write `/docs/...` explicitly.
+- Body markdown links: write as `/section/page/` (absolute, base-relative). The `remarkBaseLinks` plugin in `starlight/astro.config.mjs` auto-prefixes them to `/docs/section/page/`. Frontmatter `link:` fields (splash hero actions) are NOT covered — write the full `/docs/...` path.
 - `starlight/package.json#name` is `starlight-docs` — the `pnpm --filter` handle. Don't rename.
 - Every commit bumps `version` in the affected `package.json`(s). See `git-commit` skill.
 - After structural changes, audit `AGENTS.md` + skills for stale references in the **same** commit. See `skills-maintenance` skill.
-- **Trailing slash on all page URL paths** (`/docs/`, `/docs/tldr/start/`, `/about/`). File URLs do NOT (`.svg`, `.ico`, `.xml`, `_astro/*.css`). Enforced via `trailingSlash: 'always'` + `build.format: 'directory'` in both `astro.config.mjs`s. Redirect destinations and `_redirects` rows must follow.
+- **Trailing slash on all page URL paths** (`/docs/`, `/docs/start-here/welcome/`, `/about/`). File URLs do NOT (`.svg`, `.ico`, `.xml`, `_astro/*.css`). Enforced via `trailingSlash: 'always'` + `build.format: 'directory'` in both `astro.config.mjs`s. Redirect destinations and `_redirects` rows must follow.
 - **Favicons stay in sync.** `public/favicon.svg` and `starlight/public/favicon.svg` are byte-identical (visitors hop between `/` and `/docs/`). Same goes for any future favicon variants.
 - **Astro versions stay aligned.** Both `package.json`s pin the same caret range (`astro: ^6.3.5`) so the lockfile resolves to one version.
 - **All work via feature branch → PR → rebase merge to `main`.** Never push directly to `main` (branch protection enforces this). Preview deploys use the `preview` branch when needed. See `branch-pr-workflow` skill.

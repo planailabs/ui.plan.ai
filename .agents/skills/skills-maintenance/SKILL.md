@@ -34,6 +34,9 @@ For each changed file, check whether docs reference it:
 | `.github/pull_request_template.md` | `branch-pr-workflow` skill (PR section) |
 | Branch-protection settings (CF/GH dashboard) | `branch-pr-workflow` skill — flagged as dashboard-only |
 | `_headers` / `_redirects` (new) | `deployment` skill |
+| `remarkBaseLinks` plugin in `starlight/astro.config.mjs` | `docs-architecture` (Link prefixing section) — removal/changes are breaking |
+| `starlight/src/content.config.ts` schema `extras` | `docs-architecture` (Other gotchas) — content depends on these keys |
+| `starlight/src/content/docs/index.md` splash hero `link:` fields | Must be base-prefixed manually (remark plugin doesn't touch frontmatter) |
 | `public/robots.txt` | `deployment` skill; sitemap URL inside must match `site:` |
 | `public/favicon.svg` ↔ `starlight/public/favicon.svg` | Keep byte-identical (AGENTS.md hard rule) |
 | `src/pages/404.astro` (or its removal) | `AGENTS.md` Known-absent section |
