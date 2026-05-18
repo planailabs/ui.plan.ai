@@ -1,88 +1,76 @@
 ---
 name: dev-build
-description: Operational reference for the dev and build workflows in this dual-Astro repo (main app + Starlight docs). Use when a dev server won't start, ports collide, builds produce wrong output, when adding dependencies to the right side, or when investigating why something isn't behaving as expected.
+description: How to run, debug, and verify dev/build in this repo. Read when starting a dev server, hitting build errors, adding deps, or troubleshooting.
 ---
 
-# Dev and build operations
+# Dev / build ops
 
-For *what the architecture is*, see [`docs-architecture/SKILL.md`](../docs-architecture/SKILL.md). This skill is about *running* and *debugging* it.
+For architecture (file layout, build flow), see `docs-architecture`.
 
-## Toolchain prerequisites
+## Starting the dev server — preferred way
 
-- **pnpm** (workspaces). Don't substitute `npm` or `yarn` — `pnpm-workspace.yaml` won't be honored and the docs build will silently break.
-- **Node ≥22.12** (`package.json#engines`).
-- If pnpm isn't installed: `corepack enable && corepack prepare pnpm@latest --activate`.
+Use the harness `Bash` tool with `run_in_background: true`. Not a subagent: a subagent's backgrounded shell is reaped when the agent exits.
 
-## Running
+```
+1. Check: lsof -nP -i:4321 -i:4322 -sTCP:LISTEN
+2. If any listener belongs to a prior pnpm dev, kill it (kill <pid>) before starting.
+3. Run `pnpm dev` with Bash run_in_background: true.
+4. Use Monitor / BashOutput on the returned shell id to confirm both servers came up
+   (look for "ready in" / port lines from app and docs).
+5. Kill on request via KillShell on the same shell id.
+```
+
+Never start a second `pnpm dev` without killing the first. Always port-check first.
+
+## Commands
 
 ```bash
-pnpm dev          # both: main on :4321, docs on :4322/docs/, via concurrently
+pnpm dev          # both, concurrently (app :4321, docs :4322)
 pnpm dev:app      # main only
-pnpm dev:docs     # docs only
-
-pnpm build        # ordered: docs → public/docs → main → dist/
-pnpm build:docs   # docs only (rebuilds + re-copies into public/docs)
+pnpm dev:docs     # Starlight only
+pnpm build        # ordered: docs → main
+pnpm build:docs   # docs only (rebuild + re-copy into public/docs)
 pnpm build:app    # main only
-pnpm preview      # serves merged dist/ via astro preview
+pnpm preview      # serve dist/
 ```
 
-Inside `pnpm dev`, output is prefixed `[app]` (blue) and `[docs]` (magenta). One Ctrl+C kills both child processes (`concurrently` handles signal forwarding).
+Edit docs at `:4322/docs/` (HMR). `:4321/docs/` is whatever was last built — stale by default.
 
-**Edit docs at `:4322/docs/`, not `:4321/docs/`.** The latter serves whatever was last built into `public/docs/` — no HMR, possibly stale, possibly missing.
-
-## Adding dependencies
-
-Pick the right project. Wrong choice means `node_modules` bloat or a missing import at the wrong layer.
+## Adding deps
 
 ```bash
-# To main app (root package.json)
-pnpm add <pkg>
-
-# To Starlight (starlight/package.json)
-pnpm --filter starlight-docs add <pkg>
-# or:
-cd starlight && pnpm add <pkg>
+pnpm add <pkg>                              # main app
+pnpm --filter starlight-docs add <pkg>      # Starlight
 ```
 
-`pnpm install` always from repo root — running it inside `starlight/` makes pnpm walk up to the workspace root anyway, but with confusing log output.
+Always `pnpm install` from repo root.
 
-## Verifying a successful build
-
-After `pnpm build`, expect this shape:
+## Verify a build
 
 ```
 dist/
-├── index.html              # main app
-├── favicon.{ico,svg}
-└── docs/                   # Starlight content
-    ├── index.html
-    ├── guides/example/index.html
-    ├── reference/example/index.html
-    ├── _astro/             # optimized assets
-    └── pagefind/           # search index
+├── index.html, favicon.*
+└── docs/{index.html, guides/example/, reference/example/, _astro/, pagefind/}
 ```
 
-Quick sanity check that the `/docs` base prefix is wired correctly:
-
+Base-prefix sanity check:
 ```bash
-grep -c 'href="/docs/' dist/docs/index.html   # should be > 0
+grep -c 'href="/docs/' dist/docs/index.html   # > 0 = ok
 ```
-
-If that returns 0, the `base: '/docs'` config in `starlight/astro.config.mjs` is missing or wrong — internal links will 404 in production.
 
 ## Troubleshooting
 
-| Symptom | Likely cause / fix |
+| Symptom | Cause / fix |
 |---|---|
-| `Port 4321 (or 4322) is in use` | Astro auto-picks the next free port and logs it. To free the original: `lsof -i :4321` then `kill <pid>`. |
-| `:4321/docs/` shows nothing or is stale | Working as designed — main dev server serves built docs from `public/docs/`. Use `:4322/docs/` for HMR, or run `pnpm build:docs` to refresh. |
-| `npm install` was run by mistake | Delete `node_modules/` and `package-lock.json`, run `pnpm install`. Lockfile mismatch causes subtle resolution bugs. |
-| Build error: `ENOENT ... .astro/_astro/<file>.webp` | Someone set `outDir` outside the project root. Don't — keep default `dist/` and copy via `build:docs`. (See `docs-architecture` skill for context.) |
-| `sharp` install / postinstall fails | `pnpm-workspace.yaml` must keep `allowBuilds: { sharp: true }`. pnpm blocks postinstall scripts by default for security. |
-| `pnpm --filter starlight-docs ...` errors with "no projects matched" | Check `starlight/package.json#name` is still `"starlight-docs"` and `pnpm-workspace.yaml` still lists `starlight` under `packages:`. |
-| Built docs page has bare `/foo/` links that 404 | User-written links in MDX/frontmatter don't get the `base` prefix. Either use Starlight's slug-based linking or write `/docs/foo/`. |
+| Port 4321/4322 in use | `lsof -i :<port>` → `kill <pid>`. Or let Astro pick next (it logs it). |
+| `:4321/docs/` stale or 404 | By design. Use `:4322/docs/` for HMR or rerun `pnpm build:docs`. |
+| `npm install` was run | Delete `node_modules/` + `package-lock.json`, `pnpm install`. |
+| Build error `ENOENT .astro/_astro/*.webp` | Someone set `outDir` outside project. Don't — see docs-architecture. |
+| `sharp` postinstall fails | `pnpm-workspace.yaml` must keep `allowBuilds: { sharp: true }`. |
+| `pnpm --filter starlight-docs` → "no projects matched" | Check `starlight/package.json#name === "starlight-docs"` and workspace entry. |
+| Built page has bare `/foo/` links → 404 | User-written link missing `base`. Use slug or `/docs/...`. |
 
-## Future optimizations (not currently applied — document, don't preempt)
+## Documented, not applied
 
-- **Parallel build.** Today `build:docs` blocks `build:app` because main consumes `public/docs/`. Refactor: build both in parallel into their own `dist/`s, then a final `cp -R starlight/dist/* dist/docs/` stitches them. Saves ~0.5s today — apply only if/when build time becomes painful.
-- **Cross-platform build:docs.** `rm -rf` and `cp -R` are Unix-only. Swap to `cpy-cli` or a Node script if a Windows contributor joins.
+- Parallel build (~0.5s saved today): refactor so main and docs build into separate dirs, final `cp -R starlight/dist/* dist/docs/`. Apply only when build pain justifies the complexity.
+- Cross-platform `build:docs`: swap `rm -rf`/`cp -R` for `cpy-cli` or a Node script if Windows contributor joins.

@@ -1,50 +1,41 @@
 # Agent guide
 
-This file is the entry point for AI coding agents (Claude Code, Cursor, Codex, etc.) working in this repo.
+Agent-facing entry point. Optimize edits here for agent consumption — facts, tables, commands; not prose.
 
 ## Toolchain
 
-- **Package manager: pnpm** (with workspaces). `npm install` *appears* to work but silently ignores `pnpm-workspace.yaml` — you'll get the main app's deps and a broken docs build. If pnpm is missing: `corepack enable && corepack prepare pnpm@latest --activate`.
-- **Node: ≥22.12** (see `package.json#engines`).
-- **Single install at repo root** sets up both workspace packages — never run `pnpm install` from inside `starlight/`.
+- pnpm + workspaces (never `npm`/`yarn` — silently breaks docs build)
+- Node ≥22.12
+- Bootstrap if missing: `corepack enable && corepack prepare pnpm@latest --activate`
+- Always `pnpm install` from repo root
 
-## Project shape
+## Layout
 
-Two Astro projects in one pnpm workspace, sharing a domain but not a build:
+| Project | Path | URL | Dev port |
+|---|---|---|---|
+| Main app | `/` | `/` | `:4321` |
+| Starlight docs | `/starlight/` | `/docs/` | `:4322` |
 
-- **Main app** — repo root, served at `ui.plan.ai/`, dev port `:4321`
-- **Starlight docs** — `starlight/` subdir, served at `ui.plan.ai/docs/`, dev port `:4322`
+Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential.
 
-Docs are built first into `starlight/dist/`, copied to `public/docs/`, then the main app's build sweeps that into `dist/docs/` — final artifact is a single merged `dist/`.
-
-## Common commands
-
-```bash
-pnpm install      # one install at root sets up both workspace packages
-pnpm dev          # runs main app + docs concurrently
-pnpm build        # docs → main, ordered; produces merged dist/
-pnpm preview      # serves merged dist/
-```
-
-For working on a single side:
+## Commands
 
 ```bash
-pnpm dev:app      # main app only (:4321)
-pnpm dev:docs     # Starlight only (:4322/docs/)
-pnpm build:app    # main app only
-pnpm build:docs   # Starlight build + copy into public/docs
+pnpm dev          # both (concurrently)
+pnpm build        # ordered: docs → main
+pnpm preview      # serve dist/
+# Per-side: dev:app, dev:docs, build:app, build:docs
 ```
 
-## Detailed skills
+**Dev server: run via backgrounded Bash, not inline.** See `dev-build` skill.
 
-Deeper guidance lives in `.agents/skills/`. Read the relevant `SKILL.md` before doing non-trivial work in that area:
+## Skills
 
-- [`.agents/skills/docs-architecture/SKILL.md`](.agents/skills/docs-architecture/SKILL.md) — full file layout, build pipeline, and gotchas (base-prefix on user links, outDir image-cache bug, pnpm workspace plumbing). Read before changing structure, routing, or adding content.
-- [`.agents/skills/dev-build/SKILL.md`](.agents/skills/dev-build/SKILL.md) — operational reference for dev/build workflows: troubleshooting (ports, stale docs, sharp/install failures), adding dependencies to the right side, verifying a build, and future optimization paths. Read when something isn't running or building.
+- `.agents/skills/docs-architecture/SKILL.md` — layout, build pipeline, gotchas. Read before structural/routing changes.
+- `.agents/skills/dev-build/SKILL.md` — running, troubleshooting, deps, verification. Read when something won't run or build.
 
-## Conventions
+## Hard rules
 
-- Adding docs content → drop `.md`/`.mdx` in `starlight/src/content/docs/`. Directory structure becomes the URL path (relative to `/docs/`).
-- Adding main-app pages → drop `.astro`/`.md`/`.mdx` in `src/pages/`.
-- **Never write to `public/docs/` by hand** — it's owned by `build:docs` and `rm -rf`'d on every build. It's gitignored.
-- User-written links in MDX (e.g. `link: /guides/example/`) do **not** get auto-prefixed with `/docs`. Either use Starlight's slug-based linking or include `/docs/` explicitly.
+- Never write to `public/docs/` by hand — owned by `build:docs`, `rm -rf`'d each build, gitignored.
+- User-written links in MDX don't get `base` prefix. Use Starlight slug links or write `/docs/...` explicitly.
+- `starlight/package.json#name` is `starlight-docs` — the `pnpm --filter` handle. Don't rename.
