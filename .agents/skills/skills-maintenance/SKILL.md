@@ -37,6 +37,7 @@ For each changed file, check whether docs reference it:
 | `remarkBaseLinks` plugin in `starlight/astro.config.mjs` | `docs-architecture` (Link prefixing section) — removal/changes are breaking |
 | `starlight/src/content.config.ts` schema `extras` | `docs-architecture` (Other gotchas) — content depends on these keys |
 | `starlight/src/content/docs/index.md` splash hero `link:` fields | Must be base-prefixed manually (remark plugin doesn't touch frontmatter) |
+| Any `template: splash` page — including its body markdown links | Both frontmatter and body bypass `remarkPlugins`; write full `/docs/...` paths everywhere |
 | `public/robots.txt` | `deployment` skill; sitemap URL inside must match `site:` |
 | `public/favicon.svg` ↔ `starlight/public/favicon.svg` | Keep byte-identical (AGENTS.md hard rule) |
 | `src/pages/404.astro` (or its removal) | `AGENTS.md` Known-absent section |

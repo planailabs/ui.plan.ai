@@ -50,13 +50,15 @@ Sequential — main consumes `public/docs/`. Don't parallelize without restructu
 
 ## Link prefixing
 
-Starlight does **not** auto-prefix absolute-path markdown links with `base`. We fix this via a `remarkBaseLinks()` remark plugin defined inline in `starlight/astro.config.mjs` and wired into `markdown.remarkPlugins`. It walks every body markdown link node — if `url` starts with `/` and doesn't already start with `/docs/`, it prepends `/docs`. Covers all `.md`/`.mdx` content; idempotent.
+Starlight does **not** auto-prefix absolute-path markdown links with `base`. We fix this via a `remarkBaseLinks()` remark plugin defined inline in `starlight/astro.config.mjs` and wired into `markdown.remarkPlugins`. It walks every body markdown link node — if `url` starts with `/` and doesn't already start with `/docs/`, it prepends `/docs`. Covers regular `.md`/`.mdx` doc pages; idempotent.
 
-What it does NOT cover (frontmatter is not part of the markdown AST):
-- Splash `hero.actions[].link:` — write the full `/docs/...` path manually (only `index.md` uses this).
-- Any future custom frontmatter URL field.
+What it does NOT cover:
+- **Frontmatter** is not part of the markdown AST. Splash `hero.actions[].link:` and any custom URL frontmatter field must be written as full `/docs/...` paths.
+- **Splash template body markdown** (`template: splash` pages) — Starlight renders these through a different pipeline that bypasses `markdown.remarkPlugins`. The only splash page today is `index.md`; its body links must be written as full `/docs/...` paths. Tested empirically: regular doc pages get auto-prefixed, splash pages do not.
 
-If you add a new frontmatter field that contains a URL path, either (a) write it base-prefixed, or (b) extend the plugin / schema to normalize it.
+If you add a new splash page, write all of its body links + hero actions with explicit `/docs/` prefix. Validate via `curl -s <url> | grep -oE 'href="[^"]+"' | sort -u`.
+
+If you add a new frontmatter field that contains a URL path, write it base-prefixed (the plugin won't help).
 
 ## Other gotchas
 

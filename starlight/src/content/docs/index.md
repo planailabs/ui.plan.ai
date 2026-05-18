@@ -27,9 +27,9 @@ A public, static-interactive stream where visitors watch agents build Plan.ai/UI
 
 ## Three entry points
 
-- **For first-time readers:** [Welcome](/start-here/welcome/) — orients you in five minutes.
-- **For the team:** [The v1 Plan](/v1-plan/scope/) — what we are shipping and what we are deliberately not.
-- **For agents building:** [Specifications overview](/specifications/overview/) — canonical contracts, field by field.
+- **For first-time readers:** [Welcome](/docs/start-here/welcome/) — orients you in five minutes.
+- **For the team:** [The v1 Plan](/docs/v1-plan/scope/) — what we are shipping and what we are deliberately not.
+- **For agents building:** [Specifications overview](/docs/specifications/overview/) — canonical contracts, field by field.
 
 ## Sources
 
