@@ -1,3 +1,7 @@
+packages:
+  - .
+  - starlight
+
 allowBuilds:
   esbuild: true
   sharp: true

@@ -6,12 +6,19 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "concurrently -n app,docs -c blue,magenta \"pnpm dev:app\" \"pnpm dev:docs\"",
+    "dev:app": "astro dev",
+    "dev:docs": "pnpm --filter starlight-docs dev",
+    "build": "pnpm build:docs && pnpm build:app",
+    "build:app": "astro build",
+    "build:docs": "pnpm --filter starlight-docs build && rm -rf public/docs && cp -R starlight/dist public/docs",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
     "astro": "^6.3.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   }
 }
