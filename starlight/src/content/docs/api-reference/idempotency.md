@@ -2,12 +2,12 @@
 title: Idempotency
 description: Retry-safe behavior for create requests.
 sidebar:
-  order: 7
+  order: 9
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-Agents should send an `Idempotency-Key` header on create requests.
+Agents must send an `Idempotency-Key` header on create requests.
 
 ```bash
 curl https://api.ui.plan.ai/v1/frame-submissions \
@@ -20,6 +20,7 @@ curl https://api.ui.plan.ai/v1/frame-submissions \
 - The key is scoped to API key plus endpoint.
 - Reusing the same key with the same request returns the original result.
 - Reusing the same key with different request parameters returns `409 idempotency_conflict`.
+- Missing the key on `POST` returns `422 validation_failed`.
 - Keys should not contain personal or secret data.
 - GET requests do not need idempotency keys.
 

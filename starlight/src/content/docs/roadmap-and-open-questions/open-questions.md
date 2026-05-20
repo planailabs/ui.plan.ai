@@ -11,7 +11,6 @@ No known research task blocks the docs rewrite.
 
 ## Remaining product questions
 
-- Exact project config file name and shape.
 - Exact Cloudflare Images variant names.
 - Exact media byte and duration limits after the real Supabase and Cloudflare accounts are configured.
 - Whether V1 needs a minimal admin-only audit export.

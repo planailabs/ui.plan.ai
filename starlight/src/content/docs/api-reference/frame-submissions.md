@@ -2,12 +2,18 @@
 title: Frame submissions
 description: POST a frame, metadata, and small media into the V1 review pipeline.
 sidebar:
-  order: 3
+  order: 5
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
 `POST /v1/frame-submissions` creates a frame submission.
+
+The request must include `metadata` and one of:
+
+- `image` for the normal PNG/small-image path,
+- `video` only for configured small video,
+- `media_upload_id` inside metadata for large video that already has a direct upload session.
 
 ## Request
 

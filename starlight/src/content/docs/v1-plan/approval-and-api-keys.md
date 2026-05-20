@@ -2,7 +2,7 @@
 title: Approval & API keys
 description: Visibility policy precedence and bearer-key behavior in V1.
 sidebar:
-  order: 10
+  order: 13
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

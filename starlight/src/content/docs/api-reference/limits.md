@@ -2,7 +2,7 @@
 title: Limits
 description: V1 API and media limits that must come from project config.
 sidebar:
-  order: 8
+  order: 10
 stability: working
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

@@ -30,3 +30,11 @@ Starlight explains workflows. The machine-readable endpoint source lives in `sta
 ## D-2026-05-21-006 — Git history replaces live archives
 
 Old docs are replaced directly. The live docs should only describe current direction.
+
+## D-2026-05-21-007 — Browser auth uses PKCE and sessionStorage
+
+V1 team-member browser sessions use Supabase Auth with PKCE and `sessionStorage` as the default session store. Agents use API keys, not user sessions.
+
+## D-2026-05-21-008 — Project limits are config-driven
+
+Media, delivery, and API limits come from `config/project.config.json` and account-specific Supabase/Cloudflare limits, not hardcoded endpoint constants.

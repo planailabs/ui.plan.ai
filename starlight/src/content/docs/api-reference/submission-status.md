@@ -2,7 +2,7 @@
 title: Submission status
 description: Poll async frame and media processing state.
 sidebar:
-  order: 5
+  order: 7
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

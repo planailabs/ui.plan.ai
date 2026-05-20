@@ -2,7 +2,7 @@
 title: Media & delivery
 description: Source of truth and delivery strategy for V1 images and video.
 sidebar:
-  order: 9
+  order: 12
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
@@ -26,3 +26,10 @@ The Supabase bucket path for PNG originals is:
 ## Config
 
 Media size, MIME type, duration, and dimension limits live in project config. The API reads config and rejects oversized submissions before processing.
+
+## Cloudflare constraints
+
+- Private Cloudflare Images delivery uses predefined variants, not arbitrary flexible variants.
+- Supabase stores the Cloudflare image ID and variant names; the app must not infer IDs from storage paths.
+- Cloudflare Stream is the source of truth for large videos once a direct upload is created.
+- Delivery URLs should be short-lived or signed wherever the stream is team-only.

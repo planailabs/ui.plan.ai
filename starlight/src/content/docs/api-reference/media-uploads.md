@@ -2,7 +2,7 @@
 title: Media uploads
 description: Create direct upload sessions for large video media.
 sidebar:
-  order: 4
+  order: 6
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

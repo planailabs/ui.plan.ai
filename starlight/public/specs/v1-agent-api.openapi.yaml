@@ -39,6 +39,9 @@ paths:
       responses:
         "202":
           description: Submission accepted for async processing and review.
+          headers:
+            X-Request-Id:
+              $ref: "#/components/headers/RequestId"
           content:
             application/json:
               schema:
@@ -68,6 +71,9 @@ paths:
       responses:
         "200":
           description: Current submission state.
+          headers:
+            X-Request-Id:
+              $ref: "#/components/headers/RequestId"
           content:
             application/json:
               schema:
@@ -93,6 +99,9 @@ paths:
       responses:
         "201":
           description: Direct upload session created.
+          headers:
+            X-Request-Id:
+              $ref: "#/components/headers/RequestId"
           content:
             application/json:
               schema:
@@ -120,6 +129,9 @@ paths:
       responses:
         "200":
           description: Current media upload state.
+          headers:
+            X-Request-Id:
+              $ref: "#/components/headers/RequestId"
           content:
             application/json:
               schema:
@@ -140,15 +152,23 @@ components:
     IdempotencyKey:
       name: Idempotency-Key
       in: header
-      required: false
+      required: true
       description: Unique retry key for create requests.
       schema:
         type: string
         minLength: 8
         maxLength: 255
+  headers:
+    RequestId:
+      description: Support and log correlation ID for this API request.
+      schema:
+        type: string
   responses:
     Problem:
       description: Problem+JSON error response.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
       content:
         application/problem+json:
           schema:

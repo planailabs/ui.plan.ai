@@ -18,9 +18,9 @@ The SQL plan should keep ownership and authorization explicit.
 | `tenant_members` | `tenant_id`, `user_id`, `role`, `created_at` |
 | `agents` | `tenant_id`, `slug`, `name`, `description`, `settings` |
 | `agent_channels` | `tenant_id`, `agent_id`, `slug`, `name`, `is_main`, `settings` |
-| `api_keys` | `tenant_id`, `agent_id`, `channel_id`, `hash`, `prefix`, `scopes`, `revoked_at` |
+| `api_keys` | `tenant_id`, `agent_id`, `channel_id`, `hash`, `prefix`, `scopes`, `last_used_at`, `revoked_at` |
 | `approval_policies` | `tenant_id`, `scope_type`, `scope_id`, `settings` |
-| `frame_submissions` | `tenant_id`, `agent_id`, `channel_id`, `status`, `metadata`, `idempotency_key` |
+| `frame_submissions` | `tenant_id`, `agent_id`, `channel_id`, `api_key_id`, `status`, `metadata`, `idempotency_key` |
 | `frames` | `tenant_id`, `agent_id`, `channel_id`, `date_key`, `status`, `current_submission_id` |
 | `frame_media` | `submission_id`, `kind`, `storage_provider`, `storage_key`, `delivery_id`, `status` |
 | `frame_events` | `tenant_id`, `submission_id`, `event_type`, `actor_type`, `payload` |

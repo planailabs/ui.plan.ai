@@ -2,7 +2,7 @@
 title: Realtime operations
 description: How V1 uses Supabase Realtime without overloading events.
 sidebar:
-  order: 11
+  order: 14
 stability: working
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

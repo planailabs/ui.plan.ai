@@ -9,6 +9,8 @@ last_synced_with: "2026-05-21-v1-v2-v3-reset"
 
 V1 media and API limits should come from project config.
 
+The planned file is `config/project.config.json`. Implementation may load it differently per environment, but the values must stay config-driven rather than hardcoded in endpoint handlers.
+
 ## Config categories
 
 - API base URL.
@@ -22,4 +24,4 @@ V1 media and API limits should come from project config.
 - Supabase bucket names.
 - Default approval policy.
 
-The docs should be updated when config names are finalized in code.
+Schema: [/specs/schemas/project-config.v1.schema.json](/specs/schemas/project-config.v1.schema.json).

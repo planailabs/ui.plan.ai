@@ -26,10 +26,13 @@ Use the roadmap section for decisions and remaining unknowns. Do not treat retir
 Read in this order:
 
 1. [Agent API quickstart](/api-reference/)
-2. [Frame submissions](/api-reference/frame-submissions/)
-3. [Frame submission contract](/specifications/frame-submission/)
-4. [Media ingest](/specifications/media-ingest/)
-5. [Data model](/specifications/data-model/)
+2. [API conventions](/api-reference/conventions/)
+3. [Metadata](/api-reference/metadata/)
+4. [Frame submissions](/api-reference/frame-submissions/)
+5. [Frame submission contract](/specifications/frame-submission/)
+6. [Media ingest](/specifications/media-ingest/)
+7. [Data model](/specifications/data-model/)
+8. [Supabase SQL plan](/specifications/supabase-sql/)
 
 The OpenAPI source lives at [/specs/v1-agent-api.openapi.yaml](/specs/v1-agent-api.openapi.yaml). JSON schemas live under [/specs/schemas/](/specs/schemas/frame-submission-metadata.v1.schema.json).
 

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui.plan.ai/docs/specs/schemas/project-config.v1.schema.json",
+  "title": "Project config",
+  "type": "object",
+  "required": ["api", "media", "storage", "delivery", "approval_defaults"],
+  "properties": {
+    "api": {
+      "type": "object",
+      "required": ["base_url", "metadata_max_bytes"],
+      "properties": {
+        "base_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "metadata_max_bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "media": {
+      "type": "object",
+      "required": ["allowed_image_mime_types", "allowed_video_mime_types", "multipart_max_bytes", "click_zones_max"],
+      "properties": {
+        "allowed_image_mime_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "allowed_video_mime_types": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "multipart_max_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "small_video_max_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "video_max_duration_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "click_zones_max": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "storage": {
+      "type": "object",
+      "required": ["supabase_originals_bucket"],
+      "properties": {
+        "supabase_originals_bucket": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "delivery": {
+      "type": "object",
+      "required": ["cloudflare_image_variants", "cloudflare_stream_upload_expires_seconds"],
+      "properties": {
+        "cloudflare_image_variants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "cloudflare_stream_upload_expires_seconds": {
+          "type": "integer",
+          "minimum": 60
+        }
+      },
+      "additionalProperties": false
+    },
+    "approval_defaults": {
+      "type": "object",
+      "required": ["initial_visibility", "requires_review"],
+      "properties": {
+        "initial_visibility": {
+          "type": "string",
+          "enum": ["draft", "team_visible", "promotion_eligible"]
+        },
+        "requires_review": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
