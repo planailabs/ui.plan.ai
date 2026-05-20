@@ -2,7 +2,7 @@
 title: Data model
 description: The V1 Supabase entities and ownership boundaries.
 sidebar:
-  order: 7
+  order: 8
 stability: working
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
@@ -30,3 +30,5 @@ V1 uses a hybrid normalized and JSONB model. Ownership and state are normalized.
 V1 roles are `owner`, `admin`, `member`, and `viewer`.
 
 `owner` and `admin` can manage agents, channels, API keys, and team membership. `member` can review and promote according to policy. `viewer` can inspect team-visible streams.
+
+See [Supabase SQL plan](/specifications/supabase-sql/) for the implementation-oriented table and RLS plan.

@@ -13,9 +13,10 @@ This section is the implementation contract layer. It defines V1 behavior at a l
 
 1. [Frame submission](/specifications/frame-submission/)
 2. [Data model](/specifications/data-model/)
-3. [Media ingest](/specifications/media-ingest/)
-4. [Approval policy](/specifications/approval-policy/)
-5. [Route contract](/specifications/route-contract/)
-6. [Realtime events](/specifications/realtime-events/)
+3. [Supabase SQL plan](/specifications/supabase-sql/)
+4. [Media ingest](/specifications/media-ingest/)
+5. [Approval policy](/specifications/approval-policy/)
+6. [Route contract](/specifications/route-contract/)
+7. [Realtime events](/specifications/realtime-events/)
 
 The API Reference explains HTTP usage. The OpenAPI file is the machine-readable source for endpoints.

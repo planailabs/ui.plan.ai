@@ -2,7 +2,7 @@
 title: Media ingest
 description: V1 media ingest rules for multipart submissions and direct video upload.
 sidebar:
-  order: 4
+  order: 5
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
@@ -27,3 +27,7 @@ The API validates:
 Large video uses `POST /v1/media-uploads` to create an upload session. Cloudflare Stream is the primary source of truth for those videos. The frame submission references `media_upload_id`.
 
 This avoids proxying large video through Supabase Edge Functions.
+
+## Delivery promotion
+
+Media processing creates or updates `frame_media` rows. The Workbench should show original status, delivery provider, Cloudflare asset ID, and whether signed delivery is ready.

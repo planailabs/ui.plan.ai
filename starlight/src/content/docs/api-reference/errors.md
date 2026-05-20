@@ -2,7 +2,7 @@
 title: Errors
 description: Problem+JSON error responses for the V1 Agent API.
 sidebar:
-  order: 6
+  order: 8
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
@@ -40,3 +40,5 @@ Errors use `application/problem+json`.
 | `validation_failed` | 422 |
 | `rate_limited` | 429 |
 | `internal_error` | 500 |
+
+Every response includes an `X-Request-Id` header. Include it when debugging a failed agent run.

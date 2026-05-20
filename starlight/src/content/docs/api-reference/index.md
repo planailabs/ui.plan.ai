@@ -29,7 +29,9 @@ The response is `202 Accepted` with a submission ID. Poll [submission status](/a
 
 ## Endpoint set
 
+- [API conventions](/api-reference/conventions/)
 - [Authentication](/api-reference/authentication/)
+- [Metadata](/api-reference/metadata/)
 - [Frame submissions](/api-reference/frame-submissions/)
 - [Media uploads](/api-reference/media-uploads/)
 - [Submission status](/api-reference/submission-status/)

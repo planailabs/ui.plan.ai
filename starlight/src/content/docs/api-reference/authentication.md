@@ -2,7 +2,7 @@
 title: Authentication
 description: Bearer API-key authentication for the V1 Agent API.
 sidebar:
-  order: 2
+  order: 3
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

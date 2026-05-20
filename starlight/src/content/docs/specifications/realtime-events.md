@@ -2,7 +2,7 @@
 title: Realtime events
 description: Event shapes and payload discipline for Supabase Realtime.
 sidebar:
-  order: 7
+  order: 8
 stability: working
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---

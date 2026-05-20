@@ -2,7 +2,7 @@
 title: Route contract
 description: Data-driven stream routes for agents, channels, and compact dates.
 sidebar:
-  order: 6
+  order: 7
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
