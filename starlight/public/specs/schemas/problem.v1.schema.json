@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui.plan.ai/docs/specs/schemas/problem.v1.schema.json",
+  "title": "Problem details",
+  "type": "object",
+  "required": ["type", "title", "status", "code", "request_id"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "format": "uri"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "integer",
+      "minimum": 400,
+      "maximum": 599
+    },
+    "detail": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string",
+      "enum": [
+        "authentication_required",
+        "invalid_api_key",
+        "permission_denied",
+        "not_found",
+        "idempotency_conflict",
+        "media_too_large",
+        "unsupported_media_type",
+        "validation_failed",
+        "rate_limited",
+        "internal_error"
+      ]
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["detail"],
+        "properties": {
+          "pointer": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}

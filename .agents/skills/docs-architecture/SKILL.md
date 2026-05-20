@@ -24,6 +24,7 @@ Two Astro projects in one pnpm workspace; merged into one `dist/`.
     ├── astro.config.mjs      # base: '/docs', server.port: 4322
     ├── src/content/docs/     # all docs content (.md/.mdx)
     ├── src/content.config.ts
+    ├── public/specs/          # static OpenAPI/JSON-schema files served at /docs/specs/
     └── src/assets/           # docs images (sharp-optimized)
 ```
 
@@ -54,7 +55,7 @@ Starlight does **not** auto-prefix absolute-path markdown links with `base`. We 
 
 What it does NOT cover:
 - **Frontmatter** is not part of the markdown AST. Splash `hero.actions[].link:` and any custom URL frontmatter field must be written as full `/docs/...` paths.
-- **Splash template body markdown** (`template: splash` pages) — Starlight renders these through a different pipeline that bypasses `markdown.remarkPlugins`. The only splash page today is `index.md`; its body links must be written as full `/docs/...` paths. Tested empirically: regular doc pages get auto-prefixed, splash pages do not.
+- **Splash template body markdown** (`template: splash` pages) — Starlight renders these through a different pipeline that bypasses `markdown.remarkPlugins`. There is no splash page today; if one is added, its body links must be written as full `/docs/...` paths. Tested empirically: regular doc pages get auto-prefixed, splash pages do not.
 
 If you add a new splash page, write all of its body links + hero actions with explicit `/docs/` prefix. Validate via `curl -s <url> | grep -oE 'href="[^"]+"' | sort -u`.
 
@@ -66,11 +67,12 @@ If you add a new frontmatter field that contains a URL path, write it base-prefi
 - `pnpm install` from inside `starlight/` walks up to workspace root anyway — always install from repo root.
 - `build:docs` uses `rm -rf` + `cp -R` — Unix-only.
 - No link from `/` → `/docs/` by design.
-- Content schema is extended (`starlight/src/content.config.ts`) for custom keys: `stability` (`stable` | `working` | `experimental`), `last_synced_with` (string), `sources` (array of strings). Required by the migrated content. Removing these is a breaking change.
+- Content schema is extended (`starlight/src/content.config.ts`) for custom keys: `stability` (`stable` | `working` | `experimental`), `last_synced_with` (string), `sources` (array of strings). Required by the docs content. Removing these is a breaking change.
 
 ## Adding content
 
 - Docs: `.md`/`.mdx` in `starlight/src/content/docs/`. Path = URL (relative to `/docs/`). Sidebar in `starlight/astro.config.mjs` or `autogenerate`.
+- Static API/spec assets: `starlight/public/specs/`. Path = URL (relative to `/docs/specs/`).
 - Docs images: `starlight/src/assets/`, ref relatively in MDX.
 - Main app pages: `src/pages/`.
 - Main app static: `public/` — **never `public/docs/`**.

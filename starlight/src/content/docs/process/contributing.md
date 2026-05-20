@@ -1,63 +1,22 @@
 ---
 title: Contributing
-description: How a team member (or agent) makes a change to the docs or the project.
+description: How team members and agents change the V1 platform docs and implementation.
 sidebar:
-  order: 4
+  order: 1
 stability: stable
-last_synced_with: "folder-7"
+last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-## Two kinds of contribution
+Contributions should preserve the current V1/V2/V3 strategy.
 
-1. **Docs change** — to this section. Always welcome. PR against `docs/8 final-docs/`.
-2. **Project change** — to the new project's repo. Follows [How agents propose changes](/process/how-agents-propose/) and [PR & promotion workflow](/process/promotion-workflow/).
+## Rules
 
-This page is about the first kind.
+- Use feature branches and local verification before PR.
+- Keep API behavior synchronized across prose docs, OpenAPI, and JSON schemas.
+- Do not reintroduce retired route assumptions.
+- Do not add V3 billing or public-tenant requirements to V1 implementation work.
+- Do not copy `plan.ai-chat-turk` as a schema blueprint; use it only as implementation inspiration.
 
-## Docs PR checklist
+## Documentation changes
 
-- [ ] The change targets a file in `docs/8 final-docs/`.
-- [ ] Folders 1–7 in `docs/` are untouched.
-- [ ] Every edited or new page has frontmatter: `title`, `description`, `sidebar.order`, `stability`, `last_synced_with`, `sources`.
-- [ ] Every edited or new page ends with a `## Sources` block.
-- [ ] No forbidden term (see [Forbidden terms](/reference/forbidden-terms/)) appears outside `archive/`.
-- [ ] No German text appears outside `archive/`.
-- [ ] All internal cross-links resolve.
-- [ ] The new content uses canonical [Glossary](/reference/glossary/) terms.
-- [ ] If a `:::tip[Options]` admonition is added, a matching entry exists in [Options to decide](/roadmap-and-open-questions/options-to-decide/).
-
-## Demoting a `stable` page
-
-If new code or a folder-7+ update contradicts a `stable` page, do not silently rewrite it:
-
-1. Change `stability: stable` to `stability: working` in the frontmatter.
-2. Add an `Open:` note at the top of the page describing the drift.
-3. File or update the relevant entry in [Options to decide](/roadmap-and-open-questions/options-to-decide/).
-4. Push the change as its own PR; do not bundle with unrelated edits.
-
-## Adding a new page
-
-A new page needs:
-
-- A clear place in the sidebar (existing section preferred).
-- Frontmatter with all required fields.
-- At least one source citation in `sources` and at the bottom.
-- A reason: which decision or research it supports.
-
-A new top-level sidebar group requires a [Decision log](/roadmap-and-open-questions/decision-log/) entry. Top-level structure is not edited casually.
-
-## Archive moves
-
-A page that no longer reflects the project's direction is moved (not deleted) to `archive/superseded.md`. The move records:
-
-- The old page's title and slug.
-- One sentence on what it was.
-- One sentence on what superseded it (with a link).
-
-## When in doubt
-
-Ask. Open a draft PR with a question in the description. The team prefers an early draft to a polished PR that misunderstood the intent.
-
-## Sources
-
-- This page is a procedural derivative of the conventions throughout the other pages; no single source file applies.
+When a change touches data model, API shape, route shape, settings, or media limits, update the corresponding Starlight pages in the same commit.
