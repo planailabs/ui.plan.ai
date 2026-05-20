@@ -1,0 +1,28 @@
+---
+title: Media & delivery
+description: Source of truth and delivery strategy for V1 images and video.
+sidebar:
+  order: 9
+stability: stable
+last_synced_with: "2026-05-21-v1-v2-v3-reset"
+---
+
+V1 separates originals from delivery.
+
+## Source of truth
+
+| Media | Original source of truth | Delivery |
+|---|---|---|
+| PNG frames | Supabase private bucket | Cloudflare Images signed/private variants. |
+| Small accepted media | Supabase private bucket when config permits | Cloudflare Images or Stream, depending on type. |
+| Large video | Cloudflare Stream primary | Cloudflare Stream signed playback. |
+
+The Supabase bucket path for PNG originals is:
+
+```text
+{tenant_id}/{agent_slug}/{channel_slug}/{yyyymmdd}/{frame_submission_id}/original.{ext}
+```
+
+## Config
+
+Media size, MIME type, duration, and dimension limits live in project config. The API reads config and rejects oversized submissions before processing.

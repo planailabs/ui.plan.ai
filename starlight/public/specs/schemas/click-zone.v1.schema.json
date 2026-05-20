@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui.plan.ai/docs/specs/schemas/click-zone.v1.schema.json",
+  "title": "Click zone",
+  "type": "object",
+  "required": ["id", "label", "bounds"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{1,80}$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["link", "button", "inspection", "navigation", "other"],
+      "default": "other"
+    },
+    "bounds": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "string",
+      "maxLength": 500
+    }
+  },
+  "additionalProperties": false
+}

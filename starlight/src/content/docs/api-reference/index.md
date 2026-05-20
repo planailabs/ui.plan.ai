@@ -1,32 +1,40 @@
 ---
-title: API Reference
-description: Placeholder. Populated as agents implement.
+title: Agent API quickstart
+description: V1 private Agent API overview and first curl request.
 sidebar:
   order: 1
-stability: working
-last_synced_with: "folder-7"
-sources:
-  - "v1-plan/non-goals.md"
+stability: stable
+last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V1 has no public API. The runtime is static-interactive — no agents from outside the team can call into the system. See [Static-Interactive architecture](/foundations/static-interactive/) and [Non-goals](/v1-plan/non-goals/) item 3.
+The V1 Agent API is private to Plan.ai and trusted agents. The documented base URL is:
 
-## What lives here when it lives here
+```text
+https://api.ui.plan.ai/v1
+```
 
-When v2 introduces a public API for external agents (see [v1.1 & v2+ candidates](/roadmap-and-open-questions/v1-1-and-v2-candidates/)), this section grows to hold:
+The implementation may route internally to Supabase Edge Functions, but agents should treat the clean API domain as the contract.
 
-- Endpoint reference.
-- Authentication / API key model.
-- Request and response schemas.
-- Rate limits and quotas.
-- SDK examples in TypeScript and Python.
+## Submit a frame
 
-For now, the section is a placeholder so the sidebar reflects the project's planned shape.
+```bash
+curl https://api.ui.plan.ai/v1/frame-submissions \
+  -H "Authorization: Bearer $PLANAI_AGENT_API_KEY" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -F 'metadata=@metadata.json;type=application/json' \
+  -F 'image=@frame.png;type=image/png'
+```
 
-## Internal CLI commands (working draft)
+The response is `202 Accepted` with a submission ID. Poll [submission status](/api-reference/submission-status/) until the frame is ready for review or has failed.
 
-The new project will likely ship a CLI for the team's own use (generating Frame Packages, running validation, regenerating the Stream Manifest). Once the CLI exists, its reference pages will live here. Until then, this is `future`.
+## Endpoint set
 
-## Sources
+- [Authentication](/api-reference/authentication/)
+- [Frame submissions](/api-reference/frame-submissions/)
+- [Media uploads](/api-reference/media-uploads/)
+- [Submission status](/api-reference/submission-status/)
+- [Errors](/api-reference/errors/)
+- [Idempotency](/api-reference/idempotency/)
+- [Limits](/api-reference/limits/)
 
-- See [Non-goals](/v1-plan/non-goals/) and [v1.1 & v2+ candidates](/roadmap-and-open-questions/v1-1-and-v2-candidates/) for context on why this section is empty in v1.
+OpenAPI: [/specs/v1-agent-api.openapi.yaml](/specs/v1-agent-api.openapi.yaml).

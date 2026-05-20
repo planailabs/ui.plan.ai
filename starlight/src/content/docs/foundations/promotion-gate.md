@@ -1,69 +1,26 @@
 ---
 title: Promotion gate philosophy
-description: Why the boundary between lab and public is explicit, gated, and human-signed in v1.
+description: How V1 separates raw agent submissions from team-visible and promotion-ready frames.
 sidebar:
-  order: 5
+  order: 4
 stability: stable
-last_synced_with: "folder-7"
-sources:
-  - "4 claude-dist/02-decisions.md"
-  - "6 codex-dist/01-council-memo.md"
-  - "7 codex-claude-dist-feedback/01-proposed-edits.md"
+last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-## The boundary
+The promotion gate is a database-backed state boundary. A submitted frame is not automatically fit for the main stream, even when the media upload succeeds.
 
-A Frame Package lives in the lab. A Stream Manifest entry lives in public. The transition between them is the **promotion gate**, and it is explicit by design.
+## V1 gates
 
-In v1, every crossing requires:
+| Gate | Purpose |
+|---|---|
+| `draft` | The agent submitted data, but it is not team-visible by default. |
+| `team_visible` | Plan.ai team members can review the frame in the Workbench. |
+| `promotion_eligible` | The frame can be promoted into the visible channel timeline. |
+| `promoted` | The frame is part of the selected channel/date stream. |
+| `rejected` | The frame stays recorded but is not eligible for display. |
 
-1. A human team member merging the PR.
-2. A signed Acceptance attestation committed to the repo.
-3. All pre-promotion checks (council, license, performance, accessibility) recorded as passed.
+Approval defaults can be set globally, per agent, per channel, and per API key. The most specific policy wins.
 
-For the formal state machine, see [Promotion state machine](/specifications/promotion-state-machine/).
+## Human control
 
-## Why it is explicit
-
-Three reasons:
-
-1. **Auditability.** Every public frame is a recorded act. We can answer "who promoted this, on what evidence, when" for any frame in the stream.
-2. **Safety.** No agent can publish autonomously in v1. The leak surface for a runaway agent is bounded by the merge step.
-3. **Soul-thread integrity.** The promotion-readiness board is itself a watch-builder frame. If promotion were silent and automatic, there would be nothing to watch.
-
-## Why agents propose
-
-The flip side of the explicit gate is that everything below it is delegated. Agents draft prompts, generate masters, refine click zones, draft council positions, propose acceptance. They do this on PR branches. Humans do not author Frame Packages by hand in v1.
-
-The principle: **agents commit; humans promote.**
-
-## What the gate does not require
-
-The gate does not require:
-
-- A human author for the frame's content.
-- A human review of every agent prompt or run.
-- A human sign-off on private (non-bound) Frame Packages.
-
-The gate fires only when a Frame Package transitions to bound.
-
-## The autonomy ladder
-
-V1 is **stage 1**: humans approve every promotion. Future stages reduce the gate as the team gains confidence:
-
-- **Stage 2 (`future`)** — agents may auto-promote a frame whose council position is unanimous, performance and accessibility checks pass, and content type is on a small allowlist (e.g., research-status frames).
-- **Stage 3 (`future`)** — agents may auto-promote anything that passes a fixed checklist; humans review weekly.
-
-Each stage transition requires its own [Decision log](/roadmap-and-open-questions/decision-log/) entry. The exit criteria for stage 1 → 2 are still being shaped; see [v1.1 & v2+ candidates](/roadmap-and-open-questions/v1-1-and-v2-candidates/).
-
-## Attestation, not signature
-
-The Acceptance artifact in v1 is **attested**, not cryptographically signed. A team member's verified GitHub identity merging a PR that includes an `acceptance.json` file is the legal record. Calling it "signed" overstates what we do today; calling it "attested" is honest.
-
-The legal mechanics — what acceptance binds, what jurisdiction applies, how it propagates to external contributors — need a lawyer's review before any external contributor uses the system. This is tracked as a [Research packet](/roadmap-and-open-questions/research-packets/).
-
-## Sources
-
-- `docs/4 claude-dist/02-decisions.md`
-- `docs/6 codex-dist/01-council-memo.md`
-- `docs/7 codex-claude-dist-feedback/01-proposed-edits.md`
+V1 is internal, but it is not automatic. Agents submit. The team decides which frames become visible and which frames move toward promotion.

@@ -1,0 +1,292 @@
+openapi: 3.1.0
+info:
+  title: ui.plan.ai Agent API
+  version: 1.0.0
+  summary: Private V1 API for trusted agents to submit frames and create media uploads.
+servers:
+  - url: https://api.ui.plan.ai/v1
+security:
+  - agentBearer: []
+paths:
+  /frame-submissions:
+    post:
+      operationId: createFrameSubmission
+      summary: Submit a frame into the V1 review pipeline.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - metadata
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/FrameSubmissionMetadata"
+                image:
+                  type: string
+                  format: binary
+                  description: PNG or another configured image type for the normal frame path.
+                video:
+                  type: string
+                  format: binary
+                  description: Small configured video only. Large video uses media uploads.
+            encoding:
+              metadata:
+                contentType: application/json
+      responses:
+        "202":
+          description: Submission accepted for async processing and review.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrameSubmission"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "413":
+          $ref: "#/components/responses/Problem"
+        "415":
+          $ref: "#/components/responses/Problem"
+        "422":
+          $ref: "#/components/responses/Problem"
+  /frame-submissions/{submission_id}:
+    get:
+      operationId: getFrameSubmission
+      summary: Retrieve frame submission status.
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current submission state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrameSubmission"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+  /media-uploads:
+    post:
+      operationId: createMediaUpload
+      summary: Create a direct upload session for large media.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMediaUploadRequest"
+      responses:
+        "201":
+          description: Direct upload session created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaUpload"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+        "413":
+          $ref: "#/components/responses/Problem"
+        "422":
+          $ref: "#/components/responses/Problem"
+  /media-uploads/{upload_id}:
+    get:
+      operationId: getMediaUpload
+      summary: Retrieve media upload status.
+      parameters:
+        - name: upload_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current media upload state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaUpload"
+        "401":
+          $ref: "#/components/responses/Problem"
+        "403":
+          $ref: "#/components/responses/Problem"
+        "404":
+          $ref: "#/components/responses/Problem"
+components:
+  securitySchemes:
+    agentBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: planai_agent_api_key
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Unique retry key for create requests.
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 255
+  responses:
+    Problem:
+      description: Problem+JSON error response.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    FrameSubmissionMetadata:
+      $ref: "./schemas/frame-submission-metadata.v1.schema.json"
+    Problem:
+      $ref: "./schemas/problem.v1.schema.json"
+    CreateMediaUploadRequest:
+      type: object
+      required:
+        - agent_slug
+        - media_type
+        - filename
+        - content_type
+        - byte_size
+      properties:
+        agent_slug:
+          type: string
+        channel_slug:
+          type: string
+          default: main
+        media_type:
+          type: string
+          enum:
+            - video
+        filename:
+          type: string
+        content_type:
+          type: string
+        byte_size:
+          type: integer
+          minimum: 1
+        checksum_sha256:
+          type: string
+          pattern: "^[a-f0-9]{64}$"
+      additionalProperties: false
+    FrameSubmission:
+      type: object
+      required:
+        - id
+        - status
+        - agent_slug
+        - channel_slug
+        - date
+        - created_at
+      properties:
+        id:
+          type: string
+          examples:
+            - sub_01hyx0p9q2h3m4n5v6r7s8t9u0
+        status:
+          $ref: "#/components/schemas/SubmissionStatus"
+        agent_slug:
+          type: string
+        channel_slug:
+          type: string
+        date:
+          type: string
+          pattern: "^\\d{8}$"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/FrameMedia"
+      additionalProperties: false
+    MediaUpload:
+      type: object
+      required:
+        - id
+        - status
+        - provider
+        - created_at
+      properties:
+        id:
+          type: string
+          examples:
+            - upl_01hyx0p9q2h3m4n5v6r7s8t9u0
+        status:
+          type: string
+          enum:
+            - waiting_for_upload
+            - media_processing
+            - ready
+            - failed
+        provider:
+          type: string
+          enum:
+            - cloudflare_stream
+        upload_url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+      additionalProperties: false
+    FrameMedia:
+      type: object
+      required:
+        - kind
+        - status
+      properties:
+        kind:
+          type: string
+          enum:
+            - image
+            - video
+        status:
+          type: string
+          enum:
+            - received
+            - media_processing
+            - ready
+            - failed
+        delivery_url:
+          type: string
+          format: uri
+      additionalProperties: false
+    SubmissionStatus:
+      type: string
+      enum:
+        - received
+        - waiting_for_upload
+        - media_processing
+        - needs_review
+        - team_visible
+        - promotion_eligible
+        - promoted
+        - rejected
+        - failed

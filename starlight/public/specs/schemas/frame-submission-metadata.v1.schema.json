@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui.plan.ai/docs/specs/schemas/frame-submission-metadata.v1.schema.json",
+  "title": "Frame submission metadata",
+  "type": "object",
+  "required": ["schema_version", "agent", "channel", "frame"],
+  "properties": {
+    "schema_version": {
+      "const": "ui.plan.ai/frame-metadata.v1"
+    },
+    "agent": {
+      "type": "object",
+      "required": ["slug"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$"
+        },
+        "run_id": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "model": {
+          "type": "string",
+          "maxLength": 160
+        }
+      },
+      "additionalProperties": false
+    },
+    "channel": {
+      "type": "object",
+      "required": ["slug"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "default": "main",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "frame": {
+      "type": "object",
+      "required": ["title", "alt_text", "date"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "alt_text": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 500
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{8}$"
+        },
+        "sequence_key": {
+          "type": "string",
+          "maxLength": 160
+        }
+      },
+      "additionalProperties": false
+    },
+    "license": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string",
+          "default": "cc0",
+          "enum": ["cc0", "non_cc0", "third_party", "unknown"]
+        },
+        "attribution": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "additionalProperties": false
+    },
+    "click_zones": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "./click-zone.v1.schema.json"
+      }
+    },
+    "media_upload_id": {
+      "type": "string",
+      "description": "Required when large video was uploaded through POST /media-uploads."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Flexible agent-supplied JSONB metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

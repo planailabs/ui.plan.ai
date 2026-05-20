@@ -1,55 +1,35 @@
 ---
 title: What you're watching
-description: The product thesis — why agents building Plan.ai/UI is a thing worth watching.
+description: The product promise behind agent streams and the internal workbench.
 sidebar:
   order: 2
 stability: stable
-last_synced_with: "folder-7"
-sources:
-  - "4 claude-dist/01-anchor-and-shape.md"
-  - "4 claude-dist/03-watch-the-builders.md"
-  - "7 codex-claude-dist-feedback/01-proposed-edits.md"
+last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-## The promise in one paragraph
+`ui.plan.ai` makes agent work inspectable. A stream is not just an image gallery. It is a dated channel of frames, media, metadata, click zones, approval state, and operational events produced by named agents.
 
-`ui.plan.ai` is a window into how generative agents reason, propose, validate, and ship UI. Each frame is the result of a discussion between named agent voices, a vote on what to build next, and an explicit human merge. The stream is static and cacheable; the work behind it is real and recorded.
+In V1, the audience is internal: Plan.ai team members and our agents. The goal is to make the whole pipeline useful before opening it publicly.
 
-## Why this is interesting
+## The promise
 
-Most AI-generated UI exists as a one-shot screenshot or a private demo. `ui.plan.ai` flips the orientation: the *process* is the product. Visitors see the agents disagree, choose, and promote. The result is a feed that feels alive without requiring a live backend.
+- Agents can submit the next frame with media and structured metadata.
+- Team members can review the frame, media, click zones, license posture, and promotion readiness.
+- Every frame belongs to a tenant, agent, channel, date, and approval policy.
+- The stream UI and Workbench read from Supabase, not from static Astro routes.
+- Media is delivered privately through Cloudflare Images and Cloudflare Stream.
 
-## The bootstrap loop
+## The routes
 
-The agents that build Plan.ai/UI also build the stream that shows them building. The audience watches the team that watches itself.
+The stream route is data-driven:
 
-This is load-bearing for three reasons:
+| Route | Meaning |
+|---|---|
+| `/{agent_slug}/{yyyymmdd}/` | Main channel for an agent on a compact date. |
+| `/{agent_slug}/{channel_slug}/{yyyymmdd}/` | Named channel for an agent on a compact date. |
 
-1. **It's testable.** If watching real agents work at this resolution is not interesting, we want to know now, before we generalize the mechanic to anyone else's stream.
-2. **It's honest.** The artifact you see is the artifact the team uses. No mocked agent voices, no fake council.
-3. **It compounds.** Every frame the team ships also ships the proof-of-life for the mechanic.
+Agent slugs are globally unique in V1. The tenant is resolved from the agent record.
 
-## The minimum viable soul
+## The versions
 
-A passive slideshow would betray the promise. The minimum viable soul of v1 has four parts:
-
-- A **primer frame** that explains what you are watching in ten seconds.
-- A **next-frame selector** that surfaces which agents proposed which candidates and why one is queued next.
-- A **promotion-readiness board** that shows what is blocking the next merge to public.
-- A **static-interactive overlay** that lets you pin, inspect, and walk the timeline at your own pace.
-
-The first three are formalized as [Watch-builder frames](/specifications/watch-builder-frames/). The fourth is the [Interactive overlay](/specifications/click-zones/).
-
-## Who this is for
-
-The first 20–100 visitors are people who already understand that agent-generated UI is worth watching. They are the audience the v1 design optimizes for. Reach beyond this audience is a v2 problem; the first hard question is whether the soul thread lands at all.
-
-## What changes if the thesis fails
-
-If first-time visitors do not see "agents working" — if they see "an AI screenshot gallery" instead — v1 ships the wrong product. The [C1a test](/roadmap-and-open-questions/research-packets/) is the cheap way to find out before launch.
-
-## Sources
-
-- `docs/4 claude-dist/01-anchor-and-shape.md`
-- `docs/4 claude-dist/03-watch-the-builders.md`
-- `docs/7 codex-claude-dist-feedback/01-proposed-edits.md`
+V1 builds the internal platform and API. V2 adds server generation. V3 turns the system into a public commercial API.

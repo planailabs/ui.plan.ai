@@ -63,7 +63,7 @@ Both run on CI; failing locally avoids burning CI minutes and the slow round-tri
 ```
 dist/
 ├── index.html, favicon.*
-└── docs/{index.html (splash), start-here/, foundations/, process/, v1-plan/, specifications/, reference/, api-reference/, roadmap-and-open-questions/, archive/, _astro/, pagefind/, sitemap-*.xml}
+└── docs/{index.html (redirect), start-here/, foundations/, process/, v1-plan/, v2-plan/, v3-plan/, specifications/, api-reference/, reference/, roadmap-and-open-questions/, specs/, _astro/, pagefind/, sitemap-*.xml}
 ```
 
 Base-prefix sanity check:

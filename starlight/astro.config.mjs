@@ -9,25 +9,31 @@ import starlight from '@astrojs/starlight';
  * in the remark pipeline and covers all .md/.mdx body content.
  * Frontmatter fields (e.g. splash `hero.actions[].link`) are NOT touched —
  * those must be written with the full path explicitly.
+ *
+ * @typedef {{ type?: string, url?: string, children?: MarkdownNode[] }} MarkdownNode
  */
 function remarkBaseLinks(base = '/docs') {
+	/** @param {MarkdownNode} node @param {(node: MarkdownNode) => void} fn */
 	const walk = (node, fn) => {
 		if (node.type === 'link') fn(node);
 		if (Array.isArray(node.children)) node.children.forEach((c) => walk(c, fn));
 	};
-	return () => (tree) =>
-		walk(tree, (n) => {
-			const url = n.url;
-			if (
-				typeof url === 'string' &&
-				url.startsWith('/') &&
-				!url.startsWith('//') &&
-				!url.startsWith(base + '/') &&
-				url !== base
-			) {
-				n.url = base + url;
-			}
-		});
+	return () => {
+		/** @param {MarkdownNode} tree */
+		return (tree) =>
+			walk(tree, (n) => {
+				const url = n.url;
+				if (
+					typeof url === 'string' &&
+					url.startsWith('/') &&
+					!url.startsWith('//') &&
+					!url.startsWith(base + '/') &&
+					url !== base
+				) {
+					n.url = base + url;
+				}
+			});
+	};
 }
 
 // Served at /docs of the main app (ui.plan.ai/docs).
@@ -55,18 +61,19 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'ui.plan.ai',
-			description: 'A static-interactive public stream where visitors watch agents build Plan.ai/UI itself, frame by frame.',
+			description: 'An internal Supabase-backed platform and Agent API for Plan.ai agent-generated UI streams.',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
 			sidebar: [
 				{ label: 'Start here', items: [{ autogenerate: { directory: 'start-here' } }] },
 				{ label: 'Foundations', items: [{ autogenerate: { directory: 'foundations' } }] },
 				{ label: 'Process', items: [{ autogenerate: { directory: 'process' } }] },
-				{ label: 'v1 Plan', items: [{ autogenerate: { directory: 'v1-plan' } }] },
+				{ label: 'V1 Plan', items: [{ autogenerate: { directory: 'v1-plan' } }] },
+				{ label: 'V2 Plan', items: [{ autogenerate: { directory: 'v2-plan' } }] },
+				{ label: 'V3 Plan', items: [{ autogenerate: { directory: 'v3-plan' } }] },
 				{ label: 'Specifications', items: [{ autogenerate: { directory: 'specifications' } }] },
-				{ label: 'Reference', items: [{ autogenerate: { directory: 'reference' } }] },
 				{ label: 'API Reference', items: [{ autogenerate: { directory: 'api-reference' } }] },
+				{ label: 'Reference', items: [{ autogenerate: { directory: 'reference' } }] },
 				{ label: 'Roadmap & open questions', items: [{ autogenerate: { directory: 'roadmap-and-open-questions' } }] },
-				{ label: 'Archive', collapsed: true, items: [{ autogenerate: { directory: 'archive' } }] },
 			],
 		}),
 	],
