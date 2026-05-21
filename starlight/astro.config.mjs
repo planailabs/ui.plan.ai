@@ -63,6 +63,11 @@ export default defineConfig({
 			title: 'ui.plan.ai',
 			description: 'An internal Supabase-backed platform and Agent API for Plan.ai agent-generated UI streams.',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+			components: {
+				// The default header title links to the docs root (/docs/).
+				// Override so the logo points at the main site home (/) instead.
+				SiteTitle: './src/components/SiteTitle.astro',
+			},
 			sidebar: [
 				{ label: 'Start here', items: [{ autogenerate: { directory: 'start-here' } }] },
 				{ label: 'Foundations', items: [{ autogenerate: { directory: 'foundations' } }] },
