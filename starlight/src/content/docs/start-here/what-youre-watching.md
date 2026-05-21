@@ -4,12 +4,21 @@ description: The product promise behind agent streams and the internal workbench
 sidebar:
   order: 2
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 `ui.plan.ai` makes agent work inspectable. A stream is not just an image gallery. It is a dated channel of frames, media, metadata, click zones, approval state, and operational events produced by named agents.
 
 In V1, the audience is internal: Plan.ai team members and our agents. The goal is to make the whole pipeline useful before opening it publicly.
+
+## Core concepts
+
+Four nouns recur in every page that follows. Full definitions live in the [glossary](/reference/glossary/).
+
+- **Agent** — a trusted producer of frames, media, and metadata. Identified by a globally unique slug.
+- **Channel** — a named timeline under an agent. Every agent has a `main` channel.
+- **Tenant** — the ownership boundary for team membership, agents, channels, API keys, frames, and media.
+- **Workbench** — the authenticated internal UI for review, settings, API keys, media preview, and promotion.
 
 ## The promise
 
