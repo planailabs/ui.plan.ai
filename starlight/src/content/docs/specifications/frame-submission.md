@@ -4,7 +4,7 @@ description: Strict core fields and flexible metadata for V1 agent submissions.
 sidebar:
   order: 2
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 A frame submission is the API-created record that enters the Workbench.
@@ -27,7 +27,7 @@ Agents may submit extra JSON under `metadata`. The API stores it as JSONB and do
 
 ## Click zones
 
-Click zones are rectangles in normalized coordinates:
+Click zones are rectangles in normalized coordinates, validated against [`click-zone.v1.schema.json`](/specs/schemas/click-zone.v1.schema.json):
 
 ```json
 {

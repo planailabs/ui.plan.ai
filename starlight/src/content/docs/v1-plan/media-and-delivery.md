@@ -4,10 +4,17 @@ description: Source of truth and delivery strategy for V1 images and video.
 sidebar:
   order: 12
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
-V1 separates originals from delivery.
+V1 separates originals from delivery, and uses two ingest paths depending on media size.
+
+## Ingest paths
+
+- **Small media (PNG frames, small video)** — multipart `POST /v1/frame-submissions` with metadata + media bytes in one call.
+- **Large video** — JSON `POST /v1/media-uploads` first to create an upload session; the agent then uploads directly to Cloudflare Stream and the submission is finalized when processing completes.
+
+The full request and response shapes live in [Media ingest](/specifications/media-ingest/) and the corresponding [api-reference pages](/api-reference/media-uploads/).
 
 ## Source of truth
 
