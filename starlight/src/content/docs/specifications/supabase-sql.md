@@ -3,8 +3,8 @@ title: Supabase SQL plan
 description: Implementation-oriented SQL, RLS, indexes, and realtime plan for V1.
 sidebar:
   order: 4
-stability: working
-last_synced_with: "2026-05-21-v1-v2-v3-audit"
+stability: stable
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 This is a SQL plan, not a copied blueprint from another repo. It defines the tables, constraints, and policies V1 needs before app implementation starts.

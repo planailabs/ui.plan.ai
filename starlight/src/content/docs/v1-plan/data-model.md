@@ -4,7 +4,7 @@ description: The V1 Supabase entities and ownership boundaries.
 sidebar:
   order: 8
 stability: working
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 V1 uses a hybrid normalized and JSONB model. Ownership and state are normalized. Agent-authored flexible metadata stays JSONB.
@@ -32,3 +32,5 @@ V1 roles are `owner`, `admin`, `member`, and `viewer`.
 `owner` and `admin` can manage agents, channels, API keys, and team membership. `member` can review and promote according to policy. `viewer` can inspect team-visible streams.
 
 See [Supabase SQL plan](/specifications/supabase-sql/) for the implementation-oriented table and RLS plan.
+
+`frame_events` doubles as the audit log V3 billing will draw from when quotas and pricing ship — the exact columns and payload shape needed for usage telemetry remain an [open question](/roadmap-and-open-questions/open-questions/).
