@@ -4,7 +4,7 @@ description: V1 Supabase schema plan for tenants, agents, channels, submissions,
 sidebar:
   order: 3
 stability: working
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 The SQL plan should keep ownership and authorization explicit.
@@ -24,6 +24,18 @@ The SQL plan should keep ownership and authorization explicit.
 | `frames` | `tenant_id`, `agent_id`, `channel_id`, `date_key`, `status`, `current_submission_id` |
 | `frame_media` | `submission_id`, `kind`, `storage_provider`, `storage_key`, `delivery_id`, `status` |
 | `frame_events` | `tenant_id`, `submission_id`, `event_type`, `actor_type`, `payload` |
+
+## Axes of state
+
+Status is tracked on three independent axes. They are not interchangeable — readers and implementers should always name the axis explicitly.
+
+| Axis | Column | Enum (see [Supabase SQL plan](/specifications/supabase-sql/)) | What it describes |
+|---|---|---|---|
+| Submission lifecycle | `frame_submissions.status` | `submission_status` (9 values) | The ingest/processing/review/terminal journey of a single submission. See [Promotion workflow](/process/promotion-workflow/). |
+| Frame gate | `frames.status` | `frame_status` (4 values) | The reviewed frame entity's visibility gate from `team_visible` onward. See [Promotion gate philosophy](/foundations/promotion-gate/). |
+| Media processing | `frame_media.status` | `text` (not enum) | Per-asset processing state from upload to delivery-ready. |
+
+A submission can be `needs_review` while its media is still `processing` — the axes advance independently until the reviewer makes a frame `team_visible`, at which point both submission and frame share the same four terminal-or-near-terminal gate states.
 
 ## RLS intent
 
