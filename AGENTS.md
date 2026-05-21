@@ -53,7 +53,7 @@ pnpm preview      # serve dist/
 - **Favicons stay in sync.** `public/favicon.svg` and `starlight/public/favicon.svg` are byte-identical (visitors hop between `/` and `/docs/`). Same goes for any future favicon variants.
 - **Astro versions stay aligned.** Both `package.json`s pin the same caret range (`astro: ^6.3.5`) so the lockfile resolves to one version.
 - **All work via feature branch → PR → rebase merge to `main`.** Never push directly to `main` (branch protection enforces this). Preview deploys use the `preview` branch when needed. See `branch-pr-workflow` skill.
-- **CI on PRs is auto; CI on main is manual** (`workflow_dispatch`). Intentional: PR CI gates merges; main CI is opt-in re-verification.
+- **No GitHub Actions CI.** CF Pages builds on every deploy to `main` and `preview`; local `pnpm check && pnpm build` is the pre-merge gate. See `branch-pr-workflow` skill.
 
 ## Known absent (don't search for these — they don't exist by design or yet)
 

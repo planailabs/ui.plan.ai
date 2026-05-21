@@ -31,7 +31,7 @@ pnpm dev:docs     # Starlight only
 pnpm build        # ordered: docs → main
 pnpm build:docs   # docs only (rebuild + re-copy into public/docs)
 pnpm build:app    # main only
-pnpm check        # astro check on both (CI runs this before build)
+pnpm check        # astro check on both
 pnpm check:app    # main only
 pnpm check:docs   # Starlight only
 pnpm preview      # serve dist/
@@ -56,7 +56,7 @@ Before pushing a branch (especially before opening a PR), run:
 pnpm check && pnpm build
 ```
 
-Both run on CI; failing locally avoids burning CI minutes and the slow round-trip. See `branch-pr-workflow` skill for the rest of the flow.
+No GitHub Actions CI runs on PRs — this is the pre-merge gate. See `branch-pr-workflow` skill for the rest of the flow.
 
 ## Verify a build
 
