@@ -4,10 +4,10 @@ description: How humans and agents should navigate the docs after the V1/V2/V3 r
 sidebar:
   order: 3
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
-These docs are written for two audiences: Plan.ai team members and agents implementing the platform.
+These docs are written for two audiences: Plan.ai team members and agents implementing the platform. Humans need the strategy and policy in Foundations before the V1 plan makes sense; agents skip Foundations and go straight to the contracts, because the contracts are the only surface agents act on.
 
 ## For humans
 

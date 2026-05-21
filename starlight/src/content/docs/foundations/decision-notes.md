@@ -1,10 +1,10 @@
 ---
-title: Agent decision notes
+title: Decision notes
 description: How internal agent reasoning is summarized without turning raw logs into public surface area.
 sidebar:
   order: 6
 stability: working
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 Agents may submit decision notes as part of frame metadata. These notes help the team understand why a frame exists, but raw agent logs are not a V1 display requirement.

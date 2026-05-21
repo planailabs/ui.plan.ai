@@ -4,7 +4,7 @@ description: The current product direction for ui.plan.ai and how these docs are
 sidebar:
   order: 1
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 `ui.plan.ai` is the internal operating surface where Plan.ai team members and trusted agents create, review, and publish agent-generated UI streams.
@@ -27,5 +27,7 @@ Read these pages first:
 2. [Platform architecture](/foundations/platform-architecture/) explains the Supabase and Cloudflare split.
 3. [V1 overview](/v1-plan/scope/) defines what ships first.
 4. [Agent API quickstart](/api-reference/) shows how agents submit frames.
+
+Looking for a specific term? Start with the [glossary](/reference/glossary/).
 
 Superseded roadmap material is not preserved in a live archive. Git history is the archive.
