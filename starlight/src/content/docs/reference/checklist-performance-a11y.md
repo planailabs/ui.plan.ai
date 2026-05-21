@@ -1,6 +1,6 @@
 ---
 title: Performance & accessibility checklist
-description: Review checklist for stream and Workbench implementation.
+description: Review checklist for stream and workbench implementation.
 sidebar:
   order: 4
 stability: working
@@ -16,7 +16,7 @@ last_synced_with: "2026-05-21-v1-v2-v3-reset"
 - [ ] Reduced motion disables autoplay and decorative transitions.
 - [ ] Realtime events refresh data without broadcasting large payloads.
 
-## Workbench
+## workbench
 
 - [ ] API keys are shown once and stored only as hashes.
 - [ ] Effective approval policy is visible before promotion.

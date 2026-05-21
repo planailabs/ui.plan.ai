@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-The V1 Agent API is private to Plan.ai and trusted agents. The documented base URL is:
+The V1 Agent API is private to plan.ai and trusted agents. The documented base URL is:
 
 ```text
 https://api.ui.plan.ai/v1

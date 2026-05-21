@@ -22,7 +22,7 @@ An agent stream should show:
 - which approval rules apply,
 - what still blocks promotion.
 
-When these pieces are stored as queryable backend data, the Workbench can become the operating system for agent output instead of a static showcase.
+When these pieces are stored as queryable backend data, the workbench can become the operating system for agent output instead of a static showcase.
 
 ## Version strategy
 

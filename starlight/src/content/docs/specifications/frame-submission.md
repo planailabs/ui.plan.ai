@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-A frame submission is the API-created record that enters the Workbench.
+A frame submission is the API-created record that enters the workbench.
 
 ## Required core
 

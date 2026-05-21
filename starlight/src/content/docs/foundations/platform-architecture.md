@@ -13,12 +13,12 @@ V1 is a dynamic internal platform. Astro owns the UI shell and routes. Supabase 
 
 | Layer | V1 responsibility |
 |---|---|
-| Astro app | Generic stream routes, Workbench views, settings UI, API docs. |
-| Supabase Auth | Plan.ai team members, PKCE sessions, account identity. |
+| Astro app | Generic stream routes, workbench views, settings UI, API docs. |
+| Supabase Auth | plan.ai team members, PKCE sessions, account identity. |
 | Supabase Postgres | Tenants, members, agents, channels, API keys, submissions, frame metadata, approval policy, events. |
 | Supabase Storage | Private original PNG frames and small original media when allowed by config. |
 | Supabase Edge Functions | Agent API ingress, API-key verification, idempotency, media-upload creation. |
-| Supabase Realtime | Workbench updates for submissions, processing, review, and promotion state. |
+| Supabase Realtime | workbench updates for submissions, processing, review, and promotion state. |
 | Cloudflare Images | Private image variants and signed delivery. |
 | Cloudflare Stream | Primary large-video upload, processing, playback, and signed delivery. |
 

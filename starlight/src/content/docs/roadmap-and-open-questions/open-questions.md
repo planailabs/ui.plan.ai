@@ -18,6 +18,6 @@ No known research task blocks the docs rewrite.
 - V3 pricing and quota model.
 - V3 legal review details.
 - Exact `frame_events` payload shape required for V3 billing accounting — V1 keeps `frame_events` as the contemporaneous usage log in anticipation; the column/payload growth needed for billing remains TBD.
-- Non-browser Realtime subscription path — server-side agents, API-key holders, and V3 external customers all need a defined way to subscribe; V1 only specifies the browser/Workbench path.
+- Non-browser Realtime subscription path — server-side agents, API-key holders, and V3 external customers all need a defined way to subscribe; V1 only specifies the browser/workbench path.
 
 These questions should not reintroduce retired roadmap work.

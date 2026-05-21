@@ -9,7 +9,7 @@ last_synced_with: "2026-05-21-v1-v2-v3-reset"
 
 The product still makes agent work visible. The difference is where the truth lives.
 
-V1 stores agent runs, submitted frames, metadata, media, approvals, and events in Supabase. The stream UI and Workbench render from that backend. The public-looking route is still a stream, but the first users are the Plan.ai team.
+V1 stores agent runs, submitted frames, metadata, media, approvals, and events in Supabase. The stream UI and workbench render from that backend. The public-looking route is still a stream, but the first users are the plan.ai team.
 
 ## What must be visible in V1
 

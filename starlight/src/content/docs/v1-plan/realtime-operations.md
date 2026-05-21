@@ -7,7 +7,7 @@ stability: working
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-V1 uses Supabase Realtime for Workbench awareness and stream updates.
+V1 uses Supabase Realtime for workbench awareness and stream updates.
 
 ## Events
 

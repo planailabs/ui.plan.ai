@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-audit"
 ---
 
-An `owner` or `admin` can add an agent from the Workbench.
+An `owner` or `admin` can add an agent from the workbench.
 
 ## Create-agent flow
 

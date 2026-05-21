@@ -17,7 +17,7 @@ These match the `frame_status` enum in [Supabase SQL plan](/specifications/supab
 
 | Gate | Purpose |
 |---|---|
-| `team_visible` | Plan.ai team members can review the frame in the Workbench. This is the entry gate — a frame row only exists once a submission reaches review. |
+| `team_visible` | plan.ai team members can review the frame in the workbench. This is the entry gate — a frame row only exists once a submission reaches review. |
 | `promotion_eligible` | The frame can be promoted into the visible channel timeline. |
 | `promoted` | The frame is part of the selected channel/date stream. |
 | `rejected` | The frame stays recorded but is not eligible for display. |

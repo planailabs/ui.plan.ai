@@ -12,7 +12,7 @@ Build V1 in vertical slices instead of milestone placeholders.
 ## Priority order
 
 1. Supabase project config, auth, tenants, team roles, and RLS.
-2. Agent/channel creation from the Workbench.
+2. Agent/channel creation from the workbench.
 3. Hashed API keys with scope and policy override.
 4. `POST /v1/frame-submissions` for PNG plus metadata.
 5. Frame review screen with media, metadata, click zones, and state transition.

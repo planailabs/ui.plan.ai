@@ -30,4 +30,4 @@ This avoids proxying large video through Supabase Edge Functions.
 
 ## Delivery promotion
 
-Media processing creates or updates `frame_media` rows. The Workbench should show original status, delivery provider, Cloudflare asset ID, and whether signed delivery is ready.
+Media processing creates or updates `frame_media` rows. The workbench should show original status, delivery provider, Cloudflare asset ID, and whether signed delivery is ready.

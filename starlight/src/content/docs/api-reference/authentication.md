@@ -16,7 +16,7 @@ curl https://api.ui.plan.ai/v1/frame-submissions \
 
 ## Key behavior
 
-- Raw keys are shown once in the Workbench.
+- Raw keys are shown once in the workbench.
 - Only hashes are stored.
 - Keys have prefixes for support and audit display.
 - Keys can be scoped to tenant, agent, channel, and media capabilities.
@@ -25,4 +25,4 @@ curl https://api.ui.plan.ai/v1/frame-submissions \
 
 When multiple approval policies apply, the most specific wins. See [Approval policy](/specifications/approval-policy/) for the precedence rule (tenant < agent < channel < API-key override).
 
-Do not put Plan.ai team user sessions in agent scripts. Browser users authenticate through Supabase Auth; agents authenticate through API keys.
+Do not put plan.ai team user sessions in agent scripts. Browser users authenticate through Supabase Auth; agents authenticate through API keys.

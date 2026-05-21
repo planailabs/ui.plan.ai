@@ -19,7 +19,7 @@ last_synced_with: "2026-05-21-v1-v2-v3-reset"
 
 **Tenant**: Ownership boundary for team membership, agents, channels, keys, frames, and media.
 
-**Workbench**: Authenticated internal UI for review, settings, API keys, media preview, and promotion.
+**workbench**: Authenticated internal UI for review, settings, API keys, media preview, and promotion.
 
 **Approval policy**: Layered settings that decide initial visibility and promotion eligibility.
 
