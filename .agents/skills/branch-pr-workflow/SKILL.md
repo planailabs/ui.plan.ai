@@ -44,7 +44,7 @@ gh pr create --base main --title "<type>: <subject>" --body "<see PR template>"
 
 PR title must be a valid Conventional Commit (it ends up in main's log after rebase merge).
 
-CI is `pull_request`-triggered — it auto-runs on every push to the PR. Branch protection requires the `build` job green before merge.
+No GitHub Actions CI runs on PRs. Verification is local (see "Local pre-push" below); CF Pages builds happen on deploy to `main`/`preview`, which is *after* merge.
 
 ## Merge strategy: **rebase merge**
 
@@ -55,24 +55,17 @@ Set in repo settings → "Allow rebase merging" only. Why rebase, not squash:
 
 Before merging:
 - Rebase the branch onto latest `main` locally (`git fetch && git rebase origin/main`) and re-push.
-- Confirm CI is green.
+- Confirm `pnpm check && pnpm build` is green locally.
 - Click "Rebase and merge".
 - Delete the branch (GitHub prompt does it; or `git push origin --delete <branch>`).
 
-## CI on main
-
-`push: branches: [main]` is **intentionally absent** from `.github/workflows/build.yml`. After a merge, click "Run workflow" on the GitHub Actions page if you want main verified. Rationale: PR CI already verified the merged content; main runs are opt-in.
-
-If you want auto-CI on main back, add `push: branches: [main]` to the workflow's `on:`.
-
 ## Branch protection (dashboard, not in repo)
 
-Required settings on `main`:
-- Require status checks: `build` must be green.
+Recommended settings on `main`:
 - Require linear history (matches rebase-merge choice).
 - Block direct pushes (force all changes through PR).
 
-Enable *after* the first PR cycle has succeeded, otherwise you can lock yourself out.
+No status check requirement (no GitHub Actions CI exists). If CI is added back later, add `Require status checks: build must be green` here.
 
 ## CF Pages deploy mapping (dashboard, not in repo)
 
@@ -85,7 +78,7 @@ Enable *after* the first PR cycle has succeeded, otherwise you can lock yourself
 pnpm check && pnpm build
 ```
 
-Don't burn CI minutes on stuff that fails locally first.
+This is the only pre-merge verification — CF Pages only builds *after* merge, and no GitHub Actions CI runs on PRs. Run it before pushing.
 
 ## Hard rules
 

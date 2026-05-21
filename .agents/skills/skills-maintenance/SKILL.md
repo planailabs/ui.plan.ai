@@ -29,8 +29,7 @@ For each changed file, check whether docs reference it:
 | Root `package.json` scripts (`dev`, `build:docs`, …) | `AGENTS.md`, `dev-build` |
 | `site:` in either `astro.config.mjs` | `deployment` skill, `README.md` |
 | `trailingSlash` / `build.format` in either `astro.config.mjs` | `AGENTS.md` hard rule, `deployment` skill |
-| `.node-version` / `packageManager` field | `deployment` skill, CI workflow |
-| `.github/workflows/*` | `AGENTS.md` hard rules, `branch-pr-workflow` skill if trigger/policy changes |
+| `.node-version` / `packageManager` field | `deployment` skill |
 | `.github/pull_request_template.md` | `branch-pr-workflow` skill (PR section) |
 | Branch-protection settings (CF/GH dashboard) | `branch-pr-workflow` skill — flagged as dashboard-only |
 | `_headers` / `_redirects` (new) | `deployment` skill |
