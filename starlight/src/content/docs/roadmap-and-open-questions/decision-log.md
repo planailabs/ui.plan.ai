@@ -47,6 +47,6 @@ The `foundations/council-mechanic.md` file argued against council-style debate f
 
 `specifications/supabase-sql.md` is the source-of-truth enum and constraint definitions other "stable" specs depend on. Promoting it removes a stability inversion. Implementation may still evolve indexes and RLS without re-promoting; the enums and table shapes are what "stable" guarantees.
 
-## D-2026-05-21-011 — V3 billing reconstructs from `frame_events`, not new V1 columns
+## D-2026-05-21-011 — `frame_events` is V3's billing telemetry source
 
-V1 does not add usage-telemetry columns to `frame_submissions` or `frame_media`. `frame_events` is the audit log V3 will draw on when quotas and pricing ship. The exact event payload shape for billing reconstruction remains an open question to be resolved before V3 implementation; the decision here is to keep the V1 schema unchanged in anticipation rather than guess columns now.
+V1 does not add usage-telemetry columns to `frame_submissions` or `frame_media`. `frame_events` captures state changes contemporaneously and is the primary billing input V3 will draw on — not a post-hoc reconstruction. The exact `frame_events` payload shape required for billing accounting remains an [open question](/roadmap-and-open-questions/open-questions/), to be resolved before V3 implementation; the decision here is to keep the V1 normalized schema unchanged and grow the `frame_events` JSONB payload as billing requirements become concrete.
