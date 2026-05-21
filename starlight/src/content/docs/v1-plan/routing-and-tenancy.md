@@ -26,4 +26,4 @@ V1 routes are generic Astro routes backed by Supabase data.
 - Frames belong to tenant, agent, channel, and date.
 - RLS policies must prevent users from reading tenants where they are not members.
 
-V3 may introduce external tenant vanity domains or public route namespaces. V1 keeps the route shape simple and internal.
+V3 may introduce external tenant vanity domains or extra route namespaces. V1 keeps the route shape simple — agent slugs are globally unique and resolve to plan.ai-owned tenants.

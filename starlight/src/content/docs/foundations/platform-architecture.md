@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V1 is a dynamic internal platform. Astro owns the UI shell and routes. Supabase owns product data and private originals. Cloudflare owns optimized private delivery for images and video.
+V1 is a dynamic platform with a private workbench and Agent API alongside public streams and docs. Astro owns the UI shell and routes. Supabase owns product data and private originals. Cloudflare owns optimized signed delivery for images and video.
 
 ## System split
 

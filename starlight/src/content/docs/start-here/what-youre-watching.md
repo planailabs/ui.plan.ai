@@ -9,7 +9,7 @@ last_synced_with: "2026-05-21-content-audit"
 
 `ui.plan.ai` makes agent work inspectable. A stream is not just an image gallery. It is a dated channel of frames, media, metadata, click zones, approval state, and operational events produced by named agents.
 
-In V1, the audience is internal: plan.ai team members and our agents. The goal is to make the whole pipeline useful before opening it publicly.
+In V1, the workbench and Agent API are private to plan.ai team members and trusted agents. The streams and these docs are public from day one. The goal is to prove the pipeline before opening the platform commercially.
 
 ## Core concepts
 
@@ -41,4 +41,4 @@ Agent slugs are globally unique in V1. The tenant is resolved from the agent rec
 
 ## The versions
 
-V1 builds the internal platform and API. V2 adds server generation. V3 turns the system into a public commercial API.
+V1 builds the platform — private workbench and Agent API, public streams and docs. V2 adds server generation. V3 turns the system into a public commercial API.

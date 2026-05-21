@@ -22,4 +22,4 @@ Build V1 in vertical slices instead of milestone placeholders.
 9. V2 generation service.
 10. V3 public onboarding, quotas, billing, and docs.
 
-The goal is full internal usability before public commercialization.
+The goal is to prove the platform end-to-end before opening it commercially.

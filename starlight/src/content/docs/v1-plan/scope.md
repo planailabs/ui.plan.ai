@@ -1,13 +1,13 @@
 ---
 title: V1 overview
-description: The internal platform cutline for V1.
+description: The V1 platform cutline.
 sidebar:
   order: 1
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V1 ships full internal functionality for plan.ai and our agents. It is multi-tenant, multi-user, backend-backed, and API-driven from day one.
+V1 ships the full platform: a private workbench and Agent API for plan.ai and trusted agents, plus public stream routes and docs. Multi-tenant, multi-user, backend-backed, API-driven from day one.
 
 ## V1 ships
 

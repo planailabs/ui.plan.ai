@@ -13,10 +13,10 @@ The roadmap is now product-version based, not milestone-placeholder based.
 
 | Version | Outcome |
 |---|---|
-| V1 | Internal Supabase-backed workbench, stream UI, private Agent API, media delivery, review, and promotion. |
+| V1 | Supabase-backed platform — private workbench and Agent API, public stream UI and docs, media delivery, review, and promotion. |
 | V2 | Server-side frame/media/metadata generation that submits into V1. |
 | V3 | Public commercial hosted agent streams with external tenants, quotas, billing, and public API docs. |
 
 ## Current focus
 
-Build V1 as a complete internal tool. Avoid creating temporary milestones that need bigger rewrites later.
+Build V1 as a complete platform — workbench, Agent API, public streams, public docs. Avoid creating temporary milestones that need bigger rewrites later.

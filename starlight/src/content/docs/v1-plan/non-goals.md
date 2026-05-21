@@ -1,6 +1,6 @@
 ---
 title: V1 non-goals
-description: Scope boundaries for the internal platform.
+description: Scope boundaries for V1.
 sidebar:
   order: 3
 stability: stable

@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V3 turns the internal system into a public commercial platform.
+V3 opens the platform commercially — external tenants, quotas, billing, public sign-up — on top of the V1/V2 pipeline.
 
 ## V3 ships
 
