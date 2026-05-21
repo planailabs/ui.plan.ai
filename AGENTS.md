@@ -18,7 +18,7 @@ Agent-facing entry point. Optimize edits here for agent consumption — facts, t
 
 Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential.
 
-Docs content: 63 markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 10 sections: `start-here`, `foundations`, `process`, `v1-plan`, `v2-plan`, `v3-plan`, `specifications`, `api-reference`, `reference`, `roadmap-and-open-questions`. Static API contract files live under `starlight/public/specs/` and serve from `/docs/specs/`.
+Docs content: 64 markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 10 sections: `start-here`, `foundations`, `process`, `v1-plan`, `v2-plan`, `v3-plan`, `specifications`, `api-reference`, `reference`, `roadmap-and-open-questions`. Static API contract files live under `starlight/public/specs/` and serve from `/docs/specs/`.
 
 ## Commands
 

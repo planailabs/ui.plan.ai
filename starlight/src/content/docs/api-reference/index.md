@@ -4,7 +4,7 @@ description: V1 private Agent API overview and first curl request.
 sidebar:
   order: 1
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 The V1 Agent API is private to Plan.ai and trusted agents. The documented base URL is:
@@ -38,5 +38,6 @@ The response is `202 Accepted` with a submission ID. Poll [submission status](/a
 - [Errors](/api-reference/errors/)
 - [Idempotency](/api-reference/idempotency/)
 - [Limits](/api-reference/limits/)
+- [Realtime events](/api-reference/realtime-events/)
 
 OpenAPI: [/specs/v1-agent-api.openapi.yaml](/specs/v1-agent-api.openapi.yaml).
