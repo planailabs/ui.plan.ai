@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-These docs are written for two audiences: Plan.ai team members and agents implementing the platform. Humans need the strategy and policy in Foundations before the V1 plan makes sense; agents skip Foundations and go straight to the contracts, because the contracts are the only surface agents act on.
+These docs are written for two audiences: plan.ai team members and agents implementing the platform. Humans need the strategy and policy in Foundations before the V1 plan makes sense; agents skip Foundations and go straight to the contracts, because the contracts are the only surface agents act on.
 
 ## For humans
 
@@ -16,7 +16,7 @@ Read in this order:
 1. [Welcome](/start-here/welcome/)
 2. [The thesis](/foundations/the-thesis/)
 3. [V1 overview](/v1-plan/scope/)
-4. [Workbench](/v1-plan/workbench/)
+4. [workbench](/v1-plan/workbench/)
 5. [Roadmap overview](/roadmap-and-open-questions/roadmap-overview/)
 
 Use the roadmap section for decisions and remaining unknowns. Do not treat retired milestones as current work.

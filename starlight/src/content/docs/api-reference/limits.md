@@ -7,7 +7,7 @@ stability: working
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V1 limits are not hardcoded in endpoint handlers. They come from project config and should be visible in the Workbench.
+V1 limits are not hardcoded in endpoint handlers. They come from project config and should be visible in the workbench.
 
 ## Limit categories
 

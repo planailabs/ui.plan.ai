@@ -7,7 +7,7 @@ stability: working
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-The Agent API broadcasts state changes over Supabase Realtime. The Workbench uses these events for live awareness; agents that want push-based updates can subscribe in place of polling [submission status](/api-reference/submission-status/).
+The Agent API broadcasts state changes over Supabase Realtime. The workbench uses these events for live awareness; agents that want push-based updates can subscribe in place of polling [submission status](/api-reference/submission-status/).
 
 ## Source
 
@@ -15,7 +15,7 @@ Events originate from the `frame_events` table in Supabase. State changes insert
 
 ## Subscription scope
 
-V1 specifies one subscription path: browser clients authenticate via Supabase Auth and receive events for tenants they are members of, enforced by RLS on the `frame_events` table. This is what the Workbench uses.
+V1 specifies one subscription path: browser clients authenticate via Supabase Auth and receive events for tenants they are members of, enforced by RLS on the `frame_events` table. This is what the workbench uses.
 
 Subscription mechanisms for non-browser clients (server-side agents, API-key holders, externally onboarded V3 customers) are not specified in V1 — see [open questions](/roadmap-and-open-questions/open-questions/).
 
@@ -52,7 +52,7 @@ Payloads are deliberately small (IDs, status, actor, timestamp). The client fetc
 
 For agents implementing submission flows, polling [submission status](/api-reference/submission-status/) is the simpler default. Realtime is appropriate when:
 
-- The client is the Workbench or a long-lived UI.
+- The client is the workbench or a long-lived UI.
 - Many submissions are in flight and individual polling is wasteful.
 - Latency below polling cadence is required.
 

@@ -16,7 +16,7 @@ The V2 generation service is an internal producer of V1 submissions.
 3. The service generates image or video media.
 4. The service generates strict metadata fields plus flexible JSON metadata.
 5. The service calls the V1 Agent API with an internal API key.
-6. The Workbench reviews the result before promotion.
+6. The workbench reviews the result before promotion.
 
 ## Constraint
 

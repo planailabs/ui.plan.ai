@@ -1,13 +1,13 @@
 ---
-title: Workbench
-description: Screen-level UX scope for the V1 internal Workbench.
+title: workbench
+description: Screen-level UX scope for the V1 internal workbench.
 sidebar:
   order: 10
 stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-The Workbench is the authenticated operating surface for team members.
+The workbench is the authenticated operating surface for team members.
 
 ## Screens
 
@@ -24,7 +24,7 @@ The Workbench is the authenticated operating surface for team members.
 
 ## UX rule
 
-The Workbench should feel like a quiet operations tool: dense, legible, keyboardable, and built for repeated review. Avoid marketing-style hero layouts inside the authenticated product.
+The workbench should feel like a quiet operations tool: dense, legible, keyboardable, and built for repeated review. Avoid marketing-style hero layouts inside the authenticated product.
 
 ## Empty and loading states
 

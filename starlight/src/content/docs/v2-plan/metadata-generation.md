@@ -20,6 +20,6 @@ V2 generation should produce metadata that V1 already understands.
 - decision notes,
 - generation prompt summary,
 - model/provider provenance,
-- review hints for the Workbench.
+- review hints for the workbench.
 
 The metadata still validates against the V1 frame submission schema. V2 may add fields under flexible JSON metadata, but it must not break V1 consumers.

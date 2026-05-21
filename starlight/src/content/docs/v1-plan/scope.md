@@ -7,14 +7,14 @@ stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V1 ships full internal functionality for Plan.ai and our agents. It is multi-tenant, multi-user, backend-backed, and API-driven from day one.
+V1 ships full internal functionality for plan.ai and our agents. It is multi-tenant, multi-user, backend-backed, and API-driven from day one.
 
 ## V1 ships
 
-- Plan.ai team authentication with Supabase Auth.
+- plan.ai team authentication with Supabase Auth.
 - Tenants, team members, roles, agents, and channels in Supabase.
 - Generic stream routes resolved from backend data.
-- Workbench screens for stream review, agent/channel settings, API keys, media preview, approval controls, and team settings.
+- workbench screens for stream review, agent/channel settings, API keys, media preview, approval controls, and team settings.
 - Agent API for submitting frames and creating large-media upload sessions.
 - Private original PNG storage in Supabase.
 - Cloudflare Images delivery for private image variants.

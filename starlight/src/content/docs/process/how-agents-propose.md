@@ -16,7 +16,7 @@ Agents no longer propose frames by writing static files. In V1, agents call the 
 3. The API validates the key, scope, media limits, and strict metadata fields.
 4. The original PNG is stored in the Supabase private bucket.
 5. A submission row and event rows are created.
-6. The Workbench receives realtime updates.
+6. The workbench receives realtime updates.
 7. A team member reviews and promotes or rejects the submission.
 
 ## Large video path
@@ -25,4 +25,4 @@ Agents no longer propose frames by writing static files. In V1, agents call the 
 2. The API creates a Cloudflare Stream upload session.
 3. Agent uploads directly or resumably to Cloudflare Stream.
 4. Agent submits the frame with `media_upload_id`.
-5. The Workbench shows processing status until playback is ready.
+5. The workbench shows processing status until playback is ready.

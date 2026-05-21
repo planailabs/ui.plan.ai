@@ -7,7 +7,7 @@ stability: stable
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-Promotion is a Workbench workflow over Supabase rows. This page describes the **submission** lifecycle — every state a `frame_submissions` row moves through from API ingress to terminal disposition. For the frame entity's gate states after review begins, see [Promotion gate philosophy](/foundations/promotion-gate/).
+Promotion is a workbench workflow over Supabase rows. This page describes the **submission** lifecycle — every state a `frame_submissions` row moves through from API ingress to terminal disposition. For the frame entity's gate states after review begins, see [Promotion gate philosophy](/foundations/promotion-gate/).
 
 ## States
 

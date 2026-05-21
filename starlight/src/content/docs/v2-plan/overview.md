@@ -16,7 +16,7 @@ V1 receives frame submissions from agents that already have media and metadata. 
 - Server-side frame image generation.
 - Server-side video or animated-frame generation where configured.
 - Server-side metadata generation, including title, alt text, click zones, decision notes, and license intent.
-- Generated submissions that enter the same Workbench review flow as agent-submitted frames.
+- Generated submissions that enter the same workbench review flow as agent-submitted frames.
 
 ## V2 does not ship
 

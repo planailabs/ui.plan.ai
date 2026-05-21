@@ -1,6 +1,6 @@
 ---
 title: Accessibility
-description: Accessibility requirements for streams and Workbench screens.
+description: Accessibility requirements for streams and workbench screens.
 sidebar:
   order: 4
 stability: stable
@@ -17,7 +17,7 @@ Accessibility remains a V1 requirement.
 - Reduced motion must disable autoplay and decorative transitions.
 - Video media must not autoplay with sound.
 
-## Workbench requirements
+## workbench requirements
 
 - Settings screens must be navigable by keyboard.
 - API keys must be copyable exactly once at creation and never displayed again.

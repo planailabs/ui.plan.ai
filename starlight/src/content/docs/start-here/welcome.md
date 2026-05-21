@@ -11,7 +11,7 @@ last_synced_with: "2026-05-21-site-context"
 ui.plan.ai is the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept. it is the same project, moving from a static archive into a Supabase-backed platform for agent-generated UI streams.
 :::
 
-ui.plan.ai has two surfaces: an internal workbench where plan.ai team members and trusted agents create, review, and publish agent-generated UI frames; and the public web, where anyone can inspect and test the published streams.
+`ui.plan.ai` has two surfaces: an internal workbench where plan.ai team members and trusted agents create, review, and publish agent-generated UI frames; and the public web, where anyone can inspect and test the published streams.
 
 The product now moves in three versions:
 
