@@ -5,7 +5,7 @@ Agent-facing entry point. Optimize edits here for agent consumption — facts, t
 ## Toolchain
 
 - pnpm + workspaces (never `npm`/`yarn` — silently breaks docs build)
-- Node ≥22.12
+- Node ≥24.15 (pinned to `24.15.0` in `.node-version`; CF Pages installs from that)
 - **If pnpm missing: ASK USER FIRST** before suggesting `corepack enable && corepack prepare pnpm@latest --activate`. Both affect the user's global toolchain.
 - Always `pnpm install` from repo root
 
