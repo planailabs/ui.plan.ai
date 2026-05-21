@@ -4,22 +4,23 @@ description: How V1 uses Supabase Realtime without overloading events.
 sidebar:
   order: 14
 stability: working
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 V1 uses Supabase Realtime for Workbench awareness and stream updates.
 
 ## Events
 
-Realtime events should be small:
+Realtime events should be small. Names use dotted form and match the canonical list in [Realtime events](/specifications/realtime-events/):
 
-- submission created,
-- media upload created,
-- media processing changed,
-- approval state changed,
-- frame promoted,
-- frame rejected,
-- API key used or revoked.
+- `frame.submission.created`
+- `frame.submission.status_changed`
+- `frame.media.status_changed`
+- `frame.approval.changed`
+- `frame.promoted`
+- `frame.rejected`
+- `api_key.used`
+- `api_key.revoked`
 
 The event payload carries IDs, status, actor, and timestamp. The UI fetches full records from Supabase when it needs detail.
 
