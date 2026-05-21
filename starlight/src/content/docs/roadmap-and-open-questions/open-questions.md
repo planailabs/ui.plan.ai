@@ -17,6 +17,7 @@ No known research task blocks the docs rewrite.
 - Which V2 generation providers are allowed first.
 - V3 pricing and quota model.
 - V3 legal review details.
-- Exact telemetry columns or `frame_events` payload shape required for V3 billing reconstruction — needs decision before V3 billing implementation; V1 keeps `frame_events` as the audit log in anticipation.
+- Exact `frame_events` payload shape required for V3 billing accounting — V1 keeps `frame_events` as the contemporaneous usage log in anticipation; the column/payload growth needed for billing remains TBD.
+- Non-browser Realtime subscription path — server-side agents, API-key holders, and V3 external customers all need a defined way to subscribe; V1 only specifies the browser/Workbench path.
 
 These questions should not reintroduce retired roadmap work.

@@ -7,26 +7,26 @@ stability: stable
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-Frame metadata has a strict core and a flexible extension area.
+Frame metadata has a fixed top-level shape and a single flexible JSONB area. The contract is enforced by [`frame-submission-metadata.v1.schema.json`](/specs/schemas/frame-submission-metadata.v1.schema.json) — the top level and every reserved namespace are closed (`additionalProperties: false`), so unknown keys are rejected anywhere except inside `metadata`.
 
-## Strict core
+## Top-level shape
 
-These top-level keys are required and validated against [`frame-submission-metadata.v1.schema.json`](/specs/schemas/frame-submission-metadata.v1.schema.json):
+| Key | Purpose |
+|---|---|
+| `schema_version` | Required. Must be `ui.plan.ai/frame-metadata.v1`. |
+| `agent` | Required. Object: `slug` (required), `run_id`, `model`. |
+| `channel` | Required. Object: `slug` (defaults to `main`). |
+| `frame` | Required. Object: `title`, `alt_text`, `date` are required; `sequence_key` is optional. |
+| `license` | Optional. Object: `intent` (defaults to `cc0`), `attribution`. |
+| `click_zones` | Optional. Array of click-zone objects (max 64). |
+| `media_upload_id` | Required when the large-video direct-upload flow was used (`POST /v1/media-uploads`). |
+| `metadata` | Optional. Free-form agent JSONB — the only place new keys may appear. |
 
-- `schema_version`
-- `agent` (object)
-- `channel` (object)
-- `frame` (object)
-- `license` (object)
-- `click_zones` (array)
-
-The `agent`, `channel`, `frame`, and `license` objects each have a small set of strict-core inner fields (e.g. `agent.slug`, `channel.slug`, `frame.title`, `frame.alt_text`, `frame.date`, `license.intent`). See [Frame submission](/specifications/frame-submission/) for the required-inner-field list.
-
-Agents may add their own inner fields under these reserved namespaces — for example `agent.run_id`, `agent.model`, `frame.sequence_key`. The API stores them with the rest of the metadata; the UI renders only the inner fields it understands. Unknown inner fields under a reserved namespace are accepted; unknown top-level keys are not (use `metadata` instead).
+See [Frame submission](/specifications/frame-submission/) for the per-field required/optional contract and validation patterns.
 
 ## Flexible extension
 
-Use `metadata` for agent-specific top-level fields that don't fit the reserved namespaces:
+Use `metadata` for agent-specific data that has no reserved home:
 
 - prompt summaries,
 - model provenance,
@@ -35,4 +35,4 @@ Use `metadata` for agent-specific top-level fields that don't fit the reserved n
 - tool outputs,
 - V2 generation traces.
 
-The API stores unknown fields under `metadata` as JSONB; the UI should only render fields it understands.
+The API stores `metadata` as JSONB; the UI renders only the fields it understands.

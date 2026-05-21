@@ -11,15 +11,13 @@ The Agent API broadcasts state changes over Supabase Realtime. The Workbench use
 
 ## Source
 
-Events originate from the `frame_events` table in Supabase. Database triggers emit a row per state change; Supabase Realtime broadcasts the row to subscribed clients. The contract is the event shape, not the underlying transport — the row layout in [Supabase SQL plan](/specifications/supabase-sql/) is implementation detail.
+Events originate from the `frame_events` table in Supabase. State changes insert rows; Supabase Realtime broadcasts new rows to subscribed clients. The contract is the event name and payload shape — the row layout and trigger mechanism in [Supabase SQL plan](/specifications/supabase-sql/) are implementation detail.
 
 ## Subscription scope
 
-Realtime channels are scoped by tenant membership:
+V1 specifies one subscription path: browser clients authenticate via Supabase Auth and receive events for tenants they are members of, enforced by RLS on the `frame_events` table. This is what the Workbench uses.
 
-- Browser clients authenticate via Supabase Auth; RLS limits subscriptions to tenants the user belongs to.
-- Server-side agents subscribe with a service token scoped to their tenant; cross-tenant subscriptions are rejected.
-- API-key holders authenticating with the bearer key do not currently get a direct Realtime channel — that is a V3 concern when external customers ship.
+Subscription mechanisms for non-browser clients (server-side agents, API-key holders, externally onboarded V3 customers) are not specified in V1 — see [open questions](/roadmap-and-open-questions/open-questions/).
 
 ## Event payload
 
