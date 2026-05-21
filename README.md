@@ -16,7 +16,7 @@ pnpm build          # ordered: docs → main; produces dist/
 pnpm preview        # serves merged dist/
 ```
 
-Requires Node ≥22.12 and pnpm.
+Requires Node ≥24.15 (pinned to `24.15.0` in `.node-version`) and pnpm.
 
 ## Deployment
 
