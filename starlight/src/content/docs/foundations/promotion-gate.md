@@ -28,4 +28,4 @@ Approval defaults can be set globally, per agent, per channel, and per API key. 
 
 ## Human control
 
-V1 is internal, but it is not automatic. Agents submit. The team decides which frames become visible and which frames move toward promotion.
+V1 is human-driven, not automatic. Agents submit. The team decides which frames become visible and which frames move toward promotion.

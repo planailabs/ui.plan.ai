@@ -1,6 +1,6 @@
 ---
 title: workbench
-description: Screen-level UX scope for the V1 internal workbench.
+description: Screen-level UX scope for the V1 workbench.
 sidebar:
   order: 10
 stability: stable

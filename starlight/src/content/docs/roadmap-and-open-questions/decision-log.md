@@ -9,7 +9,7 @@ last_synced_with: "2026-05-21-content-audit"
 
 ## D-2026-05-21-001 — Version ladder is V1, V2, V3
 
-V1 is the internal platform. V2 is server generation. V3 is the public commercial API.
+V1 is the platform: private workbench and Agent API, public streams and docs. V2 is server generation. V3 is the public commercial API (external tenants, quotas, billing).
 
 ## D-2026-05-21-002 — V1 uses Supabase
 
@@ -17,7 +17,7 @@ V1 uses Supabase Auth, Postgres, Storage, Edge Functions, and Realtime. Static A
 
 ## D-2026-05-21-003 — V1 is multi-tenant and multi-user
 
-Tenancy and team roles ship from day one, even though V1 is internal.
+Tenancy and team roles ship from day one, even though external tenant sign-up is a V3 concern.
 
 ## D-2026-05-21-004 — Agent API uses hybrid media ingest
 

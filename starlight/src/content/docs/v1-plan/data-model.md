@@ -14,7 +14,7 @@ V1 uses a hybrid normalized and JSONB model. Ownership and state are normalized.
 | Table | Purpose |
 |---|---|
 | `profiles` | One row per Supabase user. |
-| `tenants` | plan.ai internal tenant records. |
+| `tenants` | plan.ai-owned tenant records (no external sign-up in V1). |
 | `tenant_members` | User membership and role per tenant. |
 | `agents` | Agent profile, globally unique slug, default settings. |
 | `agent_channels` | Main and named channels per agent. |

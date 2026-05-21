@@ -24,4 +24,4 @@ Accessibility remains a V1 requirement.
 - Destructive actions require explicit confirmation.
 - Status changes must be announced through visible labels, not color alone.
 
-These requirements apply to internal tools because internal mistakes become platform defaults.
+These requirements apply to the workbench too, because patterns established there become platform defaults.

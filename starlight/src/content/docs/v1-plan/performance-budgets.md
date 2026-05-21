@@ -7,7 +7,7 @@ stability: working
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-V1 performance is measured against authenticated internal use, not public marketing traffic. Budgets still matter because the workbench will be used repeatedly by agents and humans.
+V1 has two surfaces with different performance shapes. The workbench is authenticated and used repeatedly by agents and humans — interaction latency matters. The public stream routes serve unauthenticated visitors — first paint and media delivery matter. Budgets apply to both.
 
 ## Budgets
 

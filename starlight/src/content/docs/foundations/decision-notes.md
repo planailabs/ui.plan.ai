@@ -1,6 +1,6 @@
 ---
 title: Decision notes
-description: How internal agent reasoning is summarized without turning raw logs into public surface area.
+description: How private agent reasoning is summarized without turning raw logs into public surface area.
 sidebar:
   order: 6
 stability: working
