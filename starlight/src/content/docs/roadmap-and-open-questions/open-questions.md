@@ -4,7 +4,7 @@ description: Remaining non-blocking questions after the V1/V2/V3 reset.
 sidebar:
   order: 3
 stability: working
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 No known research task blocks the docs rewrite.
@@ -17,5 +17,6 @@ No known research task blocks the docs rewrite.
 - Which V2 generation providers are allowed first.
 - V3 pricing and quota model.
 - V3 legal review details.
+- Exact telemetry columns or `frame_events` payload shape required for V3 billing reconstruction — needs decision before V3 billing implementation; V1 keeps `frame_events` as the audit log in anticipation.
 
 These questions should not reintroduce retired roadmap work.

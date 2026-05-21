@@ -4,7 +4,7 @@ description: Settled decisions for the current V1/V2/V3 plan.
 sidebar:
   order: 2
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-21-content-audit"
 ---
 
 ## D-2026-05-21-001 — Version ladder is V1, V2, V3
@@ -38,3 +38,15 @@ V1 team-member browser sessions use Supabase Auth with PKCE and `sessionStorage`
 ## D-2026-05-21-008 — Project limits are config-driven
 
 Media, delivery, and API limits come from `config/project.config.json` and account-specific Supabase/Cloudflare limits, not hardcoded endpoint constants.
+
+## D-2026-05-21-009 — Decision-notes file replaces "council mechanic"
+
+The `foundations/council-mechanic.md` file argued against council-style debate fields for V1; the filename advertised a concept the file did not define. Renamed to `foundations/decision-notes.md` to match its actual content. No content reversal — V1 still stores concise summaries in `metadata.decision_notes`.
+
+## D-2026-05-21-010 — Supabase SQL plan promoted to `stability: stable`
+
+`specifications/supabase-sql.md` is the source-of-truth enum and constraint definitions other "stable" specs depend on. Promoting it removes a stability inversion. Implementation may still evolve indexes and RLS without re-promoting; the enums and table shapes are what "stable" guarantees.
+
+## D-2026-05-21-011 — V3 billing reconstructs from `frame_events`, not new V1 columns
+
+V1 does not add usage-telemetry columns to `frame_submissions` or `frame_media`. `frame_events` is the audit log V3 will draw on when quotas and pricing ship. The exact event payload shape for billing reconstruction remains an open question to be resolved before V3 implementation; the decision here is to keep the V1 schema unchanged in anticipation rather than guess columns now.
