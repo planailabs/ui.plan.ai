@@ -1,49 +1,21 @@
-# Starlight Starter Kit: Basics
+# starlight-docs
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+Starlight project for the ui.plan.ai documentation, served at `ui.plan.ai/docs/`.
 
-```
-pnpm create astro@latest -- --template starlight
-```
+See the [root README](../README.md) for full setup. This subproject is built and copied into `public/docs/` by the root `pnpm build`.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Per-side commands
 
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+```sh
+pnpm --filter starlight-docs dev      # local dev, :4322/docs/
+pnpm --filter starlight-docs build    # build to starlight/dist/
+pnpm --filter starlight-docs check    # astro check
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+## Content
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+Markdown files live under `src/content/docs/`. The sidebar autogenerates from the section directories — see `astro.config.mjs` for the ten sections.
 
-Static assets, like favicons, can be placed in the `public/` directory.
+Static API contract files (OpenAPI + JSON schemas) live under `public/specs/` and serve at `/docs/specs/`.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+For docs conventions, structure, and stability tags, see [reading these docs](https://ui.plan.ai/docs/start-here/reading-these-docs/) and [stability tags](https://ui.plan.ai/docs/start-here/stability-tags/).

@@ -61,8 +61,8 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'ui.plan.ai',
-			description: 'An internal Supabase-backed platform and Agent API for plan.ai agent-generated UI streams.',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+			description: 'Supabase-backed platform and Agent API for plan.ai agent-generated UI streams.',
+			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/planailabs/ui.plan.ai' }],
 			components: {
 				// The default header title links to the docs root (/docs/).
 				// Override so the logo points at the main site home (/) instead.
