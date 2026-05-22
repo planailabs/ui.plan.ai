@@ -69,3 +69,32 @@ pnpm preview      # serve dist/
 - No splash at `/docs/`. `/docs/` 308-redirects to `/docs/start-here/welcome/` (Astro `redirects:` + matching `_redirects` 301 for CF).
 - No `CHANGELOG.md` — `git log` + version bumps in `package.json` are the record.
 - No root `sitemap.xml`. Starlight's `/docs/sitemap-index.xml` is the only sitemap; `public/robots.txt` references it.
+
+## Cursor Cloud specific instructions
+
+Environment is pre-configured with Node 24.15.0 (via nvm) and pnpm 11.1.2 (via corepack). Dependencies are already installed.
+
+### Starting dev servers
+
+```bash
+pnpm dev   # both: app :4321, docs :4322
+```
+
+Run in a backgrounded tmux session. Verify with `curl -s -o /dev/null -w "%{http_code}" http://localhost:4321/` (expect 200).
+
+### Pre-merge gate
+
+No CI — run locally before pushing:
+
+```bash
+pnpm check && pnpm build
+```
+
+`pnpm check` runs `astro check` on both projects (type-check only, no linter). `pnpm build` does sequential docs→main build outputting to `dist/`.
+
+### Gotchas
+
+- No tests/linter exist — `pnpm check` is the only automated quality gate.
+- Docs HMR is on `:4322/docs/`. The path `:4321/docs/` serves stale build output.
+- User rules say "do not run `pnpm dev` or `pnpm build`" — this applies to interactive sessions only; Cloud Agents must run these for verification.
+- The `z` deprecation hints from `astro check` in starlight are benign (upstream Astro content-layer API change); 0 errors is the pass condition.
