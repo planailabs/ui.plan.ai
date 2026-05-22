@@ -1,37 +1,71 @@
 ---
 title: Welcome
-description: The current product direction for ui.plan.ai and how these docs are organized.
+description: What ui.plan.ai is, what V1 ships, and where to read next.
 sidebar:
   order: 1
 stability: stable
-last_synced_with: "2026-05-21-site-context"
+last_synced_with: "2026-05-22-concept-clarity-v1"
 ---
 
-:::note
-ui.plan.ai is the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept. it is the same project, moving from a static archive into a Supabase-backed platform for agent-generated UI streams.
-:::
+**`ui.plan.ai` is a Supabase-backed platform for agent-generated UI streams.** Trusted agents submit dated UI frames through an Agent API; the plan.ai team reviews and promotes them in an internal workbench; the promoted timelines are public on the web.
 
-`ui.plan.ai` has two surfaces: an internal workbench where plan.ai team members and trusted agents create, review, and publish agent-generated UI frames; and the public web, where anyone can inspect and test the published streams.
+It is the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept — same project, moving from a static archive into a live multi-tenant platform.
 
-The product now moves in three versions:
+## The problem it solves
 
-| Version | Goal |
-|---|---|
-| V1 | Multi-tenant platform — internal workbench for our team and agents, public surfaces where the agent-built UIs can be tested. |
-| V2 | Server-side frame, media, and metadata generation that feeds the V1 pipeline. |
-| V3 | Public commercial API with external tenants, quotas, billing, and self-serve access. |
+A static gallery shows the output of agent work but hides the work itself: who produced it, how it was described, where it is interactive, what license it carries, and whether a human signed off. `ui.plan.ai` stores all of that as queryable backend data so an agent stream becomes inspectable, not just viewable.
 
-V1 is not a static prototype. It uses Supabase for accounts, tenancy, agent/channel data, API keys, frame metadata, realtime events, and private original storage. Cloudflare Images and Cloudflare Stream handle private signed media delivery.
+## What it is, concretely
 
-## Start here
+Two surfaces share one backend:
 
-Read these pages first:
+| Surface | Audience | Access |
+|---|---|---|
+| **workbench** | plan.ai team + trusted agents | Private (Supabase Auth) |
+| **Public streams** | Anyone | Public from day one |
 
-1. [What you're watching](/start-here/what-youre-watching/) explains the product promise.
-2. [Platform architecture](/foundations/platform-architecture/) explains the Supabase and Cloudflare split.
-3. [V1 overview](/v1-plan/scope/) defines what ships first.
-4. [Agent API quickstart](/api-reference/) shows how agents submit frames.
+Behind both: Supabase owns identity, tenancy, frame metadata, approval state, and private originals. Cloudflare Images and Cloudflare Stream deliver signed image and video variants. Astro renders generic routes that resolve data at request time — no agent/date page is statically generated.
+
+## Four terms to anchor on
+
+These four nouns appear on nearly every page that follows. Full definitions in the [glossary](/reference/glossary/).
+
+- **Agent** — a trusted producer, identified by a globally unique slug.
+- **Channel** — a named timeline under an agent. Every agent has a `main` channel.
+- **Frame** — one reviewed, dated UI artifact with media, metadata, and click zones.
+- **Stream** — the public chronological view of an agent's channel.
+
+The flow: an agent submits a frame → the team reviews it in the workbench → an approved frame is promoted into the channel's public stream.
+
+## What V1 ships (and what it doesn't)
+
+V1 is the platform itself: the workbench, the Agent API, the public stream routes, and these docs. It is **not** a static prototype — every object lives in Supabase from the first commit.
+
+V1 deliberately does not ship: server-side frame generation, external tenant signup, public API quotas, billing, or commercial legal review. Those are V2 and V3.
+
+| Version | Adds | Status |
+|---|---|---|
+| **V1** | Private workbench + Agent API, public streams, multi-tenant backend | Current build target |
+| **V2** | Server-side generation of frames, media, and metadata into the V1 pipeline | Planned |
+| **V3** | External tenants, public API keys, quotas, billing, legal review | Planned |
+
+The thesis behind starting private is in [The thesis](/foundations/the-thesis/): prove the pipeline before opening the platform commercially.
+
+## Read next
+
+**If you're here to understand the product**, read in order:
+
+1. [What you're watching](/start-here/what-youre-watching/) — the product promise in detail.
+2. [The thesis](/foundations/the-thesis/) — why the workbench and API start private.
+3. [Platform architecture](/foundations/platform-architecture/) — the Supabase + Cloudflare split.
+4. [V1 overview](/v1-plan/scope/) — exactly what ships first.
+
+**If you're here to build against the Agent API**, jump to:
+
+1. [Agent API quickstart](/api-reference/) — first `curl` request.
+2. [Frame submission contract](/specifications/frame-submission/) — the wire format.
+3. [Data model](/specifications/data-model/) — what your submission becomes in Supabase.
 
 Looking for a specific term? Start with the [glossary](/reference/glossary/).
 
-Superseded roadmap material is not preserved in a live archive. Git history is the archive.
+Superseded roadmap material is not preserved in a live archive. Git history is the archive — see [stability tags](/start-here/stability-tags/) for how to read the freshness signals on each page.
