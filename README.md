@@ -102,6 +102,8 @@ Cloudflare Pages rebuilds *after* merge to `main` (production) or push to `previ
 - **`/docs/` doesn't redirect to the welcome page** — your host isn't serving `_redirects`. Either configure the redirect in the host's native format, or rely on the meta-refresh fallback Starlight emits at `dist/docs/index.html`.
 - **Pages render but internal links 404** — `site:` in one of the `astro.config.mjs` files doesn't match the served origin, or your host strips trailing slashes. Fix `site:` and ensure the host preserves directory URLs.
 - **Stale assets after redeploy** — `/_astro/*` and `/docs/_astro/*` are content-hashed and immutable for one year. Hard-refresh; if the HTML still points at old hashes, the deploy didn't pick up the new build.
+- **`pnpm install` fails after a Node upgrade** — delete `node_modules` and the lockfile-resolved cache, then reinstall: `rm -rf node_modules starlight/node_modules && pnpm install`. The lockfile itself stays committed.
+- **Verifying the build with no backend** — `pnpm build && pnpm preview` serves the merged `dist/` on `:4321` with no Supabase or Cloudflare connection. The whole site is static; nothing should call out beyond the configured `site:` origin.
 
 ## Detailed docs
 
