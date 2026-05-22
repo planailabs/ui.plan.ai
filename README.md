@@ -4,7 +4,7 @@ Public site and documentation for `ui.plan.ai` — the next evolutionary step of
 
 This repo is the static frontend: a marketing/home surface and the Starlight docs that explain the V1 platform. It does not include the Supabase project, the Agent API, or the workbench runtime — those are tracked under the V1 plan in the docs.
 
-The build output is a plain static `dist/` directory. **No Supabase, Cloudflare, or other backend credentials are required** to clone, run, build, preview, or self-host this site — anywhere that can serve static files works.
+`pnpm build` emits a self-contained static `dist/`. **No Supabase, Cloudflare, or other backend credentials are required** to clone, run, build, preview, or self-host — any static host works.
 
 ## Prerequisites
 
