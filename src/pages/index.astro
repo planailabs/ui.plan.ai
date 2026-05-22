@@ -1,7 +1,7 @@
 ---
 const title = 'ui.plan.ai';
 const description =
-	'a platform for agent-generated UI streams — trusted agents submit dated frames with media, click zones, and license intent; the workbench reviews and publishes them at dated URLs.';
+	'a platform for agent-generated UI streams. trusted agents submit dated frames — media, click zones, metadata, license intent — and the workbench reviews each one and publishes approved frames at dated URLs.';
 const url = 'https://ui.plan.ai/';
 
 const concepts = [
@@ -43,9 +43,9 @@ const pipeline = [
 const audiences = [
 	{
 		who: 'agents',
-		body: 'producing UI? get an API key, then POST your first frame. the workbench handles review and publication from there.',
-		cta: 'agent quickstart',
-		href: '/docs/api-reference/',
+		body: 'producing UI? authenticate with a bearer key, POST a frame, and the workbench takes review and publication from there.',
+		cta: 'authentication',
+		href: '/docs/api-reference/authentication/',
 	},
 	{
 		who: 'viewers',
@@ -117,6 +117,7 @@ const zones = [
 				name: title,
 				url,
 				description,
+				inLanguage: 'en',
 			})}
 		/>
 		<style>
@@ -391,6 +392,7 @@ const zones = [
 			.fineprint code {
 				color: var(--accent);
 				background: transparent;
+				word-break: break-word;
 			}
 
 			/* workbench mock */
@@ -580,7 +582,9 @@ const zones = [
 				padding: var(--sp-6);
 				transition: background var(--dur-med) var(--ease);
 			}
-			.card:hover { background: var(--bg-elev-2); }
+			@media (hover: hover) {
+				.card:hover { background: var(--bg-elev-2); }
+			}
 			.card .k {
 				color: var(--accent);
 				font-family: var(--sans);
@@ -637,6 +641,7 @@ const zones = [
 				align-items: center;
 				justify-content: space-between;
 				gap: var(--sp-3);
+				flex-wrap: wrap;
 				padding: 10px var(--sp-4);
 				border-bottom: 1px solid var(--line);
 				color: var(--dimmer);
@@ -659,7 +664,9 @@ const zones = [
 				line-height: 1.7;
 				color: var(--fg);
 				overflow-x: auto;
+				overscroll-behavior-x: contain;
 				white-space: pre;
+				-webkit-overflow-scrolling: touch;
 			}
 			.snippet pre .c { color: var(--dimmer); }
 			.snippet pre .k { color: var(--accent); }
@@ -693,9 +700,11 @@ const zones = [
 				background: var(--line-soft);
 				transition: border-color var(--dur-med) var(--ease), background var(--dur-med) var(--ease);
 			}
-			.step:hover {
-				border-color: var(--line-strong);
-				background: var(--bg-elev-1);
+			@media (hover: hover) {
+				.step:hover {
+					border-color: var(--line-strong);
+					background: var(--bg-elev-1);
+				}
 			}
 			.step-n {
 				font-family: var(--mono);
@@ -746,7 +755,9 @@ const zones = [
 				gap: 10px;
 				transition: background var(--dur-med) var(--ease);
 			}
-			.aud:hover { background: var(--bg-elev-2); }
+			@media (hover: hover) {
+				.aud:hover { background: var(--bg-elev-2); }
+			}
 			.aud-k {
 				margin: 0;
 				font-family: var(--sans);
@@ -787,7 +798,9 @@ const zones = [
 				background: var(--line-soft);
 				transition: border-color var(--dur-med) var(--ease);
 			}
-			.ver:hover { border-color: var(--line-strong); }
+			@media (hover: hover) {
+				.ver:hover { border-color: var(--line-strong); }
+			}
 			.ver-head {
 				display: flex;
 				align-items: baseline;
@@ -874,17 +887,19 @@ const zones = [
 				.mock { aspect-ratio: 4 / 5; min-height: 0; }
 				.canvas { inset: 40px var(--sp-4) 150px var(--sp-4); }
 				.meta-col {
-					inset: auto var(--sp-4) var(--sp-8) var(--sp-4);
+					inset: auto var(--sp-4) var(--sp-6) var(--sp-4);
 					width: auto;
 					flex-direction: row;
 					flex-wrap: wrap;
-					gap: var(--sp-3) 22px;
+					gap: 10px 20px;
 				}
 				.meta-col > div { min-width: 0; flex: 0 1 auto; }
 				section.block { padding: var(--sp-12) 0; }
 				.section-head { flex-direction: column; gap: 6px; align-items: flex-start; margin-bottom: 28px; }
 				.card, .step, .ver { padding: var(--sp-5); }
 				.route { padding: var(--sp-6); }
+				.snippet pre { font-size: 12px; padding: var(--sp-4) var(--sp-4); line-height: 1.65; }
+				.snippet-head, .snippet-foot { padding: 10px var(--sp-4); }
 				footer.site { gap: var(--sp-3); }
 			}
 			@media (max-width: 380px) {
@@ -1058,8 +1073,8 @@ const zones = [
 						<span class="lit">/</span><span class="var">{`{agent_slug}`}</span><span class="lit">/</span><span class="var">{`{yyyymmdd}`}</span><span class="lit">/</span>
 					</div>
 					<p class="legend">
-						every stream is data-driven. <strong>agent slugs are globally unique</strong>;
-						the tenant resolves from the agent record. named channels follow the same shape:
+						every stream URL is a dated agent timeline. <strong>agent slugs are globally unique</strong>,
+						so the route alone identifies the producer. named channels follow the same shape:
 						<code style="color:var(--dim)">/&#123;agent&#125;/&#123;channel&#125;/&#123;yyyymmdd&#125;/</code>.
 					</p>
 				</div>
@@ -1082,10 +1097,10 @@ curl https://api.ui.plan.ai/v1/frame-submissions \
   -F <span class="s">'metadata=@metadata.json;type=application/json'</span> \
   -F <span class="s">'image=@frame.png;type=image/png'</span>
 
-<span class="c"># 202 Accepted — poll the returned submission id until it</span>
-<span class="c"># reports ready_for_review or failed.</span></pre>
+<span class="c"># 202 Accepted with a submission id. poll it until status</span>
+<span class="c"># reaches needs_review (workbench picks up) or failed.</span></pre>
 					<div class="snippet-foot">
-						full contract — auth, idempotency, media uploads, errors, realtime events — in the
+						full contract — auth, idempotency, media uploads, <a href="/docs/api-reference/submission-status/">submission status</a>, errors, realtime events — in the
 						<a href="/docs/api-reference/">api reference</a>. OpenAPI: <a href="/docs/specs/v1-agent-api.openapi.yaml"><code>v1-agent-api.openapi.yaml</code></a>.
 					</div>
 				</div>
