@@ -36,9 +36,10 @@
 				place-items: center;
 				font-family: var(--mono);
 				font-size: 14px;
-				line-height: 1.55;
+				line-height: 1.6;
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
+				text-rendering: optimizeLegibility;
 			}
 			::selection {
 				background: color-mix(in srgb, var(--accent) 30%, transparent);
@@ -46,14 +47,15 @@
 			}
 			main {
 				text-align: center;
-				padding: 32px;
+				padding: 32px 24px;
 				max-width: 520px;
+				width: 100%;
 			}
 			.status {
 				display: inline-flex;
 				align-items: center;
 				gap: 8px;
-				padding: 4px 10px;
+				padding: 5px 11px;
 				border: 1px solid var(--line);
 				border-radius: 999px;
 				color: var(--dimmer);
@@ -70,7 +72,7 @@
 			.code {
 				margin: 0 0 12px;
 				font-family: var(--sans);
-				font-size: 72px;
+				font-size: clamp(56px, 12vw, 80px);
 				font-weight: 500;
 				letter-spacing: -0.04em;
 				line-height: 1;
@@ -82,43 +84,65 @@
 				font-size: 18px;
 				font-weight: 500;
 				letter-spacing: -0.01em;
+				text-wrap: balance;
 			}
 			.sub {
 				margin: 0 0 32px;
 				color: var(--dim);
+				text-wrap: pretty;
+			}
+			.sub code {
+				color: var(--accent);
+				font-size: 12.5px;
+				word-break: break-word;
 			}
 			.links {
 				margin: 0;
 				display: inline-flex;
-				gap: 20px;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: 12px 20px;
 			}
 			a {
 				color: var(--accent);
 				text-decoration: none;
 				border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-				padding-bottom: 1px;
+				padding: 4px 2px;
 				transition: color 120ms ease, border-color 120ms ease;
 			}
-			a:hover,
+			a:hover {
+				color: var(--accent-2);
+				border-color: var(--accent-2);
+			}
 			a:focus-visible {
 				color: var(--accent-2);
 				border-color: var(--accent-2);
-				outline: none;
-			}
-			a:focus-visible {
-				outline: 1px solid var(--accent-2);
+				outline: 2px solid var(--accent-2);
 				outline-offset: 4px;
+				border-radius: 2px;
+			}
+			@media (max-width: 480px) {
+				main { padding: 24px 18px; }
+				.status { margin-bottom: 22px; }
+				.sub { margin-bottom: 28px; }
 			}
 			@media (prefers-reduced-motion: reduce) {
-				a { transition: none; }
+				*, *::before, *::after {
+					animation-duration: 0.001ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.001ms !important;
+				}
 			}
 			@media (prefers-contrast: more) {
 				:root {
-					--dim: #d4d4d8;
-					--dimmer: #a1a1aa;
-					--line: #3f3f46;
+					--dim: #e4e4e7;
+					--dimmer: #c0c0c5;
+					--line: #52525b;
 				}
-				a { border-bottom-color: var(--accent); }
+				a {
+					border-bottom-color: var(--accent);
+					text-decoration: underline;
+				}
 			}
 		</style>
 	</head>
