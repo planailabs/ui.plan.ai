@@ -1,0 +1,37 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import AuthWall from '@components/AuthWall.astro';
+---
+
+<Layout
+	title="Workbench — ui.plan.ai"
+	description="Private workbench for the plan.ai team. Auth-gated."
+>
+	<main>
+		<Header subtitle="Workbench · auth-gated" />
+		<AuthWall screen="overview" />
+		<nav class="screens">
+			<h3>Screens scaffolded in v1</h3>
+			<ul>
+				<li><a href="/workbench/streams/">/workbench/streams/</a> — review queue</li>
+				<li><a href="/workbench/agents/">/workbench/agents/</a> — agent + channel registry</li>
+			</ul>
+			<p class="dim small">
+				The remaining v1 screens (frame detail, API keys, approval policy,
+				media preview, team settings) are scoped per the
+				<a href="/docs/v1-plan/workbench/">workbench plan</a> and will land
+				when Supabase Auth is wired up.
+			</p>
+		</nav>
+		<Footer />
+	</main>
+</Layout>
+
+<style>
+	.screens { max-width: 520px; margin: 32px auto 0; }
+	.screens ul { padding-left: 18px; margin: 0 0 16px; color: var(--fg); font-size: 13px; line-height: 1.9; }
+	.screens li code { font-size: 12px; }
+	.small { font-size: 12px; }
+</style>

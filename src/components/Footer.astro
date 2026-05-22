@@ -1,0 +1,29 @@
+---
+const year = new Date().getUTCFullYear();
+---
+
+<footer class="site-footer">
+	<div class="left">ui.plan.ai · {year}</div>
+	<div class="right">
+		<a href="/docs/">docs</a>
+		<a href="/docs/api-reference/">api</a>
+		<a href="/docs/v1-plan/scope/">v1</a>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		margin-top: 64px;
+		padding-top: 24px;
+		border-top: 1px solid var(--line);
+		display: flex;
+		justify-content: space-between;
+		gap: 24px;
+		color: var(--mute);
+		font-size: 12px;
+		flex-wrap: wrap;
+	}
+	.right { display: flex; gap: 16px; }
+	.right a { color: var(--mute); border-bottom-color: transparent; }
+	.right a:hover { color: var(--accent); }
+</style>

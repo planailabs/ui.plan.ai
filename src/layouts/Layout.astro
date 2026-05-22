@@ -1,0 +1,68 @@
+---
+import '../styles/global.css';
+import { USE_MOCK_BACKEND } from '@lib/env';
+
+interface Props {
+	title: string;
+	description: string;
+	canonical?: string;
+}
+
+const { title, description, canonical } = Astro.props;
+const url = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'https://ui.plan.ai').toString();
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={url} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta name="twitter:card" content="summary" />
+	</head>
+	<body>
+		<slot />
+		{USE_MOCK_BACKEND && (
+			<div class="mock-badge" aria-label="Backend mode">
+				<span>MOCK BACKEND</span>
+				<a href="/docs/start-here/welcome/">why?</a>
+			</div>
+		)}
+		<style>
+			.mock-badge {
+				position: fixed;
+				bottom: 12px;
+				right: 12px;
+				display: flex;
+				gap: 10px;
+				align-items: center;
+				padding: 6px 10px;
+				background: color-mix(in srgb, var(--bg) 80%, transparent);
+				border: 1px solid var(--line);
+				color: var(--mute);
+				font-size: 10.5px;
+				letter-spacing: 0.16em;
+				border-radius: 2px;
+				backdrop-filter: blur(6px);
+			}
+			.mock-badge a {
+				color: var(--mute);
+				border-bottom-color: transparent;
+				text-transform: lowercase;
+				letter-spacing: 0.04em;
+			}
+			.mock-badge a:hover { color: var(--accent); }
+			@media (max-width: 560px) {
+				.mock-badge { bottom: 8px; right: 8px; padding: 4px 8px; font-size: 9.5px; }
+			}
+		</style>
+	</body>
+</html>

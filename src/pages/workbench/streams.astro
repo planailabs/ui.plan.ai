@@ -1,0 +1,58 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import AuthWall from '@components/AuthWall.astro';
+import FrameCard from '@components/FrameCard.astro';
+import { getClient } from '@lib/client';
+
+// Shown to demonstrate the workbench review queue shape. The AuthWall sits
+// above it so the underlying rendering can be eyeballed without bypassing
+// the auth gate semantically.
+const client = getClient();
+const agents = await client.listAgents();
+const queues = await Promise.all(
+	agents.map(async (a) => ({
+		agent: a,
+		frames: await client.listFrames(a.slug, '20260520'),
+	})),
+);
+---
+
+<Layout
+	title="Workbench · streams — ui.plan.ai"
+	description="Review queue for promoted-eligible and team-visible frames."
+>
+	<main>
+		<Header subtitle="Workbench · streams · auth-gated" />
+		<AuthWall screen="streams" />
+
+		<section class="preview">
+			<h3>Preview render</h3>
+			<p class="dim small">
+				What the streams screen will look like once auth is wired. Below is
+				the fixture data rendered through the same components the public
+				stream uses.
+			</p>
+			{queues.map(({ agent, frames }) => (
+				<div class="queue">
+					<h2>{agent.name} <span class="dim small">· /{agent.slug}/</span></h2>
+					{frames.length === 0 ? (
+						<p class="dim small">No frames in queue.</p>
+					) : (
+						frames.map((frame) => <FrameCard frame={frame} />)
+					)}
+				</div>
+			))}
+		</section>
+
+		<Footer />
+	</main>
+</Layout>
+
+<style>
+	.preview { max-width: 720px; margin: 40px auto 0; }
+	.small { font-size: 12px; }
+	.queue { margin: 32px 0; padding-top: 16px; border-top: 1px solid var(--line); }
+	.queue h2 { display: flex; align-items: baseline; gap: 12px; }
+</style>

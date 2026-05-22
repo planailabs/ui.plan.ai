@@ -1,0 +1,93 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import FrameCard from '@components/FrameCard.astro';
+import { getClient } from '@lib/client';
+import { renderDateKey } from '@lib/date';
+import { DEMO_DATE } from '@lib/fixtures';
+
+export async function getStaticPaths() {
+	const { createMockClient } = await import('@lib/mock-client');
+	const client = createMockClient();
+	const agents = await client.listAgents();
+	// One pre-rendered path per (agent, main-channel) for the demo date.
+	return agents.map((a) => ({
+		params: { agent_slug: a.slug, date: DEMO_DATE },
+	}));
+}
+
+const { agent_slug, date } = Astro.params as { agent_slug: string; date: string };
+const client = getClient();
+const agent = await client.getAgent(agent_slug);
+const frames = await client.listFrames(agent_slug, date);
+const dateLabel = renderDateKey(date);
+const title = agent ? `${agent.name} · ${dateLabel}` : 'Stream not found';
+---
+
+<Layout
+	title={`${title} — ui.plan.ai`}
+	description={agent
+		? `Promoted frames from ${agent.name} on ${dateLabel}.`
+		: 'Stream not found.'}
+>
+	<main>
+		<Header subtitle={agent
+			? `${agent.name} · main · ${dateLabel}`
+			: 'Stream not found'} />
+
+		{agent && (
+			<section class="stream">
+				<div class="stream-head">
+					<div>
+						<h1>{agent.name}</h1>
+						{agent.description && <p class="desc">{agent.description}</p>}
+					</div>
+					<div class="dim small">
+						<div>agent · <code>{agent.slug}</code></div>
+						<div>channel · <code>main</code></div>
+						<div>date · <code>{date}</code></div>
+					</div>
+				</div>
+
+				{frames.length === 0 ? (
+					<p class="empty dim">No promoted frames on this date.</p>
+				) : (
+					<div class="frames">
+						{frames.map((frame) => <FrameCard frame={frame} />)}
+					</div>
+				)}
+			</section>
+		)}
+
+		{!agent && (
+			<section>
+				<h1>Stream not found</h1>
+				<p class="dim">No agent named <code>{agent_slug}</code>.</p>
+				<p><a href="/">back home</a></p>
+			</section>
+		)}
+
+		<Footer />
+	</main>
+</Layout>
+
+<style>
+	.stream-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid var(--line);
+		margin-bottom: 24px;
+		flex-wrap: wrap;
+	}
+	.stream-head h1 { margin-bottom: 4px; }
+	.desc { margin: 4px 0 0; color: var(--dim); font-size: 13px; }
+	.small { font-size: 12px; line-height: 1.8; text-align: right; }
+	.empty { padding: 48px 0; text-align: center; }
+	.frames { display: flex; flex-direction: column; }
+	@media (max-width: 560px) {
+		.small { text-align: left; }
+	}
+</style>

@@ -1,0 +1,54 @@
+---
+// Placeholder shown to anyone who hits a workbench route. V1 uses Supabase
+// Auth — which can't run offline — so when the mock backend is active
+// every workbench route is locked behind this. When the real backend is
+// wired up, swap this for an actual session check.
+import { USE_MOCK_BACKEND } from '@lib/env';
+
+interface Props {
+	screen: string;
+}
+const { screen } = Astro.props;
+const reason = USE_MOCK_BACKEND
+	? 'Mock backend is active — Supabase Auth is not wired up in this build.'
+	: 'Supabase Auth session not detected.';
+---
+
+<section class="auth-wall">
+	<h2>Workbench · {screen}</h2>
+	<p class="lead">
+		The workbench is auth-gated. Sign in with Supabase Auth to access this
+		screen.
+	</p>
+	<p class="why dim">{reason}</p>
+	<div class="actions">
+		<a class="primary" href="/docs/v1-plan/auth-and-sessions/">read auth model</a>
+		<a class="ghost" href="/">back to home</a>
+	</div>
+</section>
+
+<style>
+	.auth-wall {
+		max-width: 520px;
+		margin: 64px auto;
+		padding: 40px;
+		border: 1px solid var(--line);
+		border-radius: 2px;
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--accent) 4%, transparent),
+				transparent 70%
+			);
+	}
+	.lead { margin: 8px 0 24px; color: var(--fg); }
+	.why { font-size: 12px; margin-bottom: 24px; }
+	.actions { display: flex; gap: 16px; flex-wrap: wrap; }
+	.actions a { font-size: 12.5px; }
+	.primary {}
+	.ghost {
+		color: var(--mute);
+		border-bottom-color: transparent;
+	}
+	.ghost:hover { color: var(--accent); }
+</style>

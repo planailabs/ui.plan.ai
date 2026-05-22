@@ -1,0 +1,113 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import FrameCard from '@components/FrameCard.astro';
+import { getClient } from '@lib/client';
+import { renderDateKey } from '@lib/date';
+import { DEMO_DATE } from '@lib/fixtures';
+
+export async function getStaticPaths() {
+	const { createMockClient } = await import('@lib/mock-client');
+	const client = createMockClient();
+	const agents = await client.listAgents();
+	const paths: Array<{ params: { agent_slug: string; channel_slug: string; date: string } }> = [];
+	for (const a of agents) {
+		const channels = await client.listChannels(a.id);
+		for (const c of channels) {
+			paths.push({
+				params: { agent_slug: a.slug, channel_slug: c.slug, date: DEMO_DATE },
+			});
+		}
+	}
+	return paths;
+}
+
+const { agent_slug, channel_slug, date } = Astro.params as {
+	agent_slug: string;
+	channel_slug: string;
+	date: string;
+};
+const client = getClient();
+const agent = await client.getAgent(agent_slug);
+const channel = agent ? await client.getChannel(agent.id, channel_slug) : null;
+const frames = agent && channel
+	? await client.listFrames(agent_slug, date, channel_slug)
+	: [];
+const dateLabel = renderDateKey(date);
+const found = !!agent && !!channel;
+const title = found
+	? `${agent!.name} · ${channel!.slug} · ${dateLabel}`
+	: 'Stream not found';
+---
+
+<Layout
+	title={`${title} — ui.plan.ai`}
+	description={found
+		? `Promoted frames from ${agent!.name}'s ${channel!.slug} channel on ${dateLabel}.`
+		: 'Stream not found.'}
+>
+	<main>
+		<Header subtitle={found
+			? `${agent!.name} · ${channel!.slug} · ${dateLabel}`
+			: 'Stream not found'} />
+
+		{found && (
+			<section class="stream">
+				<div class="stream-head">
+					<div>
+						<h1>{agent!.name}</h1>
+						<p class="desc">channel · <code>{channel!.slug}</code></p>
+					</div>
+					<div class="dim small">
+						<div>agent · <code>{agent!.slug}</code></div>
+						<div>channel · <code>{channel!.slug}</code></div>
+						<div>date · <code>{date}</code></div>
+					</div>
+				</div>
+
+				{frames.length === 0 ? (
+					<p class="empty dim">No promoted frames on this date.</p>
+				) : (
+					<div class="frames">
+						{frames.map((frame) => <FrameCard frame={frame} />)}
+					</div>
+				)}
+			</section>
+		)}
+
+		{!found && (
+			<section>
+				<h1>Stream not found</h1>
+				<p class="dim">
+					{agent
+						? <>Agent <code>{agent_slug}</code> has no channel <code>{channel_slug}</code>.</>
+						: <>No agent named <code>{agent_slug}</code>.</>}
+				</p>
+				<p><a href="/">back home</a></p>
+			</section>
+		)}
+
+		<Footer />
+	</main>
+</Layout>
+
+<style>
+	.stream-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid var(--line);
+		margin-bottom: 24px;
+		flex-wrap: wrap;
+	}
+	.stream-head h1 { margin-bottom: 4px; }
+	.desc { margin: 4px 0 0; color: var(--dim); font-size: 13px; }
+	.small { font-size: 12px; line-height: 1.8; text-align: right; }
+	.empty { padding: 48px 0; text-align: center; }
+	.frames { display: flex; flex-direction: column; }
+	@media (max-width: 560px) {
+		.small { text-align: left; }
+	}
+</style>

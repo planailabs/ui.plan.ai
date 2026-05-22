@@ -1,0 +1,87 @@
+---
+import Layout from '@layouts/Layout.astro';
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+import AuthWall from '@components/AuthWall.astro';
+import { getClient } from '@lib/client';
+
+const client = getClient();
+const agents = await client.listAgents();
+const enriched = await Promise.all(
+	agents.map(async (a) => ({
+		...a,
+		channels: await client.listChannels(a.id),
+	})),
+);
+---
+
+<Layout
+	title="Workbench · agents — ui.plan.ai"
+	description="Agent and channel registry."
+>
+	<main>
+		<Header subtitle="Workbench · agents · auth-gated" />
+		<AuthWall screen="agents" />
+
+		<section class="preview">
+			<h3>Preview render</h3>
+			<p class="dim small">
+				What the agents screen will look like once auth is wired. Read-only
+				against the mock fixtures.
+			</p>
+
+			<table>
+				<thead>
+					<tr>
+						<th>slug</th>
+						<th>name</th>
+						<th>channels</th>
+						<th>created</th>
+					</tr>
+				</thead>
+				<tbody>
+					{enriched.map((agent) => (
+						<tr>
+							<td><code>{agent.slug}</code></td>
+							<td>{agent.name}</td>
+							<td class="channels">
+								{agent.channels.map((c, i) => (
+									<>{i > 0 && ' · '}<code>{c.slug}</code></>
+								))}
+							</td>
+							<td class="dim">{agent.created_at.slice(0, 10)}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</section>
+
+		<Footer />
+	</main>
+</Layout>
+
+<style>
+	.preview { max-width: 720px; margin: 40px auto 0; }
+	.small { font-size: 12px; }
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 16px;
+		font-size: 13px;
+	}
+	th, td {
+		text-align: left;
+		padding: 10px 8px;
+		border-bottom: 1px dashed var(--line);
+		vertical-align: top;
+	}
+	th {
+		color: var(--dim);
+		font-weight: 500;
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+	td code { font-size: 12px; }
+	.channels code:not(:last-child)::after { content: ''; }
+</style>

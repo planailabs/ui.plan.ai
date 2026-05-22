@@ -1,0 +1,41 @@
+---
+import type { FrameStatus, SubmissionStatus } from '@lib/types';
+
+interface Props {
+	status: FrameStatus | SubmissionStatus;
+}
+const { status } = Astro.props;
+
+const TONE: Record<string, 'good' | 'warn' | 'bad' | 'neutral'> = {
+	promoted: 'good',
+	promotion_eligible: 'good',
+	team_visible: 'warn',
+	needs_review: 'warn',
+	received: 'neutral',
+	waiting_for_upload: 'neutral',
+	media_processing: 'neutral',
+	rejected: 'bad',
+	failed: 'bad',
+};
+
+const tone = TONE[status] ?? 'neutral';
+---
+
+<span class={`badge tone-${tone}`}>{status}</span>
+
+<style>
+	.badge {
+		display: inline-block;
+		padding: 2px 6px;
+		font-size: 10.5px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		border: 1px solid currentColor;
+		border-radius: 2px;
+		line-height: 1.4;
+	}
+	.tone-good { color: var(--accent-2); }
+	.tone-warn { color: var(--warn); }
+	.tone-bad { color: var(--bad); }
+	.tone-neutral { color: var(--mute); }
+</style>
