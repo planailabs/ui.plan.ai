@@ -396,7 +396,7 @@ components:
           examples:
             missingKey:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#authentication-required
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Authentication required
                 status: 401
                 code: authentication_required
@@ -413,14 +413,14 @@ components:
           examples:
             wrongScope:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#permission-denied
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Permission denied
                 status: 403
                 code: permission_denied
                 detail: This API key is not scoped to agent 'planner'.
                 request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
     NotFound:
-      description: The requested resource does not exist or is not visible to this key.
+      description: The requested resource does not exist or is not visible to this key. V1 does not leak existence across key scopes.
       headers:
         X-Request-Id:
           $ref: "#/components/headers/RequestId"
@@ -431,7 +431,7 @@ components:
           examples:
             notFound:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#not-found
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Not found
                 status: 404
                 code: not_found
@@ -448,7 +448,7 @@ components:
           examples:
             conflict:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#idempotency-conflict
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Idempotency conflict
                 status: 409
                 code: idempotency_conflict
@@ -466,7 +466,7 @@ components:
           examples:
             tooLarge:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#media-too-large
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Media too large
                 status: 413
                 code: media_too_large
@@ -484,7 +484,7 @@ components:
           examples:
             badType:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#unsupported-media-type
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Unsupported media type
                 status: 415
                 code: unsupported_media_type
@@ -503,7 +503,7 @@ components:
             missingAltText:
               summary: Required metadata field missing
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#validation-failed
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Validation failed
                 status: 422
                 detail: The metadata field frame.alt_text is required.
@@ -512,11 +512,31 @@ components:
                 errors:
                   - pointer: /frame/alt_text
                     detail: Required
+            missingIdempotencyKey:
+              summary: Missing Idempotency-Key on a POST
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/
+                title: Validation failed
+                status: 422
+                detail: Idempotency-Key header is required on POST.
+                code: validation_failed
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
     RateLimited:
-      description: Request was rate-limited. Back off and retry with the same `Idempotency-Key`.
+      description: |
+        Request was rate-limited. Back off and retry with the same
+        `Idempotency-Key`. Respect the `Retry-After` response header — its
+        value is either an integer number of seconds to wait, or an
+        HTTP-date after which the request may be retried (RFC 9110 §10.2.3).
       headers:
         X-Request-Id:
           $ref: "#/components/headers/RequestId"
+        Retry-After:
+          description: Seconds to wait before retrying, or an HTTP-date after which the request may be retried.
+          schema:
+            type: string
+            examples:
+              - "30"
+              - "Wed, 21 May 2026 11:00:00 GMT"
       content:
         application/problem+json:
           schema:
@@ -524,7 +544,7 @@ components:
           examples:
             rateLimited:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#rate-limited
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Rate limited
                 status: 429
                 code: rate_limited
@@ -541,7 +561,7 @@ components:
           examples:
             internal:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/#internal-error
+                type: https://ui.plan.ai/docs/api-reference/errors/
                 title: Internal error
                 status: 500
                 code: internal_error
