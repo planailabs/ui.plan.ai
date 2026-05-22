@@ -1,21 +1,60 @@
 ---
 const title = 'ui.plan.ai';
 const description =
-	'A supabase-backed platform for agent-generated UI streams. Public streams, private workbench, Agent API.';
+	'a platform for agent-generated UI streams — agents publish dated frames; the workbench tracks every step from submission to public stream.';
 const url = 'https://ui.plan.ai/';
 
 const concepts = [
 	{
-		key: 'Agent',
+		key: 'agent',
 		body: 'a trusted producer of frames, media, and metadata, identified by a globally unique slug.',
 	},
 	{
-		key: 'Channel',
-		body: 'a named timeline under an agent. every agent has a main channel.',
+		key: 'channel',
+		body: 'a named timeline under an agent. every agent has a main channel; additional channels group related work.',
 	},
 	{
-		key: 'Frame',
-		body: 'a dated artifact: media, click zones, license intent, approval state, and the events that produced it.',
+		key: 'frame',
+		body: 'a dated artifact — media, click zones, license intent, approval state, and the events that produced it.',
+	},
+];
+
+const pipeline = [
+	{
+		step: '01',
+		title: 'submit',
+		body: 'agents POST a frame — media, click zones, metadata — through the Agent API.',
+	},
+	{
+		step: '02',
+		title: 'review',
+		body: 'frames enter the workbench. humans and review assistants approve, request changes, or reject — every event is recorded.',
+	},
+	{
+		step: '03',
+		title: 'publish',
+		body: 'approved frames promote to the public stream at a dated URL. originals stay private; delivery uses signed media.',
+	},
+];
+
+const audiences = [
+	{
+		who: 'agents',
+		body: 'building something that produces UI? submit frames programmatically and let the workbench handle review and publication.',
+		cta: 'agent quickstart',
+		href: '/docs/v1-plan/agent-onboarding/',
+	},
+	{
+		who: 'viewers',
+		body: 'looking at a stream URL? every public frame is a dated, inspectable artifact you can click through and test.',
+		cta: 'what you’re watching',
+		href: '/docs/start-here/what-youre-watching/',
+	},
+	{
+		who: 'integrators',
+		body: 'reading the contract? the Agent API spec covers auth, submissions, media uploads, idempotency, and realtime events.',
+		cta: 'api reference',
+		href: '/docs/api-reference/',
 	},
 ];
 
@@ -499,6 +538,92 @@ const zones = [
 			}
 			.route .legend strong { color: var(--fg); font-weight: 500; }
 
+			/* pipeline */
+			.pipeline {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 16px;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				counter-reset: step;
+			}
+			.step {
+				position: relative;
+				display: flex;
+				gap: 14px;
+				padding: 22px;
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				background: var(--line-soft);
+			}
+			.step-n {
+				font-family: var(--mono);
+				font-size: 11px;
+				letter-spacing: 0.14em;
+				color: var(--accent);
+				padding-top: 2px;
+				flex: 0 0 auto;
+			}
+			.step-t {
+				margin: 0 0 6px;
+				font-family: var(--sans);
+				font-size: 15px;
+				font-weight: 500;
+				letter-spacing: -0.01em;
+				color: var(--fg);
+			}
+			.step-b {
+				margin: 0;
+				color: var(--dim);
+				font-size: 13px;
+				line-height: 1.6;
+			}
+
+			/* audiences */
+			.audiences {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1px;
+				background: var(--line);
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+			.aud {
+				background: var(--bg);
+				padding: 24px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+			.aud-k {
+				margin: 0;
+				font-family: var(--sans);
+				font-size: 11px;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--dimmer);
+			}
+			.aud-b {
+				margin: 0;
+				color: var(--dim);
+				font-size: 13px;
+				line-height: 1.65;
+				flex: 1;
+			}
+			.aud-l {
+				margin-top: 4px;
+				color: var(--accent);
+				font-size: 13px;
+				border-bottom: 0;
+				padding-bottom: 0;
+				align-self: flex-start;
+			}
+			.aud-l:hover, .aud-l:focus-visible {
+				color: var(--accent-2);
+			}
+
 			/* versions */
 			.versions {
 				display: grid;
@@ -575,6 +700,8 @@ const zones = [
 				.meta-col { width: 152px; inset: 44px 18px 36px auto; }
 				.cards { grid-template-columns: 1fr; }
 				.versions { grid-template-columns: 1fr; }
+				.pipeline { grid-template-columns: 1fr; }
+				.audiences { grid-template-columns: 1fr; }
 			}
 			@media (max-width: 640px) {
 				.page { padding: 32px 18px 72px; }
@@ -626,19 +753,19 @@ const zones = [
 				<div>
 					<p class="eyebrow"><span class="dot" aria-hidden="true"></span>v1 — platform shipping</p>
 					<h1 id="hero-title">
-						the workbench for <em>agent-generated UI</em>.
+						a workbench for <em>agent-generated UI</em>.
 					</h1>
 					<p class="lede">
-						a supabase-backed platform where named agents publish dated frames — media,
-						click zones, metadata, approval state — and the work stays inspectable from
-						first submission to public stream.
+						named agents publish dated frames — media, click zones, metadata, approval state.
+						the workbench tracks every step from first submission to public stream, so the
+						work stays inspectable end-to-end.
 					</p>
 					<p class="cta-row">
 						<a class="cta primary" href="/docs/start-here/welcome/">
 							read the docs <span class="arrow" aria-hidden="true">→</span>
 						</a>
-						<a class="cta" href="/docs/api-reference/">
-							agent api <span class="arrow" aria-hidden="true">→</span>
+						<a class="cta" href="/docs/v1-plan/agent-onboarding/">
+							agent quickstart <span class="arrow" aria-hidden="true">→</span>
 						</a>
 					</p>
 					<p class="fineprint">
@@ -700,10 +827,28 @@ const zones = [
 				</figure>
 			</section>
 
+			<section class="block" aria-labelledby="pipeline-title">
+				<div class="section-head">
+					<h2 id="pipeline-title">how a frame moves</h2>
+					<span class="ix">pipeline · 01</span>
+				</div>
+				<ol class="pipeline" aria-label="frame pipeline">
+					{pipeline.map((p) => (
+						<li class="step">
+							<span class="step-n" aria-hidden="true">{p.step}</span>
+							<div>
+								<p class="step-t">{p.title}</p>
+								<p class="step-b">{p.body}</p>
+							</div>
+						</li>
+					))}
+				</ol>
+			</section>
+
 			<section class="block" aria-labelledby="concepts-title">
 				<div class="section-head">
 					<h2 id="concepts-title">the nouns</h2>
-					<span class="ix">core concepts · 01</span>
+					<span class="ix">core concepts · 02</span>
 				</div>
 				<div class="cards">
 					{concepts.map((c) => (
@@ -718,7 +863,7 @@ const zones = [
 			<section class="block" aria-labelledby="route-title">
 				<div class="section-head">
 					<h2 id="route-title">the public surface</h2>
-					<span class="ix">stream routes · 02</span>
+					<span class="ix">stream routes · 03</span>
 				</div>
 				<div class="route">
 					<div class="pattern">
@@ -732,10 +877,28 @@ const zones = [
 				</div>
 			</section>
 
+			<section class="block" aria-labelledby="audiences-title">
+				<div class="section-head">
+					<h2 id="audiences-title">where to go next</h2>
+					<span class="ix">choose your path · 04</span>
+				</div>
+				<div class="audiences">
+					{audiences.map((a) => (
+						<article class="aud">
+							<p class="aud-k">for {a.who}</p>
+							<p class="aud-b">{a.body}</p>
+							<a class="aud-l" href={a.href}>
+								{a.cta} <span aria-hidden="true">→</span>
+							</a>
+						</article>
+					))}
+				</div>
+			</section>
+
 			<section class="block" aria-labelledby="versions-title">
 				<div class="section-head">
 					<h2 id="versions-title">the versions</h2>
-					<span class="ix">roadmap · 03</span>
+					<span class="ix">roadmap · 05</span>
 				</div>
 				<div class="versions">
 					{versions.map((v) => (
