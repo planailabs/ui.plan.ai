@@ -4,10 +4,12 @@ description: How ui.plan.ai is built and served on Cloudflare Pages — settings
 sidebar:
   order: 7
 stability: stable
-last_synced_with: "2026-05-22-infra-docs"
+last_synced_with: "2026-05-22-perplexity-v1-setup"
 ---
 
 ui.plan.ai is a fully static site served by Cloudflare Pages. The CF project is connected to GitHub and rebuilds on every push to a deployment branch.
+
+Cloudflare Pages is the production host for the public site at `ui.plan.ai`, but nothing in this repo depends on it — `pnpm build` emits a portable `dist/` that any static host can serve. For self-hosting elsewhere (Netlify, Vercel, S3 + CloudFront, GitHub Pages, Nginx, …), see [Self-hosting on any static host](/reference/static-hosting/).
 
 ## Project settings
 
