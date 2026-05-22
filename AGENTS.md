@@ -69,3 +69,39 @@ pnpm preview      # serve dist/
 - No splash at `/docs/`. `/docs/` 308-redirects to `/docs/start-here/welcome/` (Astro `redirects:` + matching `_redirects` 301 for CF).
 - No `CHANGELOG.md` — `git log` + version bumps in `package.json` are the record.
 - No root `sitemap.xml`. Starlight's `/docs/sitemap-index.xml` is the only sitemap; `public/robots.txt` references it.
+
+## Cursor Cloud specific instructions
+
+### Environment
+
+- Node 24.15.0 is installed via nvm; activate with `nvm use 24.15.0` before running commands.
+- pnpm 11.1.2 is available via corepack on that Node version.
+- The update script runs `pnpm install` from repo root — deps are already present on session start.
+
+### Running services
+
+| Service | Command | Port | Verify |
+|---|---|---|---|
+| Main app (dev) | `pnpm dev:app` | :4321 | `curl -s -o /dev/null -w "%{http_code}" http://localhost:4321/` → 200 |
+| Docs (dev) | `pnpm dev:docs` | :4322 | `curl -sL -o /dev/null -w "%{http_code}" http://localhost:4322/docs/start-here/welcome/` → 200 |
+| Both (dev) | `pnpm dev` | :4321 + :4322 | Both above |
+
+Start dev servers in a tmux session (they don't terminate):
+```bash
+tmux -f /exec-daemon/tmux.portal.conf new-session -d -s astro-dev -c /workspace
+tmux -f /exec-daemon/tmux.portal.conf send-keys -t astro-dev 'source ~/.nvm/nvm.sh && nvm use 24.15.0 && pnpm dev' C-m
+```
+
+### Pre-merge gate
+
+No CI — run locally before pushing:
+```bash
+pnpm check && pnpm build
+```
+
+### Gotchas
+
+- `/docs/` on port 4322 returns 301 (redirects to `/docs/start-here/welcome/`). Use `-L` with curl.
+- Port 4321's `/docs/` path is stale unless `pnpm build:docs` was run. Always use `:4322` for live docs editing.
+- No tests or linter exist — `pnpm check` (Astro type-check) is the only automated validation.
+- `public/docs/` is gitignored and rebuilt on each `pnpm build:docs`. Never edit files there.
