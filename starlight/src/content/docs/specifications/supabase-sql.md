@@ -11,6 +11,15 @@ verify_against:
 
 This is a SQL plan, not a copied blueprint from another repo. It defines the tables, constraints, and policies V1 needs before app implementation starts. Upstream RLS guidance moves; verify against [Upstream docs](/reference/upstream-docs/) before implementing.
 
+## Extensions
+
+The plan depends on two Postgres extensions that must be created before any of the table DDL runs. Supabase enables them on demand but does not assume them — declare them explicitly so a fresh `supabase db push` succeeds on a clean project.
+
+```sql
+create extension if not exists pgcrypto;  -- gen_random_uuid()
+create extension if not exists citext;    -- case-insensitive email column on tenant_invitations
+```
+
 ## Enums
 
 ```sql
@@ -169,9 +178,31 @@ create table frame_events (
   payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+create table tenant_invitations (
+  id uuid primary key default gen_random_uuid(),
+  tenant_id uuid not null references tenants(id) on delete cascade,
+  email citext not null,
+  role tenant_role not null,
+  token_hash text not null,
+  invited_by uuid not null references auth.users(id),
+  expires_at timestamptz not null,
+  redeemed_at timestamptz,
+  redeemed_by uuid references auth.users(id),
+  created_at timestamptz not null default now()
+);
+
+create table stream_webhook_events (
+  id text primary key,
+  received_at timestamptz not null default now(),
+  status_state text not null,
+  asset_uid text not null
+);
 ```
 
 Every tenant-owned table carries `tenant_id`, timestamps, and indexes on the columns used by route resolution and review queues.
+
+`tenant_invitations` backs the [team-member invitation flow](/v1-plan/team-members/). `token_hash` is `HMAC-SHA256(API_KEY_PEPPER, raw_token)` — raw tokens are never stored. `stream_webhook_events` is the idempotency log for the Cloudflare Stream webhook receiver (see [Stream webhook payload](/v1-plan/media-and-delivery/#stream-webhook-payload)); `id` is the Cloudflare `Webhook-Id` header value, which short-circuits replays.
 
 ## Required constraints
 
@@ -195,6 +226,11 @@ create index frame_submissions_review_idx on frame_submissions (tenant_id, statu
 create index frames_route_idx on frames (agent_id, channel_id, date_key, status);
 create index frame_media_submission_idx on frame_media (submission_id);
 create index frame_events_submission_idx on frame_events (submission_id, created_at desc);
+create unique index tenant_invitations_open_email_idx
+  on tenant_invitations (tenant_id, email)
+  where redeemed_at is null;
+create index tenant_invitations_expiry_idx on tenant_invitations (expires_at);
+create index stream_webhook_events_received_idx on stream_webhook_events (received_at desc);
 ```
 
 ## RLS policy matrix
@@ -214,6 +250,8 @@ Every tenant-owned table has policies for the `authenticated` role keyed on `ten
 | `frames` | member; public read for `status in ('promotion_eligible','promoted')` | service-role only | `member`+ (per policy) | — |
 | `frame_media` | member | service-role only | service-role only | — |
 | `frame_events` | member | append-only | — | — |
+| `tenant_invitations` | `owner` of same tenant | `owner` | `owner` (redeem from Edge Function only) | `owner` |
+| `stream_webhook_events` | service-role only | service-role only | — | — |
 
 Per Supabase's current RLS performance guidance, wrap auth calls in a subselect so the planner caches them per statement: `using ((select auth.uid()) = …)`. Upstream: [RLS performance](https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select).
 
@@ -236,7 +274,7 @@ using (
 
 Write policies should distinguish roles:
 
-- `owner` and `admin` manage tenants, members, agents, channels, API keys, and settings.
+- `owner` and `admin` manage agents, channels, API keys, and settings. **Tenant membership (insert/update/delete on `tenant_members` and `tenant_invitations`) is owner-only in V1** — admins cannot invite, remove, or change roles. Loosening this is V2 work.
 - `member` reviews frame submissions and changes review state where policy allows.
 - `viewer` reads team-visible streams and review-safe metadata.
 

@@ -34,6 +34,14 @@ Supabase Postgres has point-in-time recovery enabled (≥ 7 days in prod). Cloud
 
 `plan.ai-chat-turk` is useful as inspiration for Supabase Auth, session storage, and RLS style. Its schema is not copied as a blueprint.
 
+## Hostnames
+
+| Hostname | Backed by | Notes |
+|---|---|---|
+| `ui.plan.ai` | Cloudflare Pages | The Astro app + docs. |
+| `preview.ui.plan.ai` | Cloudflare Pages (`preview` branch) | Preview deploys. |
+| `api.ui.plan.ai` | Supabase Edge Functions via Supabase custom-domain | Agent API ingress and webhook receivers. CNAME at Cloudflare DNS-only. Never a Pages custom domain. Until bound, callers use the raw `<project-ref>.supabase.co` URL. See [Wiring guide, Phase 10](/v1-plan/wiring-supabase-cloudflare/#phase-10--cloudflare-pages-the-astro-app--agent-api-hostname). |
+
 ## Upstream contracts
 
 V1 depends on specific Supabase and Cloudflare behaviors that move over time. The single jumping-off list lives in [Upstream docs](/reference/upstream-docs/) — verify against it before changing any platform configuration.

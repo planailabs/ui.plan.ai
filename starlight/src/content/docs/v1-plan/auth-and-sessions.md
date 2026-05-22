@@ -47,6 +47,23 @@ The browser login form embeds Cloudflare Turnstile. Edge Functions verify the Tu
 
 Upstream: [Turnstile](https://developers.cloudflare.com/turnstile/).
 
+## OTP email template
+
+The OTP email is Supabase Auth's "Magic Link" template, customized per environment so an operator can tell at a glance which environment they just signed into.
+
+| Field | Value |
+|---|---|
+| From name | `ui.plan.ai` |
+| From address | `auth@ui.plan.ai` (DKIM + SPF for `plan.ai` must be configured before prod). |
+| Subject (prod) | `Sign in to ui.plan.ai` |
+| Subject (preview) | `[PREVIEW] Sign in to ui.plan.ai` |
+| Subject (dev) | `[DEV] Sign in to ui.plan.ai` |
+| Body | Single CTA button + the 6-digit code as a plain-text fallback. No marketing copy. |
+| Link expiry | 10 minutes (`OTP_EXPIRY` = 600). |
+| Link single-use | Yes (Supabase default). |
+
+The redirect target on the link is always the environment's primary domain (no per-PR preview URL in the link itself). The body is plain text + minimal inline HTML — no remote images, no tracking pixels, no third-party fonts. Upstream: [Supabase email templates](https://supabase.com/docs/guides/auth/auth-email-templates).
+
 ## Identity boundary
 
 Team members authenticate as users. Agents authenticate with API keys. Agent scripts must not use team-member browser sessions.

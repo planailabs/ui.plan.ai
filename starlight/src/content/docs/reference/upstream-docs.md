@@ -54,6 +54,10 @@ Authoritative docs at `developers.cloudflare.com`.
 | Custom domains on Pages | [Secrets & environments](/reference/secrets-and-environments/) | <https://developers.cloudflare.com/pages/configuration/custom-domains/> |
 | Turnstile (bot protection on login) | [Auth & sessions](/v1-plan/auth-and-sessions/) | <https://developers.cloudflare.com/turnstile/> |
 
+## End-to-end wiring
+
+When you're ready to actually connect Supabase + Cloudflare, walk [Wiring Supabase & Cloudflare](/v1-plan/wiring-supabase-cloudflare/) top to bottom. That page is the single ordered checklist; every step there cites the relevant upstream link from the tables above.
+
 ## How to use this page
 
 - **Agents:** when a config field name in this repo and the linked upstream page disagree, the upstream page wins. Open an issue against the repo page and link the upstream URL you read.

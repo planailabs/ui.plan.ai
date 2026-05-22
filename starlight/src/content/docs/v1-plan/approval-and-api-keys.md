@@ -38,6 +38,19 @@ Policies control:
 
 The Edge Function additionally verifies that the verified key's `agent_id`/`channel_id` matches the submission target — RLS alone is not sufficient because the API path uses the service role.
 
+### Creation & rotation UI contract
+
+The API-keys screen in the workbench is gated on `aal2` for `owner`/`admin`. The creation flow:
+
+1. **Form** — required: `label` (free text, ≤ 64 chars), `agent_id`, `scopes` (channels, media capabilities); optional: `expires_at` (default: never). Show inherited approval policy preview before submit.
+2. **Confirm** — explicit "I understand this token is shown once" checkbox. No double-click submit.
+3. **Reveal** — single-pane modal showing the raw `pai_live_<base32>` token with a copy button and a "Download as `.env` snippet" link. Modal cannot be dismissed without an explicit "I've stored this" confirmation. After dismissal the raw token is unrecoverable.
+4. **Listing** — table shows `label`, `prefix` (first 12 chars), `agent`, `scopes`, `last_used_at`, `created_at`, `expires_at`, `status`. Never the raw token, never the full hash.
+
+Rotation creates a brand-new row with a fresh prefix + hash and revokes the old row in the same transaction. There is no in-place edit of the secret. Revocation is immediate (no grace period in V1).
+
+All create / rotate / revoke actions append a `api_key.*` event to `frame_events` carrying actor, target key, and `request_id` (see [Observability](/v1-plan/observability/)).
+
 ## Rate limiting
 
 Per-API-key token bucket enforced inside the Edge Function:
@@ -48,6 +61,6 @@ Per-API-key token bucket enforced inside the Edge Function:
 | `POST /v1/frame-submissions` (multipart) | 10 req/min | 3 |
 | `POST /v1/media-uploads` | 20 req/min | 5 |
 
-Over-limit responses use the canonical [error envelope](/api-reference/errors/) with `error.code = "rate_limited"` and a `Retry-After` header. See [Limits](/api-reference/limits/) for the wire shape.
+Over-limit responses use the canonical [error envelope](/api-reference/errors/) with top-level `code: "rate_limited"` and a `Retry-After` header. See [Limits](/api-reference/limits/) for the wire shape.
 
 V3 extends this model for external customers and quota enforcement. V1 uses it for internal trust boundaries.

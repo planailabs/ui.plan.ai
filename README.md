@@ -25,8 +25,9 @@ The main app's `astro build` sweeps the docs build into a single merged `dist/`.
 
 4. Edit docs at `:4322/docs/` (live HMR). `:4321/docs/` is whatever was last built and is stale until you re-run `pnpm build:docs`.
 
-Configuring the platform itself (Supabase project, Cloudflare Pages, Images, Stream)? Start at the published docs:
+Configuring the platform itself (Supabase project, Cloudflare Pages, Images, Stream)? Wiring is **deferred** until the V1 plan is locked. When it's time, start here:
 
+- **[Wiring guide](https://ui.plan.ai/docs/v1-plan/wiring-supabase-cloudflare/)** — ordered checklist for connecting Supabase + Cloudflare end-to-end.
 - **[Upstream docs](https://ui.plan.ai/docs/reference/upstream-docs/)** — deep links to the latest official Supabase and Cloudflare configuration pages V1 depends on.
 - **[Secrets & environments](https://ui.plan.ai/docs/reference/secrets-and-environments/)** — env matrix and where each secret is bound.
 - **[Platform architecture](https://ui.plan.ai/docs/foundations/platform-architecture/)** — the Supabase + Cloudflare split.

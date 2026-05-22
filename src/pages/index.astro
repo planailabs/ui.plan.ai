@@ -5,222 +5,300 @@ const url = 'https://ui.plan.ai/';
 const docsUrl = '/docs/';
 
 const ideas = [
-	{
-		n: '01',
-		name: 'Holographic workbench',
-		visual:
-			'A heads-up display floating in pure black. One frame is centered like a hologram, its click zones traced in luminous cyan. A spine of metadata typewrites beside it. A single status badge breathes through the promotion gates. No chrome — just the work, lit from inside.',
-		desktop:
-			'Wide HUD. 12% agent rail · 60% frame canvas · 28% metadata column · 1px status strip at the bottom. Faint vignette at the corners. The frame canvas is a hi-fi UI mock with click-zone outlines glowing cyan.',
-		mobile:
-			'Vertical stack: agent pill top · frame canvas in 16:9 letterbox · metadata column · status strip. Pillarbox bars are absolute black, indistinguishable from the page background.',
-		loop:
-			'8 seconds, four beats. (0–2s) frame fades up, metadata typewriters in. (2–4s) click zones pulse 1 → 4. (4–6s) status badge crossfades needs_review → team_visible → promoted. (6–8s) the whole HUD dims to the loop seam.',
-		palette:
-			'Pure black · cyan-white strokes (#a5f3fc) · electric green status (#4ade80) · warm white text (#fafafa).',
-		docs:
-			'Pill chip, bottom-center of the HUD, mono. Dimmer than the primary text. The only clickable element in the artwork.',
-	},
-	{
-		n: '02',
-		name: 'Filmstrip in the void',
-		visual:
-			'A continuous filmstrip drifting through the void. Each cell is a tiny rendered agent UI; sprocket holes glow as luminous dots; the date ticks up between cells; a soft cyan halo bleeds into the dark.',
-		desktop:
-			'Strip rotated 5–8° toward the viewer, drifts left → right. 5–7 cells visible at any time. The leader margin runs ui.plan.ai/docs along its length like a printed reel ID.',
-		mobile:
-			'Strip vertical, drifts bottom → top. 3–5 cells visible. The leader runs up the left margin, type rotated 90°.',
-		loop:
-			'12 seconds of constant-velocity scroll. No discrete beats — the loop point is invisible because nothing changes phase.',
-		palette:
-			'Pure black · cool white film edges · faintly warm overlay on cells · amber (#fbbf24) for the etched docs leader.',
-		docs:
-			'Etched into the leader margin in mono, repeating with a centerdot separator: "ui.plan.ai/docs · ui.plan.ai/docs · ". The whole leader is the link target.',
-	},
-	{
-		n: '03',
-		name: 'Constellation of agents',
-		visual:
-			'A star map. A faint 80px grid hangs in the void. Scattered glowing agent nodes labeled by slug; tiny frame-rectangles emit from each node along curved bezier paths toward a central hub — the workbench — which pulses gently on arrival.',
-		desktop:
-			'Hub anchored at the right third. 6–10 agent nodes scattered across left and upper. Several frames in flight at any time; trails decay smoothly.',
-		mobile:
-			'Hub at the bottom third. Nodes scattered above. Trails descend in soft S-curves.',
-		loop:
-			'10 seconds. Asynchronous emission cadence per agent means there is always a frame mid-flight at the loop seam — the cut is invisible.',
-		palette:
-			'Pure black · cyan agent nodes (#22d3ee) · white frames with cyan trail · green hub (#34d399).',
-		docs:
-			'Label below the hub, mono. Pulses faintly in sync with the hub whenever a frame arrives.',
-	},
+        {
+                n: '01',
+                name: 'Holographic workbench',
+                visual:
+                        'A heads-up display floating in pure black. One frame is centered like a hologram, its click zones traced in luminous cyan. A spine of metadata typewrites beside it. A single status badge breathes through the promotion gates. No chrome — just the work, lit from inside.',
+                desktop:
+                        'Wide HUD. 12% agent rail · 60% frame canvas · 28% metadata column · 1px status strip at the bottom. Faint vignette at the corners. The frame canvas is a hi-fi UI mock with click-zone outlines glowing cyan.',
+                mobile:
+                        'Vertical stack: agent pill top · frame canvas in 16:9 letterbox · metadata column · status strip. Pillarbox bars are absolute black, indistinguishable from the page background.',
+                loop:
+                        '8 seconds, four beats. (0–2s) frame fades up, metadata typewriters in. (2–4s) click zones pulse 1 → 4. (4–6s) status badge crossfades needs_review → team_visible → promoted. (6–8s) the whole HUD dims to the loop seam.',
+                palette:
+                        'Pure black · cyan-white strokes (#a5f3fc) · electric green status (#4ade80) · warm white text (#fafafa).',
+                docs:
+                        'Pill chip, bottom-center of the HUD, mono. Dimmer than the primary text. The only clickable element in the artwork.',
+        },
+        {
+                n: '02',
+                name: 'Filmstrip in the void',
+                visual:
+                        'A continuous filmstrip drifting through the void. Each cell is a tiny rendered agent UI; sprocket holes glow as luminous dots; the date ticks up between cells; a soft cyan halo bleeds into the dark.',
+                desktop:
+                        'Strip rotated 5–8° toward the viewer, drifts left → right. 5–7 cells visible at any time. The leader margin runs ui.plan.ai/docs along its length like a printed reel ID.',
+                mobile:
+                        'Strip vertical, drifts bottom → top. 3–5 cells visible. The leader runs up the left margin, type rotated 90°.',
+                loop:
+                        '12 seconds of constant-velocity scroll. No discrete beats — the loop point is invisible because nothing changes phase.',
+                palette:
+                        'Pure black · cool white film edges · faintly warm overlay on cells · amber (#fbbf24) for the etched docs leader.',
+                docs:
+                        'Etched into the leader margin in mono, repeating with a centerdot separator: "ui.plan.ai/docs · ui.plan.ai/docs · ". The whole leader is the link target.',
+        },
+        {
+                n: '03',
+                name: 'Constellation of agents',
+                visual:
+                        'A star map. A faint 80px grid hangs in the void. Scattered glowing agent nodes labeled by slug; tiny frame-rectangles emit from each node along curved bezier paths toward a central hub — the workbench — which pulses gently on arrival.',
+                desktop:
+                        'Hub anchored at the right third. 6–10 agent nodes scattered across left and upper. Several frames in flight at any time; trails decay smoothly.',
+                mobile:
+                        'Hub at the bottom third. Nodes scattered above. Trails descend in soft S-curves.',
+                loop:
+                        '10 seconds. Asynchronous emission cadence per agent means there is always a frame mid-flight at the loop seam — the cut is invisible.',
+                palette:
+                        'Pure black · cyan agent nodes (#22d3ee) · white frames with cyan trail · green hub (#34d399).',
+                docs:
+                        'Label below the hub, mono. Pulses faintly in sync with the hub whenever a frame arrives.',
+        },
 ];
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="canonical" href={url} />
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content={url} />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		<meta name="twitter:card" content="summary" />
-		<style>
-			:root {
-				--bg: #000;
-				--fg: #fafafa;
-				--dim: #a1a1aa;
-				--line: #27272a;
-				--accent: #a5f3fc;
-				--accent-2: #4ade80;
-			}
-			* { box-sizing: border-box; }
-			html, body { background: var(--bg); color: var(--fg); }
-			body {
-				margin: 0;
-				min-height: 100vh;
-				font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-				font-size: 14px;
-				line-height: 1.55;
-				-webkit-font-smoothing: antialiased;
-			}
-			main {
-				max-width: 760px;
-				margin: 0 auto;
-				padding: 96px 32px 128px;
-			}
-			header { margin-bottom: 80px; }
-			h1 {
-				margin: 0 0 8px;
-				font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
-				font-size: 28px;
-				font-weight: 500;
-				letter-spacing: -0.02em;
-			}
-			.tagline {
-				margin: 0 0 28px;
-				color: var(--dim);
-			}
-			.docs-link {
-				display: inline-block;
-				color: var(--accent);
-				text-decoration: none;
-				border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-				padding-bottom: 1px;
-				transition: color 120ms ease, border-color 120ms ease;
-			}
-			.docs-link:hover,
-			.docs-link:focus-visible {
-				color: var(--accent-2);
-				border-color: var(--accent-2);
-				outline: none;
-			}
-			.meta-bar {
-				margin-top: 32px;
-				padding-top: 16px;
-				border-top: 1px solid var(--line);
-				color: var(--dim);
-				font-size: 12px;
-				line-height: 1.6;
-			}
-			.idea {
-				margin: 56px 0;
-				padding: 24px 0 0;
-				border-top: 1px solid var(--line);
-			}
-			.idea-head {
-				display: flex;
-				align-items: baseline;
-				gap: 16px;
-				margin-bottom: 20px;
-			}
-			.idea-n {
-				color: var(--accent-2);
-				font-size: 11px;
-				letter-spacing: 0.16em;
-			}
-			.idea-name {
-				margin: 0;
-				font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
-				font-size: 18px;
-				font-weight: 500;
-				letter-spacing: -0.01em;
-			}
-			dl { margin: 0; }
-			.row {
-				display: grid;
-				grid-template-columns: 120px 1fr;
-				gap: 12px 24px;
-				padding: 10px 0;
-				border-bottom: 1px dashed var(--line);
-			}
-			.row:last-child { border-bottom: 0; }
-			.row dt {
-				color: var(--dim);
-				font-size: 11px;
-				letter-spacing: 0.14em;
-				text-transform: uppercase;
-				padding-top: 2px;
-			}
-			.row dd { margin: 0; }
-			footer {
-				margin-top: 96px;
-				padding-top: 24px;
-				border-top: 1px solid var(--line);
-				color: var(--dim);
-				font-size: 12px;
-			}
-			@media (max-width: 560px) {
-				main { padding: 64px 20px 96px; }
-				h1 { font-size: 24px; }
-				.row { grid-template-columns: 1fr; gap: 4px; }
-				.row dt { padding-top: 0; }
-			}
-			@media (prefers-reduced-motion: reduce) {
-				.docs-link { transition: none; }
-			}
-		</style>
-	</head>
-	<body>
-		<main>
-			<header>
-				<h1>{title}</h1>
-				<p class="tagline">{description}</p>
-				<p><a class="docs-link" href={docsUrl}>ui.plan.ai/docs/</a></p>
-				<p class="meta-bar">
-					Three video-loop directions in development. Black canvas, pillarbox on
-					desktop, letterbox on mobile. The docs link is the only link rendered
-					into the artwork; everything else is the project, looping.
-				</p>
-			</header>
+        <head>
+                <meta charset="utf-8" />
+                <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+                <link rel="icon" href="/favicon.ico" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta name="generator" content={Astro.generator} />
+                <title>{title}</title>
+                <meta name="description" content={description} />
+                <link rel="canonical" href={url} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={url} />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content={description} />
+                <meta name="twitter:card" content="summary" />
+                <style>
+                        :root {
+                                --bg: #000;
+                                --fg: #fafafa;
+                                --dim: #a1a1aa;
+                                --line: #27272a;
+                                --accent: #a5f3fc;
+                                --accent-2: #4ade80;
+                        }
+                        * { box-sizing: border-box; }
+                        html, body { background: var(--bg); color: var(--fg); }
+                        body {
+                                margin: 0;
+                                min-height: 100vh;
+                                font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+                                font-size: 14px;
+                                line-height: 1.55;
+                                -webkit-font-smoothing: antialiased;
+                        }
+                        main {
+                                max-width: 760px;
+                                margin: 0 auto;
+                                padding: 96px 32px 128px;
+                        }
+                        header { margin-bottom: 80px; }
+                        h1 {
+                                margin: 0 0 8px;
+                                font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+                                font-size: 28px;
+                                font-weight: 500;
+                                letter-spacing: -0.02em;
+                        }
+                        .tagline {
+                                margin: 0 0 28px;
+                                color: var(--dim);
+                        }
+                        .docs-link {
+                                display: inline-block;
+                                color: var(--accent);
+                                text-decoration: none;
+                                border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+                                padding-bottom: 1px;
+                                transition: color 120ms ease, border-color 120ms ease;
+                        }
+                        .docs-link:hover,
+                        .docs-link:focus-visible {
+                                color: var(--accent-2);
+                                border-color: var(--accent-2);
+                                outline: none;
+                        }
+                        .meta-bar {
+                                margin-top: 32px;
+                                padding-top: 16px;
+                                border-top: 1px solid var(--line);
+                                color: var(--dim);
+                                font-size: 12px;
+                                line-height: 1.6;
+                        }
+                        .notice {
+                                margin: 48px 0 0;
+                                padding: 24px 24px 20px;
+                                border: 1px solid var(--line);
+                                border-left: 2px solid var(--accent-2);
+                                background: #0a0a0a;
+                        }
+                        .notice-head {
+                                display: flex;
+                                align-items: baseline;
+                                gap: 16px;
+                                margin-bottom: 12px;
+                        }
+                        .notice-tag {
+                                color: var(--accent-2);
+                                font-size: 11px;
+                                letter-spacing: 0.16em;
+                                text-transform: uppercase;
+                        }
+                        .notice-title {
+                                margin: 0;
+                                font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+                                font-size: 16px;
+                                font-weight: 500;
+                                letter-spacing: -0.01em;
+                        }
+                        .notice-body {
+                                margin: 0 0 14px;
+                                color: var(--fg);
+                        }
+                        .notice-steps {
+                                margin: 0 0 14px;
+                                padding-left: 20px;
+                                color: var(--fg);
+                        }
+                        .notice-steps li { margin: 6px 0; }
+                        .notice-foot {
+                                margin: 0;
+                                padding-top: 12px;
+                                border-top: 1px dashed var(--line);
+                                color: var(--dim);
+                                font-size: 12px;
+                        }
+                        .idea {
+                                margin: 56px 0;
+                                padding: 24px 0 0;
+                                border-top: 1px solid var(--line);
+                        }
+                        .idea-head {
+                                display: flex;
+                                align-items: baseline;
+                                gap: 16px;
+                                margin-bottom: 20px;
+                        }
+                        .idea-n {
+                                color: var(--accent-2);
+                                font-size: 11px;
+                                letter-spacing: 0.16em;
+                        }
+                        .idea-name {
+                                margin: 0;
+                                font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+                                font-size: 18px;
+                                font-weight: 500;
+                                letter-spacing: -0.01em;
+                        }
+                        dl { margin: 0; }
+                        .row {
+                                display: grid;
+                                grid-template-columns: 120px 1fr;
+                                gap: 12px 24px;
+                                padding: 10px 0;
+                                border-bottom: 1px dashed var(--line);
+                        }
+                        .row:last-child { border-bottom: 0; }
+                        .row dt {
+                                color: var(--dim);
+                                font-size: 11px;
+                                letter-spacing: 0.14em;
+                                text-transform: uppercase;
+                                padding-top: 2px;
+                        }
+                        .row dd { margin: 0; }
+                        footer {
+                                margin-top: 96px;
+                                padding-top: 24px;
+                                border-top: 1px solid var(--line);
+                                color: var(--dim);
+                                font-size: 12px;
+                        }
+                        @media (max-width: 560px) {
+                                main { padding: 64px 20px 96px; }
+                                h1 { font-size: 24px; }
+                                .row { grid-template-columns: 1fr; gap: 4px; }
+                                .row dt { padding-top: 0; }
+                        }
+                        @media (prefers-reduced-motion: reduce) {
+                                .docs-link { transition: none; }
+                        }
+                </style>
+        </head>
+        <body>
+                <main>
+                        <header>
+                                <h1>{title}</h1>
+                                <p class="tagline">{description}</p>
+                                <p><a class="docs-link" href={docsUrl}>ui.plan.ai/docs/</a></p>
+                                <p class="meta-bar">
+                                        Three video-loop directions in development. Black canvas, pillarbox on
+                                        desktop, letterbox on mobile. The docs link is the only link rendered
+                                        into the artwork; everything else is the project, looping.
+                                </p>
+                        </header>
 
-			{ideas.map((idea) => (
-				<section class="idea">
-					<div class="idea-head">
-						<span class="idea-n">{idea.n}</span>
-						<h2 class="idea-name">{idea.name}</h2>
-					</div>
-					<dl>
-						<div class="row"><dt>Visual</dt><dd>{idea.visual}</dd></div>
-						<div class="row"><dt>Desktop 16:9</dt><dd>{idea.desktop}</dd></div>
-						<div class="row"><dt>Mobile 9:16</dt><dd>{idea.mobile}</dd></div>
-						<div class="row"><dt>Loop</dt><dd>{idea.loop}</dd></div>
-						<div class="row"><dt>Palette</dt><dd>{idea.palette}</dd></div>
-						<div class="row"><dt>Docs link</dt><dd>{idea.docs}</dd></div>
-					</dl>
-				</section>
-			))}
+                        <section class="notice">
+                                <div class="notice-head">
+                                        <span class="notice-tag">Status</span>
+                                        <h2 class="notice-title">Platform wiring is deferred</h2>
+                                </div>
+                                <p class="notice-body">
+                                        The V1 plan is being finalized first. Supabase, Cloudflare Pages,
+                                        Images, Stream, and Turnstile are <strong>not</strong> connected yet
+                                        &mdash; no real projects, no live secrets, no production data. When
+                                        the plan is locked, work through the wiring guide top to bottom.
+                                </p>
+                                <ol class="notice-steps">
+                                        <li>
+                                                <a class="docs-link" href="/docs/v1-plan/wiring-supabase-cloudflare/">Wiring guide</a>
+                                                &mdash; ordered checklist for connecting Supabase + Cloudflare.
+                                        </li>
+                                        <li>
+                                                <a class="docs-link" href="/docs/reference/secrets-and-environments/">Secrets &amp; environments</a>
+                                                &mdash; env matrix + secret inventory.
+                                        </li>
+                                        <li>
+                                                <a class="docs-link" href="/docs/reference/upstream-docs/">Upstream docs</a>
+                                                &mdash; current Supabase + Cloudflare reference pages.
+                                        </li>
+                                        <li>
+                                                <a class="docs-link" href="/docs/foundations/platform-architecture/">Platform architecture</a>
+                                                &mdash; the Supabase + Cloudflare split.
+                                        </li>
+                                </ol>
+                                <p class="notice-foot">
+                                        GitHub connection &amp; Cloudflare Pages auto-deploy come last,
+                                        after the plan is locked and wiring is verified end-to-end.
+                                </p>
+                        </section>
 
-			<footer>
-				Pick one. The chosen loop replaces this page; the docs link stays —
-				rendered into the artwork, the only clickable text on the canvas.
-			</footer>
-		</main>
-	</body>
+                        {ideas.map((idea) => (
+                                <section class="idea">
+                                        <div class="idea-head">
+                                                <span class="idea-n">{idea.n}</span>
+                                                <h2 class="idea-name">{idea.name}</h2>
+                                        </div>
+                                        <dl>
+                                                <div class="row"><dt>Visual</dt><dd>{idea.visual}</dd></div>
+                                                <div class="row"><dt>Desktop 16:9</dt><dd>{idea.desktop}</dd></div>
+                                                <div class="row"><dt>Mobile 9:16</dt><dd>{idea.mobile}</dd></div>
+                                                <div class="row"><dt>Loop</dt><dd>{idea.loop}</dd></div>
+                                                <div class="row"><dt>Palette</dt><dd>{idea.palette}</dd></div>
+                                                <div class="row"><dt>Docs link</dt><dd>{idea.docs}</dd></div>
+                                        </dl>
+                                </section>
+                        ))}
+
+                        <footer>
+                                Pick one. The chosen loop replaces this page; the docs link stays —
+                                rendered into the artwork, the only clickable text on the canvas.
+                        </footer>
+                </main>
+        </body>
 </html>
