@@ -50,9 +50,9 @@ Set in both `astro.config.mjs`s as `https://ui.plan.ai`. Drives sitemap URLs and
 
 ## Sitemap & robots
 
+- The root Astro app emits `/sitemap.xml` for home, stream index, and pre-rendered public stream fixture routes.
 - Starlight generates `sitemap-index.xml` at `/docs/sitemap-index.xml` (because `base: '/docs'`).
-- `public/robots.txt` allows all and references that sitemap. Submit to Search Console at the sitemap URL.
-- No root `sitemap.xml` today. If the main app gains real content, add one (or extend robots.txt with multiple `Sitemap:` lines).
+- `public/robots.txt` allows all and references both the root sitemap and docs sitemap. Submit both sitemap URLs to Search Console.
 
 ## Absent by design
 

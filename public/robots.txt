@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://ui.plan.ai/docs/sitemap-index.xml
+Sitemap: https://ui.plan.ai/sitemap.xml

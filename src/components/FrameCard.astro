@@ -56,6 +56,21 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 				</div>
 			</dl>
 		)}
+		{!compact && (
+			<div class="event-log" aria-label={`${frame.title} event log`}>
+				<h4>Events</h4>
+				<ol>
+					{frame.events.map((event) => (
+						<li>
+							<span>{event.at}</span>
+							<strong>{event.type}</strong>
+							<em>{event.actor}</em>
+							<p>{event.summary}</p>
+						</li>
+					))}
+				</ol>
+			</div>
+		)}
 	</div>
 </article>
 
@@ -191,6 +206,55 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 	dd {
 		margin: 0;
 		color: var(--muted);
+	}
+
+	.event-log {
+		padding-top: 4px;
+	}
+
+	h4 {
+		margin: 0 0 10px;
+		color: var(--soft);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	ol {
+		display: grid;
+		gap: 10px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		gap: 6px 10px;
+		padding: 10px;
+		border: 1px solid var(--line);
+		border-radius: 14px;
+		background: rgba(0, 0, 0, 0.2);
+	}
+
+	li span,
+	li em {
+		color: var(--soft);
+		font-size: 11px;
+		font-style: normal;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+
+	li strong {
+		color: var(--accent);
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	li p {
+		grid-column: 1 / -1;
 	}
 
 	@media (max-width: 860px) {
