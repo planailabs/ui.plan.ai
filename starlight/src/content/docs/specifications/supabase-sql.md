@@ -4,10 +4,12 @@ description: Implementation-oriented SQL, RLS, indexes, and realtime plan for V1
 sidebar:
   order: 4
 stability: stable
-last_synced_with: "2026-05-21-content-audit"
+last_synced_with: "2026-05-22-llm-council-v1-pass"
+verify_against:
+  - https://supabase.com/docs/guides/database/postgres/row-level-security
 ---
 
-This is a SQL plan, not a copied blueprint from another repo. It defines the tables, constraints, and policies V1 needs before app implementation starts.
+This is a SQL plan, not a copied blueprint from another repo. It defines the tables, constraints, and policies V1 needs before app implementation starts. Upstream RLS guidance moves; verify against [Upstream docs](/reference/upstream-docs/) before implementing.
 
 ## Enums
 
@@ -176,8 +178,12 @@ Every tenant-owned table carries `tenant_id`, timestamps, and indexes on the col
 - `agents.slug` is globally unique.
 - Each agent has one `agent_channels.is_main = true` row.
 - `frame_submissions.idempotency_key` is unique per API key and endpoint.
-- `api_keys` stores `hash`, `prefix`, `scopes`, and `revoked_at`, never the raw token.
+- `api_keys` stores `hash`, `prefix`, `scopes`, and `revoked_at`, never the raw token. The browser must not be able to `select` raw `hash` — expose `api_keys` to the workbench through a view that returns `id, prefix, scopes, last_used_at, revoked_at, created_at` only, and deny `select` on the base table to the `authenticated` role.
 - `frame_media.storage_key` stores Supabase object paths or Cloudflare asset IDs, never signed delivery URLs.
+- A trigger on `auth.users insert` creates the matching `profiles` row.
+- A trigger or check constraint prevents demoting the last `owner` of a tenant and prevents non-`owner` callers from updating `tenant_members.role`.
+- `frame_events` is append-only: no UPDATE or DELETE policies. Corrections are new compensating events.
+- `force row level security` is set on every tenant-owned table so even `postgres` is RLS-checked outside service-role flows.
 
 ## Required indexes
 
@@ -191,7 +197,27 @@ create index frame_media_submission_idx on frame_media (submission_id);
 create index frame_events_submission_idx on frame_events (submission_id, created_at desc);
 ```
 
-## RLS policy intent
+## RLS policy matrix
+
+Every tenant-owned table has policies for the `authenticated` role keyed on `tenant_members`. Service-role writes (Edge Functions on the Agent API path) bypass RLS by design and re-check membership in code.
+
+| Table | select | insert | update | delete |
+|---|---|---|---|---|
+| `profiles` | self or shared-tenant member | trigger only | self | — |
+| `tenants` | member | — | `owner` | — |
+| `tenant_members` | member of same tenant | `owner` | `owner` (not last owner) | `owner` (not self) |
+| `agents` | member | `owner`/`admin` | `owner`/`admin` | `owner`/`admin` |
+| `agent_channels` | member | `owner`/`admin` | `owner`/`admin` | `owner`/`admin` |
+| `api_keys` (view, read-only) | `owner`/`admin` via view exposing `id, prefix, scopes, last_used_at, revoked_at, created_at` | — | — | — |
+| `approval_policies` | member | `owner`/`admin` | `owner`/`admin` | `owner`/`admin` |
+| `frame_submissions` | member | service-role only | `member`+ (status transitions per policy) | — |
+| `frames` | member; public read for `status in ('promotion_eligible','promoted')` | service-role only | `member`+ (per policy) | — |
+| `frame_media` | member | service-role only | service-role only | — |
+| `frame_events` | member | append-only | — | — |
+
+Per Supabase's current RLS performance guidance, wrap auth calls in a subselect so the planner caches them per statement: `using ((select auth.uid()) = …)`. Upstream: [RLS performance](https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select).
+
+### Example membership policy
 
 Browser policies are membership-based:
 
@@ -214,8 +240,16 @@ Write policies should distinguish roles:
 - `member` reviews frame submissions and changes review state where policy allows.
 - `viewer` reads team-visible streams and review-safe metadata.
 
-Agent API writes happen through Supabase Edge Functions after hashed API-key verification. Do not expose API-key writes directly through browser RLS.
+Agent API writes happen through Supabase Edge Functions after hashed API-key verification. API-key create, rotate, and revoke also happen through Edge Functions (so the workbench receives the raw token exactly once at creation and the base `api_keys` table is never writable from the browser). The browser only reads the limited view shown above; the base table denies all access to the `authenticated` role.
+
+## Storage policies
+
+Storage policies on `storage.objects` constrain `bucket_id = 'frame-originals'` AND the object path's first segment matches a tenant the caller is a member of. Originals are otherwise unreadable from the browser; Edge Functions fetch them via short-lived signed URLs (TTL ≤ 5 min).
+
+Upstream: [Storage access control](https://supabase.com/docs/guides/storage/security/access-control).
 
 ## Realtime
 
-Realtime should broadcast small events from `frame_events` or database triggers. Payloads include IDs, status, actor, and timestamp. Full metadata stays in `frame_submissions.metadata` and is fetched by ID.
+Realtime broadcasts small events from `frame_events` or database triggers. Payloads include IDs, status, actor, timestamp, and the originating `request_id`. Full metadata stays in `frame_submissions.metadata` and is fetched by ID.
+
+Only `frame_events`, `frame_submissions`, `frames`, and `frame_media` are added to the `supabase_realtime` publication. See [Realtime operations](/v1-plan/realtime-operations/).

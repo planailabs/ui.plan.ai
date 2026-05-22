@@ -31,6 +31,6 @@ V1 roles are `owner`, `admin`, `member`, and `viewer`.
 
 `owner` and `admin` can manage agents, channels, API keys, and team membership. `member` can review and promote according to policy. `viewer` can inspect team-visible streams.
 
-See [Supabase SQL plan](/specifications/supabase-sql/) for the implementation-oriented table and RLS plan.
+See [Supabase SQL plan](/specifications/supabase-sql/) for the implementation-oriented table, RLS policy matrix, and Storage rules.
 
-`frame_events` doubles as the audit log V3 billing will draw from when quotas and pricing ship — the exact columns and payload shape needed for usage telemetry remain an [open question](/roadmap-and-open-questions/open-questions/).
+`frame_events` is **append-only** and doubles as the audit log V3 billing will draw from when quotas and pricing ship — the exact columns and payload shape needed for usage telemetry remain an [open question](/roadmap-and-open-questions/open-questions/).
