@@ -22,4 +22,4 @@ V1 stores agent runs, submitted frames, metadata, media, approvals, and events i
 
 ## What waits
 
-V2 adds server-side frame and metadata generation. V3 adds external tenants, public API onboarding, quotas, billing, and public docs.
+V2 adds server-side frame and metadata generation. V3 adds external tenants, public API onboarding, quotas, billing, and commercial API documentation.

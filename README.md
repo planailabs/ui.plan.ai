@@ -20,7 +20,16 @@ Requires Node ≥24.15 (pinned to `24.15.0` in `.node-version`) and pnpm.
 
 ## Deployment
 
-Cloudflare Pages, GitHub-connected. Build command `pnpm build`, output dir `dist`.
+Cloudflare Pages serves the static Astro output from `dist`.
+
+| Setting | Value |
+|---|---|
+| Build command | `pnpm build` |
+| Build output directory | `dist` |
+| Root directory | `/` |
+| Node version | `24.15.0` from `.node-version` |
+
+The V1 product backend is planned for Supabase Auth, Postgres, Storage, Realtime, and Edge Functions, with Cloudflare Images/Stream for media delivery. Start from `env.example`, `config/project.config.json.example`, and the [V1 setup checklist](./starlight/src/content/docs/process/v1-setup.md) when those accounts are available.
 
 ## For AI agents
 

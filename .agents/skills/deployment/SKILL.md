@@ -24,6 +24,8 @@ Cloudflare Pages, GitHub-connected.
 
 `pnpm` version comes from `packageManager` in root `package.json` via Corepack (CF Pages honors it).
 
+Future V1 backend credentials are not needed for the static shell. Public browser env placeholders live in `env.example`; server-only Supabase and Cloudflare secrets belong in Supabase Edge Function secrets or deployment dashboards.
+
 ## How dual-build is served
 
 CF serves `dist/` at the domain root. `build:docs` copies Starlight output into `public/docs/` *before* the root `astro build`, so `dist/docs/*` exists and serves at `/docs/*`. No CF rewrites needed.
@@ -55,6 +57,7 @@ Set in both `astro.config.mjs`s as `https://ui.plan.ai`. Drives sitemap URLs and
 ## Absent by design
 
 - No SSR / no CF Functions — fully static.
+- Dynamic V1 product data is expected to come from browser Supabase clients plus Supabase Edge Functions behind `api.ui.plan.ai`.
 - No `wrangler.toml` — CF Pages config lives in the dashboard.
 - No preview-branch deploys (toggle in dashboard if needed).
 - No env-based config switching.

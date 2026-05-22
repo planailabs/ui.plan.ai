@@ -11,7 +11,7 @@ Build V1 in vertical slices instead of milestone placeholders.
 
 ## Priority order
 
-1. Supabase project config, auth, tenants, team roles, and RLS.
+1. Supabase project config, auth, tenants, team roles, and RLS. Start with the [V1 setup checklist](/process/v1-setup/).
 2. Agent/channel creation from the workbench.
 3. Hashed API keys with scope and policy override.
 4. `POST /v1/frame-submissions` for PNG plus metadata.
@@ -20,6 +20,6 @@ Build V1 in vertical slices instead of milestone placeholders.
 7. `POST /v1/media-uploads` for large video and Cloudflare Stream status.
 8. Realtime event updates.
 9. V2 generation service.
-10. V3 public onboarding, quotas, billing, and docs.
+10. V3 external onboarding, quotas, billing, and commercial API documentation.
 
 The goal is to prove the platform end-to-end before opening it commercially.

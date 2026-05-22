@@ -17,7 +17,8 @@ Read in this order:
 2. [The thesis](/foundations/the-thesis/)
 3. [V1 overview](/v1-plan/scope/)
 4. [workbench](/v1-plan/workbench/)
-5. [Roadmap overview](/roadmap-and-open-questions/roadmap-overview/)
+5. [V1 setup checklist](/process/v1-setup/)
+6. [Roadmap overview](/roadmap-and-open-questions/roadmap-overview/)
 
 Use the roadmap section for decisions and remaining unknowns. Do not treat retired milestones as current work.
 
@@ -33,6 +34,7 @@ Read in this order:
 6. [Media ingest](/specifications/media-ingest/)
 7. [Data model](/specifications/data-model/)
 8. [Supabase SQL plan](/specifications/supabase-sql/)
+9. [V1 setup checklist](/process/v1-setup/)
 
 The OpenAPI source lives at [/specs/v1-agent-api.openapi.yaml](/specs/v1-agent-api.openapi.yaml). JSON schemas live under [/specs/schemas/](/specs/schemas/frame-submission-metadata.v1.schema.json).
 

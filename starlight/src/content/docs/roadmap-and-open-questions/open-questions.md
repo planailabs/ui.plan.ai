@@ -11,8 +11,8 @@ No known research task blocks the docs rewrite.
 
 ## Remaining product questions
 
-- Exact Cloudflare Images variant names.
-- Exact media byte and duration limits after the real Supabase and Cloudflare accounts are configured.
+- Exact Cloudflare Images variant names after the real account is configured; the setup example currently reserves `review`, `public`, and `thumbnail`.
+- Exact media byte and duration limits after the real Supabase and Cloudflare accounts are configured; update `config/project.config.json.example` when these settle.
 - Whether V1 needs a minimal admin-only audit export.
 - Which V2 generation providers are allowed first.
 - V3 pricing and quota model.
