@@ -36,7 +36,14 @@ Current: `/docs` and `/docs/` 301 → `/docs/start-here/welcome/`. Implemented i
 - `public/_redirects`: CF Pages server-side 301 (no flash in prod).
 - Starlight `redirects: { '/': '/docs/start-here/welcome/' }`: meta-refresh HTML for `astro preview` and as a fallback.
 
-There is no `index.md` in `starlight/src/content/docs/` — Astro file-based routes take precedence over `redirects:` config, so the file's absence is required for the redirect to fire. No `_headers` today.
+There is no `index.md` in `starlight/src/content/docs/` — Astro file-based routes take precedence over `redirects:` config, so the file's absence is required for the redirect to fire.
+
+`public/_headers` ships a conservative baseline for a fully static site:
+- Global `/*`: `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Permissions-Policy` denying sensors and payments, `Cross-Origin-Opener-Policy: same-origin`. No CSP yet — Starlight inlines styles/scripts, so adding one needs deliberate tuning.
+- Long-lived caches on content-hashed paths: `/_astro/*`, `/docs/_astro/*`, `/docs/pagefind/*` → `public, max-age=31536000, immutable`.
+- Favicons: 1-day cache with `must-revalidate` (they may swap; not content-hashed).
+
+Edit `public/_headers` directly — copied into `dist/` by the main `astro build`. **Never** put it in `public/docs/` (wiped on every `build:docs`).
 
 ## Trailing slashes
 
