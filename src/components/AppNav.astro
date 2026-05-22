@@ -1,0 +1,75 @@
+---
+const links = [
+	{ label: 'Home', href: '/' },
+	{ label: 'Streams', href: '/streams/' },
+	{ label: 'Workbench preview', href: '/workbench/' },
+	{ label: 'Docs', href: '/docs/start-here/welcome/' },
+];
+---
+
+<header class="app-nav">
+	<a class="brand" href="/" aria-label="ui.plan.ai home">
+		<span class="brand-mark"></span>
+		<span>ui.plan.ai</span>
+	</a>
+	<nav aria-label="Site">
+		{links.map((link) => (
+			<a href={link.href}>{link.label}</a>
+		))}
+	</nav>
+</header>
+
+<style>
+	.app-nav {
+		width: min(1120px, calc(100% - 40px));
+		margin: 0 auto;
+		padding: 24px 0 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 24px;
+	}
+
+	.brand,
+	nav {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.brand {
+		color: var(--fg);
+		border-bottom: 0;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	.brand-mark {
+		width: 10px;
+		height: 10px;
+		border-radius: 999px;
+		background: var(--success);
+		box-shadow: 0 0 18px color-mix(in srgb, var(--success) 72%, transparent);
+	}
+
+	nav {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	nav a {
+		color: var(--muted);
+		font-size: 12px;
+	}
+
+	@media (max-width: 720px) {
+		.app-nav {
+			align-items: flex-start;
+			flex-direction: column;
+		}
+
+		nav {
+			justify-content: flex-start;
+		}
+	}
+</style>

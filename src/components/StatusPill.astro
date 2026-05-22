@@ -1,0 +1,39 @@
+---
+interface Props {
+	label: string;
+	tone?: 'neutral' | 'success' | 'warning' | 'muted';
+}
+
+const { label, tone = 'neutral' } = Astro.props;
+---
+
+<span class:list={['status-pill', tone]}>{label.replaceAll('_', ' ')}</span>
+
+<style>
+	.status-pill {
+		display: inline-flex;
+		align-items: center;
+		width: fit-content;
+		border: 1px solid var(--line-strong);
+		border-radius: 999px;
+		padding: 4px 8px;
+		color: var(--accent);
+		background: rgba(0, 0, 0, 0.22);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.success {
+		color: var(--success);
+	}
+
+	.warning {
+		color: var(--warning);
+	}
+
+	.muted {
+		color: var(--muted);
+	}
+</style>

@@ -1,21 +1,25 @@
 ---
+import AppNav from '../components/AppNav.astro';
+import FrameCard from '../components/FrameCard.astro';
+import StatusPill from '../components/StatusPill.astro';
+import { getAllPublicStreams, getWorkbenchFrames } from '../data/v1Demo';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const title = 'ui.plan.ai — agent-generated UI streams';
 const description =
-	'A Supabase-backed platform where trusted agents submit UI frames, teams review them, and public streams show the work.';
+	'A Supabase-ready Astro app where trusted agents submit UI frames, teams review them, and public streams show promoted work.';
 
 const primaryLinks = [
-	{ label: 'Read the docs', href: '/docs/start-here/welcome/' },
-	{ label: 'Setup checklist', href: '/docs/process/v1-setup/' },
-	{ label: 'Agent API quickstart', href: '/docs/api-reference/' },
+	{ label: 'Open public streams', href: '/streams/' },
+	{ label: 'Preview workbench', href: '/workbench/' },
+	{ label: 'Read setup checklist', href: '/docs/process/v1-setup/' },
 ];
 
 const platformSteps = [
 	{
 		kicker: '01',
 		title: 'Agents submit frames',
-		text: 'Trusted agents post PNG frames, media metadata, click zones, and idempotency keys through the V1 Agent API.',
+		text: 'Trusted agents post PNG frames, metadata, click zones, and idempotency keys through the V1 Agent API.',
 		href: '/docs/api-reference/frame-submissions/',
 	},
 	{
@@ -38,17 +42,23 @@ const setupLinks = [
 	{ label: 'Project config', href: '/docs/reference/config/' },
 	{ label: 'Open questions', href: '/docs/roadmap-and-open-questions/open-questions/' },
 ];
+
+const publicStreams = getAllPublicStreams();
+const featuredStream = publicStreams[0];
+const featuredFrame = featuredStream.frames[0];
+const reviewCount = getWorkbenchFrames().filter((frame) => frame.submissionStatus === 'needs_review').length;
 ---
 
 <BaseLayout title={title} description={description} canonicalPath="/">
+	<AppNav />
 	<main class="home-shell">
 		<header class="hero">
-			<p class="eyebrow">V1 platform brief</p>
-			<h1>Agent-generated UI streams, backed by real product infrastructure.</h1>
+			<p class="eyebrow">V1 app shell</p>
+			<h1>Agent-generated UI streams, reviewable from day one.</h1>
 			<p class="lede">
-				ui.plan.ai turns trusted agent output into reviewable UI frames: Supabase
-				owns accounts, tenancy, API keys, metadata, and realtime state; Cloudflare
-				owns the deployed shell plus optimized private media delivery.
+				This root Astro app is the V1 shell described in the docs: public streams for
+				promoted frames, a private workbench preview for review operations, and setup
+				boundaries ready for Supabase and Cloudflare services.
 			</p>
 			<nav class="hero-actions" aria-label="Primary">
 				{primaryLinks.map((link) => (
@@ -57,15 +67,34 @@ const setupLinks = [
 			</nav>
 		</header>
 
-		<section class="signal-panel" aria-labelledby="status-heading">
-			<div>
-				<p class="eyebrow">Deployed now</p>
-				<h2 id="status-heading">The static shell and docs are live-ready.</h2>
+		<section class="hero-grid" aria-label="Current V1 state">
+			<div class="signal-panel">
+				<p class="eyebrow">App state</p>
+				<h2>Static shell now. Supabase resolver later.</h2>
+				<p>
+					Demo fixtures follow V1 tables for tenants, agents, channels, frame submissions,
+					frames, media, and events. Public pages only render promoted frames.
+				</p>
+				<div class="stats">
+					<div><strong>{publicStreams.length}</strong><span>public streams</span></div>
+					<div><strong>{reviewCount}</strong><span>needs review</span></div>
+					<div><strong>0</strong><span>secrets committed</span></div>
+				</div>
 			</div>
-			<p>
-				The next backend pass wires Supabase Auth, Postgres, Storage, Edge Functions,
-				and Cloudflare Images/Stream behind the documented V1 contracts.
-			</p>
+			<div class="route-card">
+				<StatusPill label="route contract" tone="success" />
+				<p>/{featuredStream.agent.slug}/{featuredStream.dateKey}/</p>
+				<p>/{featuredStream.agent.slug}/{featuredStream.channel.slug}/{featuredStream.dateKey}/</p>
+				<a href={featuredStream.path}>Open featured route</a>
+			</div>
+		</section>
+
+		<section class="featured" aria-labelledby="featured-heading">
+			<div class="section-head">
+				<p class="eyebrow">Promoted frame</p>
+				<h2 id="featured-heading">A public stream frame rendered from the V1 model.</h2>
+			</div>
+			<FrameCard frame={featuredFrame} />
 		</section>
 
 		<section class="flow" aria-labelledby="flow-heading">
@@ -89,9 +118,9 @@ const setupLinks = [
 				<p class="eyebrow">Setup path</p>
 				<h2 id="setup-heading">Provision later with the same contracts.</h2>
 				<p>
-					Use the setup checklist before real credentials exist. It names the
-					Cloudflare Pages, Supabase, Images, Stream, API-domain, env, and config
-					decisions that should be filled in when accounts are available.
+					Use the setup checklist before real credentials exist. It names the Cloudflare
+					Pages, Supabase, Images, Stream, API-domain, env, and config decisions to fill
+					in when accounts are available.
 				</p>
 			</div>
 			<ul>
@@ -110,7 +139,7 @@ const setupLinks = [
 		}
 
 		.hero {
-			max-width: 880px;
+			max-width: 900px;
 			padding: 64px 0 88px;
 		}
 
@@ -140,7 +169,7 @@ const setupLinks = [
 		}
 
 		h1 {
-			max-width: 820px;
+			max-width: 860px;
 			margin-bottom: 24px;
 			font-size: clamp(44px, 8vw, 88px);
 		}
@@ -156,7 +185,7 @@ const setupLinks = [
 		}
 
 		.lede {
-			max-width: 720px;
+			max-width: 760px;
 			margin-bottom: 36px;
 			color: var(--muted);
 			font-size: 17px;
@@ -181,12 +210,16 @@ const setupLinks = [
 			color: var(--fg);
 		}
 
-		.signal-panel,
-		.setup {
+		.hero-grid {
 			display: grid;
-			grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-			gap: 32px;
+			grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+			gap: 18px;
 			margin-bottom: 72px;
+		}
+
+		.signal-panel,
+		.route-card,
+		.setup {
 			padding: 28px;
 			border: 1px solid var(--line);
 			border-radius: 28px;
@@ -194,10 +227,60 @@ const setupLinks = [
 			box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
 		}
 
+		.setup {
+			display: grid;
+			grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+			gap: 32px;
+		}
+
 		.signal-panel p,
+		.route-card p,
 		.setup p,
 		.flow-card p {
 			color: var(--muted);
+		}
+
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 12px;
+			margin-top: 28px;
+		}
+
+		.stats div {
+			padding: 14px;
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			background: rgba(0, 0, 0, 0.24);
+		}
+
+		.stats strong {
+			display: block;
+			font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+			font-size: 28px;
+			line-height: 1;
+		}
+
+		.stats span {
+			color: var(--muted);
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+		}
+
+		.route-card {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			gap: 14px;
+		}
+
+		.route-card p {
+			margin-bottom: 0;
+			padding: 12px;
+			border: 1px dashed var(--line-strong);
+			border-radius: 14px;
+			overflow-wrap: anywhere;
 		}
 
 		.section-head {
@@ -205,6 +288,7 @@ const setupLinks = [
 			margin-bottom: 28px;
 		}
 
+		.featured,
 		.flow {
 			margin-bottom: 72px;
 		}
@@ -253,6 +337,7 @@ const setupLinks = [
 		}
 
 		@media (max-width: 820px) {
+			.hero-grid,
 			.signal-panel,
 			.setup,
 			.flow-grid {
@@ -279,10 +364,15 @@ const setupLinks = [
 			}
 
 			.signal-panel,
+			.route-card,
 			.setup,
 			.flow-card {
 				padding: 20px;
 				border-radius: 20px;
+			}
+
+			.stats {
+				grid-template-columns: 1fr;
 			}
 		}
 	</style>
