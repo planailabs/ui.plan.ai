@@ -128,10 +128,11 @@ const zones = [
 				min-height: 100svh;
 				font-family: var(--mono);
 				font-size: 14px;
-				line-height: 1.55;
+				line-height: 1.6;
 				-webkit-font-smoothing: antialiased;
 				-moz-osx-font-smoothing: grayscale;
 				text-rendering: optimizeLegibility;
+				text-underline-offset: 2px;
 			}
 			::selection {
 				background: color-mix(in srgb, var(--accent) 30%, transparent);
@@ -143,13 +144,14 @@ const zones = [
 				position: absolute;
 				left: 12px;
 				top: 12px;
-				padding: 8px 12px;
+				padding: 10px 14px;
 				background: var(--fg);
 				color: var(--bg);
 				font-family: var(--sans);
 				font-size: 13px;
+				font-weight: 500;
 				border-radius: 4px;
-				transform: translateY(-200%);
+				transform: translateY(calc(-100% - 16px));
 				transition: transform 120ms ease;
 				z-index: 10;
 			}
@@ -176,14 +178,16 @@ const zones = [
 				padding-bottom: 1px;
 				transition: color 120ms ease, border-color 120ms ease;
 			}
-			a:hover, a:focus-visible {
+			a:hover {
 				color: var(--accent-2);
 				border-color: var(--accent-2);
-				outline: none;
 			}
 			a:focus-visible {
-				outline: 1px solid var(--accent-2);
+				color: var(--accent-2);
+				border-color: var(--accent-2);
+				outline: 2px solid var(--accent-2);
 				outline-offset: 4px;
+				border-radius: 2px;
 			}
 
 			/* layout */
@@ -192,11 +196,13 @@ const zones = [
 				margin: 0 auto;
 				padding: 56px 28px 96px;
 			}
+			#main { scroll-margin-top: 24px; }
 			.topbar {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				gap: 16px;
+				gap: 16px 24px;
+				flex-wrap: wrap;
 				padding-bottom: 28px;
 				border-bottom: 1px solid var(--line);
 				color: var(--dim);
@@ -212,15 +218,20 @@ const zones = [
 			}
 			.topbar nav {
 				display: inline-flex;
-				gap: 20px;
+				flex-wrap: wrap;
+				gap: 8px 20px;
 			}
 			.topbar nav a {
 				color: var(--dim);
 				border-bottom: 0;
-				padding-bottom: 0;
+				padding: 4px 0;
 			}
-			.topbar nav a:hover, .topbar nav a:focus-visible {
+			.topbar nav a:hover { color: var(--accent); }
+			.topbar nav a:focus-visible {
 				color: var(--accent);
+				outline: 2px solid var(--accent);
+				outline-offset: 4px;
+				border-radius: 2px;
 			}
 
 			/* hero */
@@ -236,7 +247,7 @@ const zones = [
 				align-items: center;
 				gap: 10px;
 				margin: 0 0 24px;
-				padding: 4px 10px;
+				padding: 5px 11px;
 				border: 1px solid var(--line);
 				border-radius: 999px;
 				color: var(--dim);
@@ -252,10 +263,11 @@ const zones = [
 			h1 {
 				margin: 0 0 20px;
 				font-family: var(--sans);
-				font-size: clamp(34px, 4.6vw, 52px);
+				font-size: clamp(32px, 4.6vw, 52px);
 				font-weight: 500;
 				letter-spacing: -0.025em;
-				line-height: 1.05;
+				line-height: 1.08;
+				text-wrap: balance;
 			}
 			h1 em {
 				font-style: normal;
@@ -267,6 +279,7 @@ const zones = [
 				font-size: 15px;
 				line-height: 1.65;
 				max-width: 46ch;
+				text-wrap: pretty;
 			}
 			.cta-row {
 				display: inline-flex;
@@ -278,6 +291,7 @@ const zones = [
 				display: inline-flex;
 				align-items: center;
 				gap: 8px;
+				min-height: 44px;
 				padding: 10px 16px;
 				font-family: var(--mono);
 				font-size: 13px;
@@ -287,22 +301,42 @@ const zones = [
 				color: var(--fg);
 				transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 			}
-			.cta:hover, .cta:focus-visible {
+			.cta:hover {
 				border-color: var(--accent);
 				color: var(--accent);
 				background: #0b0b0d;
+			}
+			.cta:focus-visible {
+				border-color: var(--accent);
+				color: var(--accent);
+				background: #0b0b0d;
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
 			}
 			.cta.primary {
 				background: color-mix(in srgb, var(--accent) 18%, #000);
 				border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 				color: var(--fg);
 			}
-			.cta.primary:hover, .cta.primary:focus-visible {
+			.cta.primary:hover {
 				background: color-mix(in srgb, var(--accent) 26%, #000);
 				border-color: var(--accent);
 				color: #fff;
 			}
-			.cta .arrow { color: var(--accent); }
+			.cta.primary:focus-visible {
+				background: color-mix(in srgb, var(--accent) 26%, #000);
+				border-color: var(--accent);
+				color: #fff;
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
+			}
+			.cta:hover .arrow, .cta:focus-visible .arrow {
+				transform: translateX(2px);
+			}
+			.cta .arrow {
+				color: var(--accent);
+				transition: transform 160ms ease;
+			}
 			.fineprint {
 				color: var(--dimmer);
 				font-size: 12px;
@@ -418,10 +452,10 @@ const zones = [
 			}
 			.meta-col .k {
 				color: var(--dimmer);
-				font-size: 9.5px;
+				font-size: 10px;
 				letter-spacing: 0.16em;
 				text-transform: uppercase;
-				margin-bottom: 3px;
+				margin-bottom: 4px;
 			}
 			.meta-col .v { color: var(--fg); font-family: var(--mono); }
 			.meta-col .v.muted { color: var(--dim); }
@@ -451,9 +485,12 @@ const zones = [
 				padding: 8px 14px;
 				border-top: 1px solid var(--line);
 				background: rgba(0, 0, 0, 0.5);
-				font-size: 10.5px;
+				font-size: 11px;
 				color: var(--dimmer);
 				letter-spacing: 0.08em;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 			.mock-status .ok { color: var(--accent-2); }
 			.mock-status .sep { color: var(--line); }
@@ -496,7 +533,9 @@ const zones = [
 			.card {
 				background: var(--bg);
 				padding: 24px;
+				transition: background 160ms ease;
 			}
+			.card:hover { background: #060608; }
 			.card .k {
 				color: var(--accent);
 				font-family: var(--sans);
@@ -510,6 +549,7 @@ const zones = [
 				margin: 0;
 				font-size: 13px;
 				line-height: 1.65;
+				text-wrap: pretty;
 			}
 
 			/* route plate */
@@ -524,9 +564,11 @@ const zones = [
 			}
 			.route .pattern {
 				font-family: var(--mono);
-				font-size: clamp(18px, 2.4vw, 26px);
+				font-size: clamp(16px, 2.4vw, 26px);
 				color: var(--fg);
-				word-break: break-all;
+				word-break: break-word;
+				overflow-wrap: anywhere;
+				line-height: 1.4;
 			}
 			.route .pattern .var { color: var(--accent); }
 			.route .pattern .lit { color: var(--dimmer); }
@@ -689,11 +731,17 @@ const zones = [
 			footer.site nav a:hover, footer.site nav a:focus-visible { color: var(--accent); }
 
 			/* responsive */
+			@media (max-width: 1024px) {
+				.hero {
+					gap: 36px;
+					padding: 64px 0 72px;
+				}
+			}
 			@media (max-width: 960px) {
 				.hero {
 					grid-template-columns: 1fr;
 					gap: 40px;
-					padding: 56px 0 64px;
+					padding: 48px 0 56px;
 				}
 				.mock { min-height: 320px; }
 				.canvas { inset: 44px 180px 36px 18px; }
@@ -702,36 +750,61 @@ const zones = [
 				.versions { grid-template-columns: 1fr; }
 				.pipeline { grid-template-columns: 1fr; }
 				.audiences { grid-template-columns: 1fr; }
+				section.block { padding: 64px 0; }
 			}
 			@media (max-width: 640px) {
-				.page { padding: 32px 18px 72px; }
-				.topbar nav { display: none; }
-				.hero { padding: 32px 0 48px; }
+				.page { padding: 28px 16px 64px; }
+				.topbar { font-size: 11px; padding-bottom: 20px; }
+				.hero { padding: 24px 0 40px; gap: 32px; }
+				.eyebrow { margin-bottom: 20px; }
+				.cta-row { gap: 10px; margin-bottom: 24px; }
+				.cta { padding: 12px 16px; font-size: 13px; }
 				.mock { aspect-ratio: 4 / 5; min-height: 0; }
-				.canvas { inset: 40px 18px 130px 18px; }
+				.canvas { inset: 40px 16px 150px 16px; }
 				.meta-col {
-					inset: auto 18px 36px 18px;
+					inset: auto 16px 32px 16px;
 					width: auto;
 					flex-direction: row;
 					flex-wrap: wrap;
-					gap: 14px 24px;
+					gap: 12px 22px;
 				}
-				.meta-col > div { min-width: 0; }
-				section.block { padding: 56px 0; }
-				.section-head { flex-direction: column; gap: 8px; align-items: flex-start; }
+				.meta-col > div { min-width: 0; flex: 0 1 auto; }
+				section.block { padding: 48px 0; }
+				.section-head { flex-direction: column; gap: 6px; align-items: flex-start; margin-bottom: 28px; }
+				.card { padding: 20px; }
+				.ver { padding: 20px; }
+				.route { padding: 22px; }
+				footer.site { gap: 12px; }
+				footer.site nav { gap: 14px 18px; flex-wrap: wrap; }
+			}
+			@media (max-width: 380px) {
+				.cta-row { display: flex; flex-direction: column; align-items: stretch; }
+				.cta { justify-content: center; }
 			}
 			@media (prefers-reduced-motion: reduce) {
+				*, *::before, *::after {
+					animation-duration: 0.001ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.001ms !important;
+					scroll-behavior: auto !important;
+				}
 				.mock-strip .pulse .led, .meta-col .badge .led { animation: none; }
-				a, .cta, .skip { transition: none; }
+				.cta:hover .arrow, .cta:focus-visible .arrow { transform: none; }
 			}
 			@media (prefers-contrast: more) {
 				:root {
-					--dim: #d4d4d8;
-					--dimmer: #a1a1aa;
-					--line: #3f3f46;
-					--line-soft: #3f3f46;
+					--dim: #e4e4e7;
+					--dimmer: #c0c0c5;
+					--line: #52525b;
+					--line-soft: #27272a;
 				}
-				a { border-bottom-color: var(--accent); }
+				a {
+					border-bottom-color: var(--accent);
+					text-decoration: underline;
+					text-decoration-thickness: 1px;
+				}
+				.card, .ver, .route, .mock { border-color: var(--line); }
+				.zone { border-style: solid; }
 			}
 		</style>
 	</head>
@@ -744,7 +817,7 @@ const zones = [
 					<a href="/docs/">docs</a>
 					<a href="/docs/api-reference/">api</a>
 					<a href="/docs/v1-plan/scope/">v1 plan</a>
-					<a href="https://github.com/planailabs/ui.plan.ai" rel="noopener">github</a>
+					<a href="https://github.com/planailabs/ui.plan.ai" target="_blank" rel="noopener noreferrer">github</a>
 				</nav>
 			</header>
 
@@ -915,12 +988,12 @@ const zones = [
 			</main>
 
 			<footer class="site">
-				<span>ui.plan.ai · the next step of <a href="https://plan.ai/ui/" rel="noopener">plan.ai/ui</a>.</span>
+				<span>ui.plan.ai · the next step of <a href="https://plan.ai/ui/" target="_blank" rel="noopener noreferrer">plan.ai/ui</a>.</span>
 				<nav aria-label="footer">
 					<a href="/docs/">docs</a>
 					<a href="/docs/api-reference/">api</a>
 					<a href="/docs/reference/glossary/">glossary</a>
-					<a href="https://github.com/planailabs/ui.plan.ai" rel="noopener">github</a>
+					<a href="https://github.com/planailabs/ui.plan.ai" target="_blank" rel="noopener noreferrer">github</a>
 				</nav>
 			</footer>
 		</div>
