@@ -59,7 +59,7 @@ pnpm preview      # serve dist/
 
 - No tests, no test runner.
 - No `wrangler.toml` — Cloudflare Pages config lives in the CF dashboard. See `deployment` skill.
-- No `_headers` file (no custom headers needed yet). `public/_redirects` and `public/robots.txt` exist — see `deployment` skill.
+- `public/_headers`, `public/_redirects`, `public/robots.txt` exist — see `deployment` skill.
 - No `.npmrc` — pnpm defaults.
 - No Prettier / ESLint / `.editorconfig` — formatting is by-hand consistency for now.
 - No `CODEOWNERS` — solo repo for now.
