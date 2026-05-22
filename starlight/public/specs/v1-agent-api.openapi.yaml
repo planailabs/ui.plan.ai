@@ -396,7 +396,7 @@ components:
           examples:
             missingKey:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#authentication_required
                 title: Authentication required
                 status: 401
                 code: authentication_required
@@ -413,7 +413,7 @@ components:
           examples:
             wrongScope:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#permission_denied
                 title: Permission denied
                 status: 403
                 code: permission_denied
@@ -431,7 +431,7 @@ components:
           examples:
             notFound:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#not_found
                 title: Not found
                 status: 404
                 code: not_found
@@ -448,7 +448,7 @@ components:
           examples:
             conflict:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#idempotency_conflict
                 title: Idempotency conflict
                 status: 409
                 code: idempotency_conflict
@@ -466,7 +466,7 @@ components:
           examples:
             tooLarge:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#media_too_large
                 title: Media too large
                 status: 413
                 code: media_too_large
@@ -484,7 +484,7 @@ components:
           examples:
             badType:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#unsupported_media_type
                 title: Unsupported media type
                 status: 415
                 code: unsupported_media_type
@@ -503,7 +503,7 @@ components:
             missingAltText:
               summary: Required metadata field missing
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#validation_failed
                 title: Validation failed
                 status: 422
                 detail: The metadata field frame.alt_text is required.
@@ -515,7 +515,7 @@ components:
             missingIdempotencyKey:
               summary: Missing Idempotency-Key on a POST
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#validation_failed
                 title: Validation failed
                 status: 422
                 detail: Idempotency-Key header is required on POST.
@@ -544,7 +544,7 @@ components:
           examples:
             rateLimited:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#rate_limited
                 title: Rate limited
                 status: 429
                 code: rate_limited
@@ -561,7 +561,7 @@ components:
           examples:
             internal:
               value:
-                type: https://ui.plan.ai/docs/api-reference/errors/
+                type: https://ui.plan.ai/docs/api-reference/errors/#internal_error
                 title: Internal error
                 status: 500
                 code: internal_error
