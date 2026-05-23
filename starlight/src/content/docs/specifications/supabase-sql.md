@@ -30,6 +30,12 @@ create type frame_status as enum (
   'promoted',
   'rejected'
 );
+create type frame_media_status as enum (
+  'received',
+  'media_processing',
+  'ready',
+  'failed'
+);
 create type media_kind as enum ('image', 'video');
 create type approval_scope as enum ('tenant', 'agent', 'channel', 'api_key');
 ```
@@ -151,7 +157,7 @@ create table frame_media (
   storage_provider text not null,
   storage_key text not null,
   delivery_id text,
-  status text not null,
+  status frame_media_status not null,
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

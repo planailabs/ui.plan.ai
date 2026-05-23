@@ -1,4 +1,4 @@
-import { getAllPublicStreams } from '../data/v1Demo';
+import { getAllPublicStreams } from '../lib/streamResolver';
 
 export const prerender = true;
 

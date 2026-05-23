@@ -97,7 +97,7 @@ export interface ResolvedStream {
 	path: string;
 }
 
-const RESERVED_SLUGS = new Set(['404', 'docs', 'streams', 'workbench']);
+const RESERVED_SLUGS = new Set(['404', 'api', 'assets', 'docs', 'favicon.ico', 'favicon.svg', 'sitemap.xml', 'streams', 'v1-status.json', 'workbench']);
 
 export const tenants: Tenant[] = [
 	{
@@ -305,21 +305,43 @@ export const frames: Frame[] = [
 		channelId: 'channel_atlas_main',
 		dateKey: '20260522',
 		title: 'Failed media derivative',
-		summary: 'Rejected workbench item used to exercise failed media and rejection states.',
+		summary: 'Failed workbench item used to exercise failed media and pre-gate failure states.',
 		altText: 'Error state panel showing a failed derivative job and reviewer rejection.',
-		frameStatus: 'rejected',
 		submissionStatus: 'failed',
 		mediaStatus: 'failed',
 		variant: 'review',
 		submittedAt: '2026-05-22T10:18:00Z',
 		license: { intent: 'unknown' },
-		decisionNotes: 'Rejected because media processing failed and no public variant was produced.',
+		decisionNotes: 'No frame gate exists because media processing failed before review.',
 		clickZones: [
 			{ id: 'problem-schema', label: 'Problem schema', kind: 'navigation', bounds: { x: 0.2, y: 0.28, width: 0.36, height: 0.18 }, target: '/docs/specs/schemas/problem.v1.schema.json' },
 		],
 		events: [
-			{ type: 'frame.media.status_changed', actor: 'system', occurredAt: '2026-05-22T10:18:00Z', summary: 'Derivative processing failed.' },
-			{ type: 'frame.rejected', actor: 'team', occurredAt: '2026-05-22T10:20:00Z', summary: 'Reviewer rejected the submission.' },
+			{ type: 'frame.media.status_changed', actor: 'system', occurredAt: '2026-05-22T10:18:00Z', summary: 'Derivative processing failed before review.' },
+		],
+	},
+	{
+		id: 'frame_planner_20260522_rejected',
+		tenantId: 'tenant_planai',
+		agentId: 'agent_planner',
+		channelId: 'channel_planner_review',
+		dateKey: '20260522',
+		title: 'Rejected interaction pattern',
+		summary: 'Reviewed frame rejected after media was ready and the team inspected the interaction pattern.',
+		altText: 'Review panel showing a rejected interaction pattern and reviewer notes.',
+		frameStatus: 'rejected',
+		submissionStatus: 'rejected',
+		mediaStatus: 'ready',
+		variant: 'review',
+		submittedAt: '2026-05-22T10:22:00Z',
+		license: { intent: 'cc0' },
+		decisionNotes: 'Rejected after review because the proposed interaction duplicated existing navigation.',
+		clickZones: [
+			{ id: 'approval-policy', label: 'Approval policy', kind: 'navigation', bounds: { x: 0.18, y: 0.18, width: 0.42, height: 0.2 }, target: '/docs/specifications/approval-policy/' },
+		],
+		events: [
+			{ type: 'frame.approval.changed', actor: 'team', occurredAt: '2026-05-22T10:22:00Z', summary: 'Reviewer inspected the ready frame.' },
+			{ type: 'frame.rejected', actor: 'team', occurredAt: '2026-05-22T10:24:00Z', summary: 'Reviewer rejected the frame.' },
 		],
 	},
 ];

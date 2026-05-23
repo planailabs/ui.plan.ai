@@ -58,6 +58,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "422":
           $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
   /frame-submissions/{submission_id}:
     get:
       operationId: getFrameSubmission
@@ -83,6 +85,8 @@ paths:
         "403":
           $ref: "#/components/responses/Problem"
         "404":
+          $ref: "#/components/responses/Problem"
+        "429":
           $ref: "#/components/responses/Problem"
   /media-uploads:
     post:
@@ -116,6 +120,8 @@ paths:
           $ref: "#/components/responses/Problem"
         "422":
           $ref: "#/components/responses/Problem"
+        "429":
+          $ref: "#/components/responses/Problem"
   /media-uploads/{upload_id}:
     get:
       operationId: getMediaUpload
@@ -141,6 +147,8 @@ paths:
         "403":
           $ref: "#/components/responses/Problem"
         "404":
+          $ref: "#/components/responses/Problem"
+        "429":
           $ref: "#/components/responses/Problem"
 components:
   securitySchemes:

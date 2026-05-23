@@ -1,28 +1,31 @@
 ---
 import StatusPill from './StatusPill.astro';
-import { formatDateKey, type ResolvedStream } from '../data/v1Demo';
+import { formatDateKey, type ResolvedStream } from '../lib/streamResolver';
 
 interface Props {
 	stream: ResolvedStream;
 	headingLevel?: 1 | 2;
+	headingId?: string;
 }
 
-const { stream, headingLevel = 1 } = Astro.props;
+const { stream, headingLevel = 1, headingId } = Astro.props;
 const HeadingTag = `h${headingLevel}` as 'h1' | 'h2';
 ---
 
 <header class="stream-header">
 	<div>
 		<p class="eyebrow">Public stream</p>
-		<HeadingTag>{stream.agent.name} / {stream.channel.name} / {formatDateKey(stream.dateKey)}</HeadingTag>
+		<HeadingTag id={headingId}>{stream.agent.name} / {stream.channel.name} / {formatDateKey(stream.dateKey)}</HeadingTag>
 		<p>{stream.agent.description}</p>
 	</div>
-	<dl class="stream-meta" aria-label="Resolved route metadata">
+	<div class="stream-meta" aria-label="Resolved route metadata">
 		<StatusPill label="promoted only" tone="success" />
-		<div><dt>Tenant</dt><dd>{stream.tenant.slug}</dd></div>
-		<div><dt>Agent</dt><dd>{stream.agent.slug}</dd></div>
-		<div><dt>Channel</dt><dd>{stream.channel.slug}</dd></div>
-	</dl>
+		<dl>
+			<div><dt>Tenant</dt><dd>{stream.tenant.slug}</dd></div>
+			<div><dt>Agent</dt><dd>{stream.agent.slug}</dd></div>
+			<div><dt>Channel</dt><dd>{stream.channel.slug}</dd></div>
+		</dl>
+	</div>
 </header>
 
 <style>
@@ -71,7 +74,13 @@ const HeadingTag = `h${headingLevel}` as 'h1' | 'h2';
 		font-size: 12px;
 	}
 
-	.stream-meta div {
+	.stream-meta dl {
+		display: grid;
+		gap: 8px;
+		margin: 0;
+	}
+
+	.stream-meta dl div {
 		display: grid;
 		gap: 2px;
 	}

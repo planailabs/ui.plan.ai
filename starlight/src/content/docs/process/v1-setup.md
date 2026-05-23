@@ -25,7 +25,7 @@ The root app remains static. Browser sessions read dynamic product state through
 
 Create one Supabase project for each environment that needs isolated data.
 
-1. Enable Supabase Auth with PKCE redirects for `https://ui.plan.ai/` and the local development origin.
+1. Enable Supabase Auth with PKCE redirects for `https://ui.plan.ai/` and `http://localhost:4321/` for local main-app development.
 2. Apply the [Supabase SQL plan](/specifications/supabase-sql/) as migrations before adding application code.
 3. Create the private originals bucket named in `config/project.config.json.example`.
 4. Deploy Edge Functions for Agent API ingress, API-key verification, idempotency checks, frame submissions, media-upload creation, and webhook handling.
@@ -53,7 +53,7 @@ The public contract uses `https://api.ui.plan.ai/v1`.
 
 ## Environment variables
 
-Start from `env.example`.
+Start from `env.example`. Public `PUBLIC_*` values can be copied into local Astro `.env` files. Server-only values belong in Supabase Edge Function secrets, or in local Supabase function environment files only while running functions locally.
 
 | Name | Scope | Notes |
 |---|---|---|
@@ -67,6 +67,8 @@ Start from `env.example`.
 
 ## Project config
 
-Copy `config/project.config.json.example` when implementation begins. Keep values config-driven and validate the shape against the [project config schema](/specs/schemas/project-config.v1.schema.json).
+Copy `config/project.config.json.example` to `config/project.config.json` when implementation begins. Keep values config-driven and validate the shape against the [project config schema](/specs/schemas/project-config.v1.schema.json). The environment-specific `config/project.config.json` file is gitignored.
 
 Do not commit production secrets or account-specific private values. Public limits, bucket names, variant names, and default approval behavior may be committed once they are stable.
+
+After deploying the static shell, smoke-test `/v1-status.json` to confirm the app can expose contract links, public routes, and whether public Supabase env values are configured.

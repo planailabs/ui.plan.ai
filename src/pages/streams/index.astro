@@ -2,7 +2,7 @@
 import AppNav from '../../components/AppNav.astro';
 import FrameCard from '../../components/FrameCard.astro';
 import StreamHeader from '../../components/StreamHeader.astro';
-import { formatDateKey, getAllPublicStreams } from '../../data/v1Demo';
+import { formatDateKey, getAllPublicStreams } from '../../lib/streamResolver';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const streams = getAllPublicStreams();
@@ -23,12 +23,19 @@ const description = 'Promoted V1 agent-generated UI streams rendered by the stat
 		</header>
 
 		<div class="stream-list">
+			{streams.length === 0 && (
+				<section class="stream-preview">
+					<p class="eyebrow">Empty state</p>
+					<h2>No promoted stream fixtures are available yet.</h2>
+					<p><a href="/docs/process/v1-setup/">Open the V1 setup checklist</a></p>
+				</section>
+			)}
 			{streams.map((stream) => (
 				<section class="stream-preview" aria-labelledby={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`}>
-					<StreamHeader stream={stream} headingLevel={2} />
-					<h3 id={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`}>
+					<StreamHeader stream={stream} headingLevel={2} headingId={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`} />
+					<p class="stream-path">
 						<a href={stream.path}>{stream.path}</a>
-					</h3>
+					</p>
 					<p class="stream-date">Resolved date: {formatDateKey(stream.dateKey)}</p>
 					<FrameCard frame={stream.frames[0]} compact />
 				</section>
@@ -71,7 +78,7 @@ const description = 'Promoted V1 agent-generated UI streams rendered by the stat
 			font-size: clamp(42px, 7vw, 76px);
 		}
 
-		h3 {
+		.stream-path {
 			margin: -8px 0 8px;
 			font-size: 18px;
 			letter-spacing: -0.01em;

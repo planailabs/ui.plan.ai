@@ -2,7 +2,7 @@
 import AppNav from '../../components/AppNav.astro';
 import FrameCard from '../../components/FrameCard.astro';
 import StatusPill from '../../components/StatusPill.astro';
-import { getFrameContext, getWorkbenchFrames } from '../../data/v1Demo';
+import { getFrameContext, getWorkbenchFrames } from '../../lib/streamResolver';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const frames = getWorkbenchFrames();

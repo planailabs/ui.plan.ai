@@ -2,7 +2,7 @@
 import AppNav from '../../../../components/AppNav.astro';
 import FrameCard from '../../../../components/FrameCard.astro';
 import StreamHeader from '../../../../components/StreamHeader.astro';
-import { formatDateKey, getPublicChannelStreams, type ResolvedStream } from '../../../../data/v1Demo';
+import { formatDateKey, getPublicChannelStreams, type ResolvedStream } from '../../../../lib/streamResolver';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 
 export function getStaticPaths() {
@@ -35,6 +35,7 @@ const description = `${stream.agent.name} public ${stream.channel.slug} channel 
 				<FrameCard frame={frame} />
 			))}
 		</div>
+		<p class="back-link"><a href="/streams/">All public streams</a></p>
 	</main>
 
 	<style>
@@ -47,6 +48,10 @@ const description = `${stream.agent.name} public ${stream.channel.slug} channel 
 		.frames {
 			display: grid;
 			gap: 24px;
+		}
+
+		.back-link {
+			margin: 24px 0 0;
 		}
 
 		h2 {

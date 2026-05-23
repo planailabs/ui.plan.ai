@@ -41,7 +41,7 @@ For each changed file, check whether docs reference it:
 | `src/pages/sitemap.xml.ts` | `deployment` skill + `public/robots.txt`; keep public route list intentional |
 | `src/pages/v1-status.json.ts` | README + route conventions docs; keep contract/schema links current |
 | `env.example` | README + V1 setup checklist env table |
-| `config/project.config.json.example` | Reference config docs + project config schema |
+| `config/project.config.json.example` or `/config/project.config.json` ignore rule | Reference config docs + project config schema |
 | `public/favicon.svg` ↔ `starlight/public/favicon.svg` | Keep byte-identical (AGENTS.md hard rule) |
 | `src/pages/404.astro` (or its removal) | `AGENTS.md` Known-absent section |
 | `tsconfig.json` excludes | If a new top-level dir is added, ensure `astro check` doesn't traverse generated content (`public/docs`, `dist`, `starlight`) |

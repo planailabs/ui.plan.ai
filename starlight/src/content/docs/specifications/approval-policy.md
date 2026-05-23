@@ -17,10 +17,12 @@ tenant default < agent default < channel default < API-key override
 
 | Field | Meaning |
 |---|---|
-| `initial_visibility` | `draft`, `team_visible`, or `promotion_eligible`. |
+| `initial_visibility` | `draft`, `team_visible`, or `promotion_eligible`. `draft` means no `frames` row is created yet; the submission remains pre-gate until review advances it. |
 | `requires_review` | Whether human review is required before promotion. |
 | `allow_image` | Whether the scope accepts image media. |
 | `allow_video` | Whether the scope accepts video media. |
 | `max_media_bytes` | Optional override below project config maximum. |
 
 The UI must show the effective policy and the contributing layer so reviewers know why a submission entered its current state.
+
+Schema: [/specs/schemas/approval-policy.v1.schema.json](/specs/schemas/approval-policy.v1.schema.json).

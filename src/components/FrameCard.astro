@@ -1,6 +1,6 @@
 ---
 import StatusPill from './StatusPill.astro';
-import { formatEventTime, getFrameStatusLabel, getLicenseLabel, type Frame } from '../data/v1Demo';
+import { formatEventTime, getFrameStatusLabel, getLicenseLabel, type Frame } from '../lib/streamResolver';
 
 interface Props {
 	frame: Frame;
@@ -14,7 +14,7 @@ const sortedClickZones = frame.clickZones.slice().sort((a, b) => a.bounds.y - b.
 ---
 
 <article class:list={['frame-card', { compact }]}>
-	<figure class="frame-stage" aria-label={frame.altText}>
+	<figure class="frame-stage">
 		<div class="frame-topline">
 			<span>{frame.variant} variant</span>
 			<span>{frame.mediaStatus.replaceAll('_', ' ')}</span>

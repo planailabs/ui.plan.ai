@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui.plan.ai/docs/specs/schemas/approval-policy.v1.schema.json",
+  "title": "Approval policy settings",
+  "type": "object",
+  "properties": {
+    "initial_visibility": {
+      "type": "string",
+      "enum": ["draft", "team_visible", "promotion_eligible"]
+    },
+    "requires_review": {
+      "type": "boolean"
+    },
+    "allow_image": {
+      "type": "boolean"
+    },
+    "allow_video": {
+      "type": "boolean"
+    },
+    "max_media_bytes": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "additionalProperties": false
+}
