@@ -72,15 +72,26 @@ pnpm preview      # serve dist/
 
 ## Cursor Cloud specific instructions
 
-Environment is pre-configured with Node 24.15.0 (via nvm) and pnpm 11.1.2 (via corepack). Dependencies are already installed.
+### Environment
 
-### Starting dev servers
+- Node 24.15.0 is installed via nvm; activate with `nvm use 24.15.0` before running commands if the shell has not already done so.
+- pnpm 11.1.2 is available via corepack on that Node version.
+- The update script runs `pnpm install` from repo root — deps are already present on session start.
+
+### Running services
+
+| Service | Command | Port | Verify |
+|---|---|---|---|
+| Main app (dev) | `pnpm dev:app` | :4321 | `curl -s -o /dev/null -w "%{http_code}" http://localhost:4321/` → 200 |
+| Docs (dev) | `pnpm dev:docs` | :4322 | `curl -sL -o /dev/null -w "%{http_code}" http://localhost:4322/docs/start-here/welcome/` → 200 |
+| Both (dev) | `pnpm dev` | :4321 + :4322 | Both above |
+
+Start dev servers in a tmux session (they don't terminate):
 
 ```bash
-pnpm dev   # both: app :4321, docs :4322
+tmux -f /exec-daemon/tmux.portal.conf new-session -d -s astro-dev -c /workspace
+tmux -f /exec-daemon/tmux.portal.conf send-keys -t astro-dev 'source ~/.nvm/nvm.sh && nvm use 24.15.0 && pnpm dev' C-m
 ```
-
-Run in a backgrounded tmux session. Verify with `curl -s -o /dev/null -w "%{http_code}" http://localhost:4321/` (expect 200).
 
 ### Pre-merge gate
 
@@ -95,6 +106,8 @@ pnpm check && pnpm build
 ### Gotchas
 
 - No tests/linter exist — `pnpm check` is the only automated quality gate.
+- `/docs/` on port 4322 returns 301 (redirects to `/docs/start-here/welcome/`). Use `-L` with curl.
 - Docs HMR is on `:4322/docs/`. The path `:4321/docs/` serves stale build output.
+- `public/docs/` is gitignored and rebuilt on each `pnpm build:docs`. Never edit files there.
 - User rules say "do not run `pnpm dev` or `pnpm build`" — this applies to interactive sessions only; Cloud Agents must run these for verification.
 - The `z` deprecation hints from `astro check` in starlight are benign (upstream Astro content-layer API change); 0 errors is the pass condition.
