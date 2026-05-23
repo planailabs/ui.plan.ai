@@ -32,7 +32,7 @@ git reset --hard <feature-branch>     # or git merge --ff-only
 git push origin preview               # CF deploys to the preview URL
 ```
 
-Use only when needed — visual UI changes, redirect/_redirects changes, deploy-config changes. Routine code-only changes can skip preview and rely on local `pnpm preview` + CI.
+Use only when needed — visual UI changes, redirect/_redirects changes, deploy-config changes. Routine code-only changes can skip preview and rely on the local pre-merge gate.
 
 The `preview` branch is disposable scratch — reset / force-push freely. Never merge `preview` into `main`.
 

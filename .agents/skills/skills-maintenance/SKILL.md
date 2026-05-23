@@ -38,6 +38,10 @@ For each changed file, check whether docs reference it:
 | `starlight/src/content/docs/index.md` splash hero `link:` fields | Must be base-prefixed manually (remark plugin doesn't touch frontmatter) |
 | Any `template: splash` page — including its body markdown links | Both frontmatter and body bypass `remarkPlugins`; write full `/docs/...` paths everywhere |
 | `public/robots.txt` | `deployment` skill; sitemap URL inside must match `site:` |
+| `src/pages/sitemap.xml.ts` | `deployment` skill + `public/robots.txt`; keep public route list intentional |
+| `src/pages/v1-status.json.ts` | README + route conventions docs; keep contract/schema links current |
+| `env.example` | README + V1 setup checklist env table |
+| `config/project.config.json.example` | Reference config docs + project config schema |
 | `public/favicon.svg` ↔ `starlight/public/favicon.svg` | Keep byte-identical (AGENTS.md hard rule) |
 | `src/pages/404.astro` (or its removal) | `AGENTS.md` Known-absent section |
 | `tsconfig.json` excludes | If a new top-level dir is added, ensure `astro check` doesn't traverse generated content (`public/docs`, `dist`, `starlight`) |

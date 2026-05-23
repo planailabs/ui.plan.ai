@@ -12,7 +12,7 @@ Two Astro projects in one pnpm workspace; merged into one `dist/`.
 ```
 /
 ├── package.json              # main app + orchestration scripts
-├── astro.config.mjs          # main app (empty)
+├── astro.config.mjs          # main app site/trailing-slash/build config
 ├── pnpm-workspace.yaml       # packages: [., starlight]
 ├── config/                   # example project config; no secrets
 ├── src/pages/                # main app routes

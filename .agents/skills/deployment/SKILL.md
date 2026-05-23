@@ -52,12 +52,12 @@ Set in both `astro.config.mjs`s as `https://ui.plan.ai`. Drives sitemap URLs and
 
 - The root Astro app emits `/sitemap.xml` for home, stream index, and pre-rendered public stream fixture routes.
 - Starlight generates `sitemap-index.xml` at `/docs/sitemap-index.xml` (because `base: '/docs'`).
-- `public/robots.txt` allows all and references both the root sitemap and docs sitemap. Submit both sitemap URLs to Search Console.
+- `public/robots.txt` allows public routes, disallows `/workbench/`, and references both the root sitemap and docs sitemap. Submit both sitemap URLs to Search Console.
 
 ## Absent by design
 
 - No SSR / no CF Functions — fully static.
 - Dynamic V1 product data is expected to come from browser Supabase clients plus Supabase Edge Functions behind `api.ui.plan.ai`.
 - No `wrangler.toml` — CF Pages config lives in the dashboard.
-- No preview-branch deploys (toggle in dashboard if needed).
+- No feature-branch deploys; only `main` and the disposable `preview` branch should deploy from CF Pages.
 - No env-based config switching.

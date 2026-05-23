@@ -5,6 +5,9 @@ const links = [
 	{ label: 'Workbench preview', href: '/workbench/' },
 	{ label: 'Docs', href: '/docs/start-here/welcome/' },
 ];
+
+const currentPath = Astro.url.pathname;
+const isCurrent = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
 <header class="app-nav">
@@ -14,7 +17,7 @@ const links = [
 	</a>
 	<nav aria-label="Site">
 		{links.map((link) => (
-			<a href={link.href}>{link.label}</a>
+			<a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>{link.label}</a>
 		))}
 	</nav>
 </header>
@@ -60,6 +63,11 @@ const links = [
 	nav a {
 		color: var(--muted);
 		font-size: 12px;
+	}
+
+	nav a[aria-current="page"] {
+		color: var(--success);
+		border-color: var(--success);
 	}
 
 	@media (max-width: 720px) {

@@ -14,7 +14,7 @@ const description = 'Static preview of the private V1 workbench review surface.'
 
 <BaseLayout title={title} description={description} canonicalPath="/workbench/" noindex>
 	<AppNav />
-	<main class="workbench-shell">
+	<main id="main" class="workbench-shell">
 		<header class="intro">
 			<div>
 				<p class="eyebrow">Private surface preview</p>
@@ -36,7 +36,7 @@ const description = 'Static preview of the private V1 workbench review surface.'
 			<div><strong>{frames.length}</strong><span>submissions</span></div>
 			<div><strong>{reviewQueue.length}</strong><span>needs review</span></div>
 			<div><strong>{promotedCount}</strong><span>promoted</span></div>
-			<div><strong>3</strong><span>policy layers</span></div>
+			<div><strong>4</strong><span>policy layers</span></div>
 		</section>
 
 		<section class="layout-grid">
@@ -81,9 +81,10 @@ const description = 'Static preview of the private V1 workbench review surface.'
 				<p class="eyebrow">Approval settings</p>
 				<h2>Effective inherited values first.</h2>
 				<dl>
-					<div><dt>Global default</dt><dd>requires review</dd></div>
-					<div><dt>Agent override</dt><dd>Planner keeps manual promotion</dd></div>
-					<div><dt>Channel override</dt><dd>Review channel requires explicit team action</dd></div>
+					<div><dt>Tenant default</dt><dd>requires review</dd></div>
+					<div><dt>Agent default</dt><dd>Planner keeps manual promotion</dd></div>
+					<div><dt>Channel default</dt><dd>Review channel requires explicit team action</dd></div>
+					<div><dt>API-key override</dt><dd>may narrow media policy, never expose secrets</dd></div>
 				</dl>
 			</div>
 			<div class="settings-card">
@@ -91,7 +92,7 @@ const description = 'Static preview of the private V1 workbench review surface.'
 				<h2>Scoped key metadata, no secret values.</h2>
 				<dl>
 					<div><dt>Prefix</dt><dd>plai_demo_7QK</dd></div>
-					<div><dt>Scopes</dt><dd>frame:write, media:write</dd></div>
+					<div><dt>Policy</dt><dd>allow_image, allow_video, max_media_bytes</dd></div>
 					<div><dt>Last used</dt><dd>2026-05-22 10:04 UTC</dd></div>
 				</dl>
 			</div>

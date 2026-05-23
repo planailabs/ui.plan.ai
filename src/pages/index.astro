@@ -45,13 +45,14 @@ const setupLinks = [
 
 const publicStreams = getAllPublicStreams();
 const featuredStream = publicStreams[0];
-const featuredFrame = featuredStream.frames[0];
+const featuredFrame = featuredStream?.frames[0];
+const namedChannelStream = publicStreams.find((stream) => !stream.channel.isMain);
 const reviewCount = getWorkbenchFrames().filter((frame) => frame.submissionStatus === 'needs_review').length;
 ---
 
 <BaseLayout title={title} description={description} canonicalPath="/">
 	<AppNav />
-	<main class="home-shell">
+	<main id="main" class="home-shell">
 		<header class="hero">
 			<p class="eyebrow">V1 app shell</p>
 			<h1>Agent-generated UI streams, reviewable from day one.</h1>
@@ -81,21 +82,32 @@ const reviewCount = getWorkbenchFrames().filter((frame) => frame.submissionStatu
 					<div><strong>0</strong><span>secrets committed</span></div>
 				</div>
 			</div>
-			<div class="route-card">
-				<StatusPill label="route contract" tone="success" />
-				<p>/{featuredStream.agent.slug}/{featuredStream.dateKey}/</p>
-				<p>/{featuredStream.agent.slug}/{featuredStream.channel.slug}/{featuredStream.dateKey}/</p>
-				<a href={featuredStream.path}>Open featured route</a>
-			</div>
+			{featuredStream ? (
+				<div class="route-card">
+					<StatusPill label="route contract" tone="success" />
+					<p>/{featuredStream.agent.slug}/{featuredStream.dateKey}/</p>
+					{namedChannelStream && <p>/{namedChannelStream.agent.slug}/{namedChannelStream.channel.slug}/{namedChannelStream.dateKey}/</p>}
+					<a href={featuredStream.path}>Open featured route</a>
+					<a href="/v1-status.json">Read V1 status JSON</a>
+				</div>
+			) : (
+				<div class="route-card">
+					<StatusPill label="empty state" tone="warning" />
+					<p>No promoted stream fixtures are available yet.</p>
+					<a href="/docs/process/v1-setup/">Open setup checklist</a>
+				</div>
+			)}
 		</section>
 
-		<section class="featured" aria-labelledby="featured-heading">
-			<div class="section-head">
-				<p class="eyebrow">Promoted frame</p>
-				<h2 id="featured-heading">A public stream frame rendered from the V1 model.</h2>
-			</div>
-			<FrameCard frame={featuredFrame} />
-		</section>
+		{featuredFrame && (
+			<section class="featured" aria-labelledby="featured-heading">
+				<div class="section-head">
+					<p class="eyebrow">Promoted frame</p>
+					<h2 id="featured-heading">A public stream frame rendered from the V1 model.</h2>
+				</div>
+				<FrameCard frame={featuredFrame} />
+			</section>
+		)}
 
 		<section class="flow" aria-labelledby="flow-heading">
 			<div class="section-head">

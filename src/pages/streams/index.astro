@@ -12,7 +12,7 @@ const description = 'Promoted V1 agent-generated UI streams rendered by the stat
 
 <BaseLayout title={title} description={description} canonicalPath="/streams/">
 	<AppNav />
-	<main class="page-shell">
+	<main id="main" class="page-shell">
 		<header class="intro">
 			<p class="eyebrow">Public streams</p>
 			<h1>Promoted frames only.</h1>
@@ -25,10 +25,10 @@ const description = 'Promoted V1 agent-generated UI streams rendered by the stat
 		<div class="stream-list">
 			{streams.map((stream) => (
 				<section class="stream-preview" aria-labelledby={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`}>
-					<StreamHeader stream={stream} />
-					<h2 id={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`}>
+					<StreamHeader stream={stream} headingLevel={2} />
+					<h3 id={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`}>
 						<a href={stream.path}>{stream.path}</a>
-					</h2>
+					</h3>
 					<p class="stream-date">Resolved date: {formatDateKey(stream.dateKey)}</p>
 					<FrameCard frame={stream.frames[0]} compact />
 				</section>
@@ -71,7 +71,7 @@ const description = 'Promoted V1 agent-generated UI streams rendered by the stat
 			font-size: clamp(42px, 7vw, 76px);
 		}
 
-		h2 {
+		h3 {
 			margin: -8px 0 8px;
 			font-size: 18px;
 			letter-spacing: -0.01em;

@@ -31,9 +31,11 @@ const canonicalUrl = new URL(canonicalPath, site).toString();
 		<link rel="canonical" href={canonicalUrl} />
 		<meta name="theme-color" content="#000000" />
 		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="ui.plan.ai" />
 		<meta property="og:url" content={canonicalUrl} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
+		<meta name="author" content="plan.ai" />
 		<meta name="twitter:card" content="summary" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
@@ -96,6 +98,26 @@ const canonicalUrl = new URL(canonicalPath, site).toString();
 				outline: none;
 			}
 
+			.skip-link {
+				position: fixed;
+				z-index: 100;
+				top: 12px;
+				left: 12px;
+				transform: translateY(-150%);
+				padding: 10px 12px;
+				border: 1px solid var(--accent);
+				border-radius: 999px;
+				color: var(--bg);
+				background: var(--accent);
+			}
+
+			.skip-link:focus-visible {
+				transform: translateY(0);
+				color: var(--bg);
+				outline: 2px solid var(--success);
+				outline-offset: 3px;
+			}
+
 			::selection {
 				color: #001013;
 				background: var(--accent);
@@ -112,6 +134,7 @@ const canonicalUrl = new URL(canonicalPath, site).toString();
 		</style>
 	</head>
 	<body class={bodyClass}>
+		<a class="skip-link" href="#main">Skip to main content</a>
 		<slot />
 	</body>
 </html>

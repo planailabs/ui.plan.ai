@@ -31,7 +31,7 @@ Cloudflare Pages serves the static Astro output from `dist`.
 
 The V1 product backend is planned for Supabase Auth, Postgres, Storage, Realtime, and Edge Functions, with Cloudflare Images/Stream for media delivery. Start from `env.example`, `config/project.config.json.example`, and the [V1 setup checklist](./starlight/src/content/docs/process/v1-setup.md) when those accounts are available.
 
-The root app emits `/sitemap.xml` for public app routes and `/v1-status.json` as a machine-readable snapshot of the current static shell.
+The root app emits `/sitemap.xml` for public app routes and `/v1-status.json` as a machine-readable snapshot of the current static shell. `public/robots.txt` advertises both the root sitemap and the Starlight docs sitemap.
 
 ## For AI agents
 

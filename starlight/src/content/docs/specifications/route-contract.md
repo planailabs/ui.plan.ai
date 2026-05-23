@@ -24,4 +24,6 @@ Astro implements generic routes. Supabase resolves what they mean.
 4. Query promoted or team-visible frames for the date based on viewer permissions.
 5. Return a not-found state if the viewer cannot access the tenant or stream.
 
+Anonymous readers only receive `promoted` frames. Authenticated team members may receive `team_visible` and `promotion_eligible` frames when RLS grants access.
+
 V1 does not generate one Astro page per agent or date.

@@ -1,6 +1,6 @@
 ---
 import StatusPill from './StatusPill.astro';
-import type { Frame } from '../data/v1Demo';
+import { formatEventTime, getFrameStatusLabel, getLicenseLabel, type Frame } from '../data/v1Demo';
 
 interface Props {
 	frame: Frame;
@@ -8,11 +8,13 @@ interface Props {
 }
 
 const { frame, compact = false } = Astro.props;
+const frameStatusLabel = getFrameStatusLabel(frame);
 const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStatus === 'team_visible' ? 'warning' : 'muted';
+const sortedClickZones = frame.clickZones.slice().sort((a, b) => a.bounds.y - b.bounds.y || a.bounds.x - b.bounds.x);
 ---
 
 <article class:list={['frame-card', { compact }]}>
-	<div class="frame-stage" role="img" aria-label={frame.altText}>
+	<figure class="frame-stage" aria-label={frame.altText}>
 		<div class="frame-topline">
 			<span>{frame.variant} variant</span>
 			<span>{frame.mediaStatus.replaceAll('_', ' ')}</span>
@@ -26,20 +28,21 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 			</div>
 			<div class="mock-meta"></div>
 		</div>
-		{frame.clickZones.map((zone) => (
+		{sortedClickZones.map((zone) => (
 			<a
 				class="click-zone"
-				href={zone.target}
+				href={zone.target ?? '#'}
 				aria-label={`${zone.label}: ${frame.title}`}
-				style={`left:${zone.x}%;top:${zone.y}%;width:${zone.width}%;height:${zone.height}%;`}
+				style={`left:${zone.bounds.x * 100}%;top:${zone.bounds.y * 100}%;width:${zone.bounds.width * 100}%;height:${zone.bounds.height * 100}%;`}
 			>
 				<span>{zone.label}</span>
 			</a>
 		))}
-	</div>
+		<figcaption class="sr-only">{frame.altText}</figcaption>
+	</figure>
 	<div class="frame-copy">
 		<div class="frame-status">
-			<StatusPill label={frame.frameStatus} tone={frameTone} />
+			<StatusPill label={frameStatusLabel} tone={frameTone} />
 			<StatusPill label={frame.submissionStatus} tone="muted" />
 		</div>
 		<h3>{frame.title}</h3>
@@ -48,7 +51,7 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 			<dl>
 				<div>
 					<dt>License</dt>
-					<dd>{frame.license}</dd>
+					<dd>{getLicenseLabel(frame.license)}</dd>
 				</div>
 				<div>
 					<dt>Decision</dt>
@@ -62,7 +65,7 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 				<ol>
 					{frame.events.map((event) => (
 						<li>
-							<span>{event.at}</span>
+							<time datetime={event.occurredAt}>{formatEventTime(event.occurredAt)}</time>
 							<strong>{event.type}</strong>
 							<em>{event.actor}</em>
 							<p>{event.summary}</p>
@@ -91,6 +94,7 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 
 	.frame-stage {
 		position: relative;
+		margin: 0;
 		min-height: 340px;
 		overflow: hidden;
 		border: 1px solid var(--line-strong);
@@ -155,6 +159,8 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 		font-size: 11px;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
+		min-width: 44px;
+		min-height: 44px;
 	}
 
 	.click-zone:focus-visible {
@@ -238,7 +244,7 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 		background: rgba(0, 0, 0, 0.2);
 	}
 
-	li span,
+	li time,
 	li em {
 		color: var(--soft);
 		font-size: 11px;
@@ -255,6 +261,18 @@ const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStat
 
 	li p {
 		grid-column: 1 / -1;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	@media (max-width: 860px) {

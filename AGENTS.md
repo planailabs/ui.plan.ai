@@ -25,7 +25,7 @@ Docs content: 64 markdown files under `starlight/src/content/docs/`. Sidebar aut
 ```bash
 pnpm dev          # both (concurrently)
 pnpm build        # ordered: docs → main
-pnpm check        # astro check, both projects (used by CI)
+pnpm check        # astro check, both projects
 pnpm preview      # serve dist/
 # Per-side: dev:app, dev:docs, build:app, build:docs, check:app, check:docs
 ```

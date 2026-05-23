@@ -15,7 +15,7 @@ Use this checklist when real accounts and credentials are available. The reposit
 - Build command: `pnpm build`.
 - Build output directory: `dist`.
 - Root directory: `/`.
-- Production branch: the repository's integration branch.
+- Production branch: `main`.
 - Node version: `24.15.0` from `.node-version`.
 - Keep `_redirects` in root `public/`; do not write generated docs output by hand.
 
