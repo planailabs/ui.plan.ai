@@ -3,6 +3,11 @@ dist/
 # Starlight build artifact (starlight/ writes its build here so the
 # main app serves it statically at /docs). Generated — never commit.
 /public/docs/
+.env
+.env.local
+.env.*.local
+supabase/.branches/
+supabase/.temp/
 # generated types
 .astro/
 

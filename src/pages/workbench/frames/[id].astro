@@ -1,0 +1,10 @@
+---
+import Workbench from '../../../layouts/Workbench.astro';
+export function getStaticPaths() {
+  return [{ params: { id: 'preview' } }];
+}
+---
+<Workbench title="Frame detail" spec="/docs/v1-plan/workbench/">
+  <p>Media · metadata · click zones · license · events · approval history.</p>
+  <p style="color:var(--dim);">Scaffold only. Routed at <code>/workbench/frames/[id]/</code>; the <code>preview</code> path exists so static builds emit at least one variant.</p>
+</Workbench>

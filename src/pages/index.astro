@@ -4,6 +4,14 @@ const description = 'Agent-generated UI streams.';
 const url = 'https://ui.plan.ai/';
 const docsUrl = '/docs/';
 
+const env = import.meta.env;
+const platform = {
+        supabaseUrl: Boolean(env.PUBLIC_SUPABASE_URL),
+        supabaseAnon: Boolean(env.PUBLIC_SUPABASE_ANON_KEY),
+        turnstile: Boolean(env.PUBLIC_TURNSTILE_SITE_KEY),
+};
+const allWired = platform.supabaseUrl && platform.supabaseAnon && platform.turnstile;
+
 const ideas = [
         {
                 n: '01',
@@ -245,37 +253,46 @@ const ideas = [
 
                         <section class="notice">
                                 <div class="notice-head">
-                                        <span class="notice-tag">Status</span>
-                                        <h2 class="notice-title">Platform wiring is deferred</h2>
+                                        <span class="notice-tag">{allWired ? 'Online' : 'Setup'}</span>
+                                        <h2 class="notice-title">{allWired ? 'Platform is wired' : 'Platform wiring is incomplete'}</h2>
                                 </div>
-                                <p class="notice-body">
-                                        The V1 plan is being finalized first. Supabase, Cloudflare Pages,
-                                        Images, Stream, and Turnstile are <strong>not</strong> connected yet
-                                        &mdash; no real projects, no live secrets, no production data. When
-                                        the plan is locked, work through the wiring guide top to bottom.
-                                </p>
-                                <ol class="notice-steps">
-                                        <li>
-                                                <a class="docs-link" href="/docs/v1-plan/wiring-supabase-cloudflare/">Wiring guide</a>
-                                                &mdash; ordered checklist for connecting Supabase + Cloudflare.
-                                        </li>
-                                        <li>
-                                                <a class="docs-link" href="/docs/reference/secrets-and-environments/">Secrets &amp; environments</a>
-                                                &mdash; env matrix + secret inventory.
-                                        </li>
-                                        <li>
-                                                <a class="docs-link" href="/docs/reference/upstream-docs/">Upstream docs</a>
-                                                &mdash; current Supabase + Cloudflare reference pages.
-                                        </li>
-                                        <li>
-                                                <a class="docs-link" href="/docs/foundations/platform-architecture/">Platform architecture</a>
-                                                &mdash; the Supabase + Cloudflare split.
-                                        </li>
-                                </ol>
-                                <p class="notice-foot">
-                                        GitHub connection &amp; Cloudflare Pages auto-deploy come last,
-                                        after the plan is locked and wiring is verified end-to-end.
-                                </p>
+                                {allWired ? (
+                                        <>
+                                                <p class="notice-body">
+                                                        Supabase and Cloudflare environment variables were detected
+                                                        at build time. Sign in to the workbench to review frames
+                                                        and manage agents.
+                                                </p>
+                                                <p class="notice-body">
+                                                        <a class="docs-link" href="/workbench/login/">Sign in to the workbench &rarr;</a>
+                                                </p>
+                                        </>
+                                ) : (
+                                        <>
+                                                <p class="notice-body">
+                                                        Supabase, Cloudflare Pages, Images, Stream, and Turnstile
+                                                        are <strong>not</strong> fully connected yet. Below is
+                                                        what was detected at build time. Work through the wiring
+                                                        guide top to bottom, then redeploy.
+                                                </p>
+                                                <ul class="notice-steps">
+                                                        <li><code>PUBLIC_SUPABASE_URL</code>: {platform.supabaseUrl ? 'set' : 'missing'}</li>
+                                                        <li><code>PUBLIC_SUPABASE_ANON_KEY</code>: {platform.supabaseAnon ? 'set' : 'missing'}</li>
+                                                        <li><code>PUBLIC_TURNSTILE_SITE_KEY</code>: {platform.turnstile ? 'set' : 'missing'}</li>
+                                                </ul>
+                                                <ol class="notice-steps">
+                                                        <li><a class="docs-link" href="/docs/v1-plan/wiring-supabase-cloudflare/">Wiring guide</a> &mdash; ordered checklist for connecting Supabase + Cloudflare.</li>
+                                                        <li><a class="docs-link" href="/docs/reference/secrets-and-environments/">Secrets &amp; environments</a> &mdash; env matrix + secret inventory.</li>
+                                                        <li><a class="docs-link" href="/docs/reference/upstream-docs/">Upstream docs</a> &mdash; current Supabase + Cloudflare reference pages.</li>
+                                                        <li><a class="docs-link" href="/docs/foundations/platform-architecture/">Platform architecture</a> &mdash; the Supabase + Cloudflare split.</li>
+                                                </ol>
+                                                <p class="notice-foot">
+                                                        Once <code>PUBLIC_SUPABASE_URL</code>, <code>PUBLIC_SUPABASE_ANON_KEY</code>,
+                                                        and <code>PUBLIC_TURNSTILE_SITE_KEY</code> are set in the Cloudflare Pages
+                                                        environment, the next deploy will swap this panel for a sign-in CTA.
+                                                </p>
+                                        </>
+                                )}
                         </section>
 
                         {ideas.map((idea) => (

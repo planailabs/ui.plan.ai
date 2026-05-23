@@ -1,0 +1,98 @@
+---
+import Workbench from '../../layouts/Workbench.astro';
+import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
+---
+<Workbench title="Sign in" spec="/docs/v1-plan/auth-and-sessions/" guarded={false}>
+  <p>Email OTP, then TOTP MFA if enrolled. No password.</p>
+  <form id="otp-form" style="display:grid;gap:12px;max-width:380px;margin-top:16px;">
+    <label>Email
+      <input type="email" name="email" required autocomplete="email"
+             style="width:100%;padding:8px;background:#0a0a0a;color:var(--fg);border:1px solid var(--line);" />
+    </label>
+    {PUBLIC_TURNSTILE_SITE_KEY ? (
+      <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}></div>
+    ) : (
+      <p style="color:var(--dim);font-size:12px;">Turnstile site key not configured; CAPTCHA disabled in this build.</p>
+    )}
+    <button type="submit" style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">Send code</button>
+    <p id="otp-msg" style="color:var(--dim);font-size:12px;"></p>
+  </form>
+
+  <form id="verify-form" hidden style="display:grid;gap:12px;max-width:380px;margin-top:16px;">
+    <label>6-digit code
+      <input type="text" name="token" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"
+             style="width:100%;padding:8px;background:#0a0a0a;color:var(--fg);border:1px solid var(--line);font-family:inherit;letter-spacing:0.4em;" />
+    </label>
+    <button type="submit" style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">Verify</button>
+    <p id="verify-msg" style="color:var(--dim);font-size:12px;"></p>
+  </form>
+
+  <form id="mfa-form" hidden style="display:grid;gap:12px;max-width:380px;margin-top:16px;">
+    <label>TOTP code
+      <input type="text" name="code" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"
+             style="width:100%;padding:8px;background:#0a0a0a;color:var(--fg);border:1px solid var(--line);font-family:inherit;letter-spacing:0.4em;" />
+    </label>
+    <button type="submit" style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">Verify MFA</button>
+    <p id="mfa-msg" style="color:var(--dim);font-size:12px;"></p>
+  </form>
+
+  {PUBLIC_TURNSTILE_SITE_KEY && (
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  )}
+  <script>
+    import { sendEmailOtp, verifyEmailOtp, challengeMfa, verifyMfa } from '../../lib/auth-client';
+
+    const otpForm = document.getElementById('otp-form');
+    const verifyForm = document.getElementById('verify-form');
+    const mfaForm = document.getElementById('mfa-form');
+    const otpMsg = document.getElementById('otp-msg');
+    const verifyMsg = document.getElementById('verify-msg');
+    const mfaMsg = document.getElementById('mfa-msg');
+
+    let currentEmail = '';
+    let challenge = null;
+
+    otpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      otpMsg.textContent = 'Sending…';
+      const fd = new FormData(otpForm);
+      currentEmail = String(fd.get('email') ?? '');
+      const turnstile = (document.querySelector('[name="cf-turnstile-response"]')?.value) ?? '';
+      try {
+        await sendEmailOtp(currentEmail, turnstile);
+        otpMsg.textContent = 'Code sent. Check email.';
+        otpForm.hidden = true;
+        verifyForm.hidden = false;
+      } catch (err) {
+        otpMsg.textContent = err.message ?? String(err);
+      }
+    });
+
+    verifyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      verifyMsg.textContent = 'Verifying…';
+      const fd = new FormData(verifyForm);
+      try {
+        await verifyEmailOtp(currentEmail, String(fd.get('token') ?? ''));
+        challenge = await challengeMfa();
+        if (!challenge) { window.location.replace('/workbench/inbox/'); return; }
+        verifyForm.hidden = true;
+        mfaForm.hidden = false;
+      } catch (err) {
+        verifyMsg.textContent = err.message ?? String(err);
+      }
+    });
+
+    mfaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      mfaMsg.textContent = 'Verifying…';
+      const fd = new FormData(mfaForm);
+      try {
+        await verifyMfa(challenge.factorId, challenge.challengeId, String(fd.get('code') ?? ''));
+        window.location.replace('/workbench/inbox/');
+      } catch (err) {
+        mfaMsg.textContent = err.message ?? String(err);
+      }
+    });
+  </script>
+</Workbench>

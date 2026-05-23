@@ -13,12 +13,13 @@ Agent-facing entry point. Optimize edits here for agent consumption — facts, t
 
 | Project | Path | URL | Dev port |
 |---|---|---|---|
-| Main app | `/` | `/` | `:4321` |
+| Main app | `/` | `/` (marketing + `/workbench/*`) | `:4321` |
 | Starlight docs | `/starlight/` | `/docs/` | `:4322` |
+| Supabase project | `/supabase/` | (Edge Functions on `api.ui.plan.ai`) | n/a (CLI) |
 
-Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential.
+Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential. The `supabase/` directory is not part of the Pages build — it's prepared for `supabase db push` + `supabase functions deploy`, run manually by the user.
 
-Docs content: 63 markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 10 sections: `start-here`, `foundations`, `process`, `v1-plan`, `v2-plan`, `v3-plan`, `specifications`, `api-reference`, `reference`, `roadmap-and-open-questions`. Static API contract files live under `starlight/public/specs/` and serve from `/docs/specs/`.
+Docs content: 65+ markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 10 sections: `start-here`, `foundations`, `process`, `v1-plan`, `v2-plan`, `v3-plan`, `specifications`, `api-reference`, `reference`, `roadmap-and-open-questions`. Static API contract files live under `starlight/public/specs/` and serve from `/docs/specs/`.
 
 ## Commands
 
@@ -40,6 +41,8 @@ pnpm preview      # serve dist/
 - `.agents/skills/skills-maintenance/SKILL.md` — prevents skill drift. Read before committing any change that touches paths, names, ports, scripts, or configs referenced in docs.
 - `.agents/skills/deployment/SKILL.md` — Cloudflare Pages config, headers/redirects, sitemap, `site:` URL. Read before changing build outputs, Node/pnpm version, or anything user-visible in prod.
 - `.agents/skills/branch-pr-workflow/SKILL.md` — GitHub Flow + rebase merge + preview branch. Read before starting any change, opening a PR, or pushing to `preview`.
+- `.agents/skills/supabase-setup/SKILL.md` — `supabase/` directory conventions, migration naming, Edge Function structure, env-var table. Read before touching anything under `supabase/`.
+- `.agents/skills/workbench-app/SKILL.md` — `/workbench/*` routing, auth pattern, layout structure. Read before adding or refactoring workbench pages.
 
 ## Hard rules
 
@@ -59,7 +62,7 @@ pnpm preview      # serve dist/
 
 - No tests, no test runner.
 - No `wrangler.toml` — Cloudflare Pages config lives in the CF dashboard. See `deployment` skill.
-- No `_headers` file (no custom headers needed yet). `public/_redirects` and `public/robots.txt` exist — see `deployment` skill.
+- No SSR / no CF Pages Functions — agent API is Supabase Edge Functions on `api.ui.plan.ai`. `public/_headers`, `public/_redirects`, and `public/robots.txt` exist — see `deployment` skill.
 - No `.npmrc` — pnpm defaults.
 - No Prettier / ESLint / `.editorconfig` — formatting is by-hand consistency for now.
 - No `CODEOWNERS` — solo repo for now.

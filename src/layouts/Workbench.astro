@@ -1,0 +1,96 @@
+---
+import { isPlatformWired } from '../lib/env';
+
+interface Props {
+  title: string;
+  spec?: string;
+  guarded?: boolean;
+}
+
+const { title, spec, guarded = true } = Astro.props;
+const wired = isPlatformWired();
+const sections = [
+  { href: '/workbench/inbox/', label: 'Inbox' },
+  { href: '/workbench/channels/', label: 'Channels' },
+  { href: '/workbench/agents/', label: 'Agents' },
+  { href: '/workbench/api-keys/', label: 'API keys' },
+  { href: '/workbench/approval-settings/', label: 'Approval' },
+  { href: '/workbench/team/', label: 'Team' },
+  { href: '/workbench/settings/', label: 'Settings' },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} — workbench</title>
+    <style>
+      :root {
+        --bg: #000;
+        --fg: #fafafa;
+        --dim: #a1a1aa;
+        --line: #27272a;
+        --accent: #a5f3fc;
+        --accent-2: #4ade80;
+      }
+      * { box-sizing: border-box; }
+      html, body { background: var(--bg); color: var(--fg); margin: 0; }
+      body { font: 14px/1.55 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+      .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+      nav.side { border-right: 1px solid var(--line); padding: 24px 16px; }
+      nav.side .brand { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 24px; }
+      nav.side a { display: block; padding: 6px 8px; color: var(--fg); text-decoration: none; border-radius: 2px; }
+      nav.side a:hover { background: #0a0a0a; color: var(--accent); }
+      nav.side a[aria-current="page"] { color: var(--accent-2); border-left: 2px solid var(--accent-2); padding-left: 6px; }
+      main.work { padding: 32px 40px 80px; max-width: 960px; }
+      h1 { font: 500 22px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; margin: 0 0 8px; }
+      .spec-pill { display: inline-block; margin-top: 12px; padding: 4px 8px; border: 1px solid var(--line); font-size: 11px; color: var(--dim); }
+      .spec-pill a { color: var(--accent); text-decoration: none; }
+      .banner { margin-bottom: 24px; padding: 12px 16px; border: 1px solid var(--line); border-left: 2px solid #f59e0b; background: #0a0a0a; color: var(--dim); font-size: 13px; }
+      footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--dim); font-size: 11px; }
+      @media (max-width: 720px) {
+        .app { grid-template-columns: 1fr; }
+        nav.side { border-right: 0; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 4px; padding: 12px; }
+        nav.side .brand { width: 100%; margin: 0 0 8px; }
+        nav.side a { padding: 6px 10px; }
+        main.work { padding: 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <nav class="side">
+        <div class="brand">ui.plan.ai · workbench</div>
+        {sections.map((s) => (
+          <a href={s.href} aria-current={Astro.url.pathname === s.href ? 'page' : undefined}>{s.label}</a>
+        ))}
+        <a href="/" style="margin-top:24px;color:var(--dim);">&larr; back to home</a>
+      </nav>
+      <main class="work">
+        {!wired && (
+          <div class="banner">
+            Supabase / Turnstile env vars are not set on this build. The workbench will render but stay read-only.
+            See <a href="/docs/v1-plan/wiring-supabase-cloudflare/" style="color:var(--accent)">wiring guide</a>.
+          </div>
+        )}
+        <h1>{title}</h1>
+        {spec && (
+          <div class="spec-pill">
+            Spec: <a href={spec}>{spec}</a>
+          </div>
+        )}
+        <slot />
+        <footer>ui.plan.ai · workbench — V1 scaffold. Behavior follows /docs/v1-plan/*.</footer>
+      </main>
+    </div>
+    {guarded && (
+      <script>
+        import { requireSession } from '../lib/auth-client';
+        requireSession();
+      </script>
+    )}
+  </body>
+</html>

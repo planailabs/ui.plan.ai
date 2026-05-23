@@ -36,7 +36,9 @@ Current: `/docs` and `/docs/` 301 → `/docs/start-here/welcome/`. Implemented i
 - `public/_redirects`: CF Pages server-side 301 (no flash in prod).
 - Starlight `redirects: { '/': '/docs/start-here/welcome/' }`: meta-refresh HTML for `astro preview` and as a fallback.
 
-There is no `index.md` in `starlight/src/content/docs/` — Astro file-based routes take precedence over `redirects:` config, so the file's absence is required for the redirect to fire. No `_headers` today.
+There is no `index.md` in `starlight/src/content/docs/` — Astro file-based routes take precedence over `redirects:` config, so the file's absence is required for the redirect to fire.
+
+`public/_headers` is committed and ships at `dist/_headers`. Sets the security baseline (HSTS, nosniff, Referrer-Policy, Permissions-Policy), immutable cache on `/docs/_astro/*` and `/_astro/*`, and `Cache-Control: private, no-store` + `X-Frame-Options: DENY` on `/workbench/*` so authenticated pages are never cached by CF or by the browser. Mirrors the table in `docs/reference/secrets-and-environments`. Edit both together.
 
 ## Trailing slashes
 
@@ -52,9 +54,21 @@ Set in both `astro.config.mjs`s as `https://ui.plan.ai`. Drives sitemap URLs and
 - `public/robots.txt` allows all and references that sitemap. Submit to Search Console at the sitemap URL.
 - No root `sitemap.xml` today. If the main app gains real content, add one (or extend robots.txt with multiple `Sitemap:` lines).
 
+## Env vars (CF Pages dashboard)
+
+Public values exposed to the browser at build time. Astro requires the `PUBLIC_` prefix.
+
+| Variable | Required for |
+|---|---|
+| `PUBLIC_SUPABASE_URL` | Workbench auth + data |
+| `PUBLIC_SUPABASE_ANON_KEY` | Workbench auth + data |
+| `PUBLIC_TURNSTILE_SITE_KEY` | Login CAPTCHA |
+| `APP_ORIGINS` | (Edge Function side) comma-separated CORS allowlist |
+
+When all three `PUBLIC_*` are set, the home page swaps the setup-status panel for a workbench sign-in CTA. Server-only secrets (service role, signing keys, pepper) live in Supabase Edge Functions, **never** in CF Pages env. Full inventory: `docs/reference/secrets-and-environments`.
+
 ## Absent by design
 
-- No SSR / no CF Functions — fully static.
-- No `wrangler.toml` — CF Pages config lives in the dashboard.
+- No SSR / no CF Pages Functions / no `wrangler.toml` — the Agent API is Supabase Edge Functions on `api.ui.plan.ai`, not CF Pages. CF Pages serves only static HTML/JS/CSS.
 - No preview-branch deploys (toggle in dashboard if needed).
-- No env-based config switching.
+- No build-time secrets beyond the `PUBLIC_*` table above.

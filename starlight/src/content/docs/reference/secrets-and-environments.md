@@ -23,20 +23,22 @@ Upstream reference: [Pages env vars](https://developers.cloudflare.com/pages/con
 
 ## Secret inventory
 
-| Secret | Bound to | Notes |
-|---|---|---|
-| `SUPABASE_URL` | CF Pages env (public), Edge Functions, agents | Same value in browser and server. |
-| `SUPABASE_ANON_KEY` | CF Pages env (public) | Browser-only key; RLS does the protecting. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Edge Functions only | **Never** in the Astro build env. |
-| `API_KEY_PEPPER` | Edge Functions only | Server pepper for API-key HMAC; rotatable, versioned. |
-| `CF_ACCOUNT_ID` | Edge Functions | Identifies the Cloudflare account for Images/Stream API calls. |
-| `CF_IMAGES_TOKEN` | Edge Functions | Scoped API token, Images write. |
-| `CF_IMAGES_SIGNING_KEY` | Edge Functions | Mints signed delivery URLs for private images. |
-| `CF_STREAM_TOKEN` | Edge Functions | Scoped API token, Stream write + Direct Creator Uploads. |
-| `CF_STREAM_SIGNING_KEY` | Edge Functions | Mints Stream signed playback JWTs. |
-| `CF_STREAM_WEBHOOK_SECRET` | Edge Functions | Verifies `webhook-signature` on Stream callbacks. |
-| `TURNSTILE_SITE_KEY` | CF Pages env (public) | Login form widget. |
-| `TURNSTILE_SECRET_KEY` | Edge Functions | Verifies Turnstile tokens server-side. |
+The "Canonical name" column is the value's logical identity. The "Per-surface variable" column shows the literal environment-variable name on each surface, because Astro requires a `PUBLIC_` prefix to expose a value to client JS and Supabase Edge Functions reserve `SUPABASE_*` for the runtime-injected pair. Browser code reads `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY`; agents and Edge Functions read the unprefixed canonical name.
+
+| Canonical name | Per-surface variable | Bound to | Notes |
+|---|---|---|---|
+| `SUPABASE_URL` | `PUBLIC_SUPABASE_URL` (Astro build env), `SUPABASE_URL` (Edge Functions, agents) | CF Pages env (public), Edge Functions, agents | Same value in browser and server. |
+| `SUPABASE_ANON_KEY` | `PUBLIC_SUPABASE_ANON_KEY` (Astro build env) | CF Pages env (public) | Browser-only key; RLS does the protecting. |
+| `SUPABASE_SERVICE_ROLE_KEY` | `SUPABASE_SERVICE_ROLE_KEY` | Edge Functions only | **Never** in the Astro build env. |
+| `API_KEY_PEPPER` | `API_KEY_PEPPER` | Edge Functions only | Server pepper for API-key HMAC; rotatable, versioned. |
+| `CF_ACCOUNT_ID` | `CF_ACCOUNT_ID` | Edge Functions | Identifies the Cloudflare account for Images/Stream API calls. |
+| `CF_IMAGES_TOKEN` | `CF_IMAGES_TOKEN` | Edge Functions | Scoped API token, Images write. |
+| `CF_IMAGES_SIGNING_KEY` | `CF_IMAGES_SIGNING_KEY` | Edge Functions | Mints signed delivery URLs for private images. |
+| `CF_STREAM_TOKEN` | `CF_STREAM_TOKEN` | Edge Functions | Scoped API token, Stream write + Direct Creator Uploads. |
+| `CF_STREAM_SIGNING_KEY` | `CF_STREAM_SIGNING_KEY` | Edge Functions | Mints Stream signed playback JWTs. |
+| `CF_STREAM_WEBHOOK_SECRET` | `CF_STREAM_WEBHOOK_SECRET` | Edge Functions | Verifies `webhook-signature` on Stream callbacks. |
+| `TURNSTILE_SITE_KEY` | `PUBLIC_TURNSTILE_SITE_KEY` (Astro build env) | CF Pages env (public) | Login form widget. |
+| `TURNSTILE_SECRET_KEY` | `TURNSTILE_SECRET_KEY` | Edge Functions | Verifies Turnstile tokens server-side. |
 
 Upstream references: [Supabase Edge Function secrets](https://supabase.com/docs/guides/functions/secrets), [Pages env vars](https://developers.cloudflare.com/pages/configuration/build-configuration/#environment-variables).
 
@@ -51,7 +53,7 @@ Upstream: [database migrations](https://supabase.com/docs/guides/deployment/data
 
 ## Cache & headers (Cloudflare Pages)
 
-A future `_headers` file (not yet shipped — tracked in [open questions](/roadmap-and-open-questions/open-questions/)) must set, at minimum:
+`public/_headers` is committed in the repo and ships as `dist/_headers` on every Pages deploy. It sets, at minimum:
 
 ```text
 /*
