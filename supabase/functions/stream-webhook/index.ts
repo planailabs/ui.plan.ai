@@ -73,9 +73,10 @@ Deno.serve(async (req) => {
     if ((idemErr as { code?: string }).code === "23505") {
       return ok({ idempotent: true }, rid, undefined, 200);
     }
+    console.error("stream-webhook idempotency insert failed", { rid, err: idemErr.message });
     return problem({
-      status: 500, code: "internal_error", title: "Idempotency write failed",
-      detail: idemErr.message, requestId: rid,
+      status: 500, code: "internal_error", title: "Internal error",
+      detail: "An internal error occurred.", requestId: rid,
     });
   }
 
@@ -113,10 +114,16 @@ Deno.serve(async (req) => {
     }).eq("id", mediaRow.submission_id);
   }
 
+  const eventType = mapping.ours === "ready"
+    ? "frame.media.ready"
+    : mapping.ours === "failed"
+      ? "frame.media.failed"
+      : "frame.media.status_changed";
+
   await appendEvent({
     tenant_id: mediaRow.tenant_id,
     submission_id: mediaRow.submission_id,
-    event_type: "frame.media.status_changed",
+    event_type: eventType,
     actor_type: "system",
     request_id: rid,
     payload: { state, mapped: mapping.ours, stream_uid: uid },

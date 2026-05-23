@@ -5,6 +5,9 @@ import { serviceClient } from "../_shared/supabase.ts";
 import { appendEvent } from "../_shared/events.ts";
 import { consume } from "../_shared/rate-limit.ts";
 import { uploadImage } from "../_shared/images.ts";
+import { canonicalFingerprint } from "../_shared/hash.ts";
+
+const MAX_MULTIPART_BYTES = 25 * 1024 * 1024;
 
 function deriveDateKey(metadata: Record<string, unknown>): string {
   const fromMeta = (metadata.date ?? (metadata.frame as Record<string, unknown> | undefined)?.date) as
@@ -66,6 +69,14 @@ Deno.serve(async (req) => {
       requestId: rid, cors,
     });
   }
+  const declaredLen = Number(req.headers.get("content-length") ?? 0);
+  if (declaredLen > MAX_MULTIPART_BYTES) {
+    return problem({
+      status: 413, code: "validation_failed", title: "Payload too large",
+      detail: `Body exceeds ${MAX_MULTIPART_BYTES} bytes.`,
+      requestId: rid, cors,
+    });
+  }
 
   let form: FormData;
   try {
@@ -104,21 +115,53 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (metadata.media_upload_id !== undefined || metadata.video !== undefined) {
+    return problem({
+      status: 415, code: "unsupported_media_type", title: "Video not accepted here",
+      detail: "V1 /v1/frame-submissions accepts image only. Use POST /v1/media-uploads for video.",
+      requestId: rid, cors,
+    });
+  }
+
+  const fileBytes = new Uint8Array(await file.arrayBuffer());
+  if (fileBytes.byteLength > MAX_MULTIPART_BYTES) {
+    return problem({
+      status: 413, code: "validation_failed", title: "Image too large",
+      detail: `image exceeds ${MAX_MULTIPART_BYTES} bytes.`,
+      requestId: rid, cors,
+    });
+  }
+  const fileFingerprint = await canonicalFingerprint({
+    name: file.name, type: file.type, size: fileBytes.byteLength,
+  });
+  const requestFingerprint = await canonicalFingerprint({
+    metadata, file: fileFingerprint,
+  });
+
   const supabase = serviceClient();
 
   const { data: existing } = await supabase
     .from("frame_submissions")
-    .select("id, status, created_at, agent_id, channel_id")
+    .select("id, status, created_at, agent_id, channel_id, metadata")
     .eq("api_key_id", key.id)
     .eq("idempotency_key", idempotencyKey)
     .maybeSingle();
   if (existing) {
+    const existingFp = (existing.metadata as Record<string, unknown> | null)?._idempotency_fp as string | undefined;
+    if (existingFp && existingFp !== requestFingerprint) {
+      return problem({
+        status: 409, code: "conflict", title: "idempotency_conflict",
+        detail: "Idempotency-Key reused with different request parameters.",
+        requestId: rid, cors,
+      });
+    }
     const { data: ag } = await supabase.from("agents").select("slug").eq("id", existing.agent_id).maybeSingle();
     const { data: ch } = await supabase.from("agent_channels").select("slug").eq("id", existing.channel_id).maybeSingle();
+    const storedDate = (existing.metadata as Record<string, unknown> | null)?.date as string | undefined;
     return ok({
       id: existing.id, status: existing.status,
       agent_slug: ag?.slug ?? null, channel_slug: ch?.slug ?? null,
-      date: deriveDateKey(metadata), created_at: existing.created_at,
+      date: storedDate ?? deriveDateKey(metadata), created_at: existing.created_at,
       idempotent: true,
     }, rid, cors, 202);
   }
@@ -180,7 +223,11 @@ Deno.serve(async (req) => {
       idempotency_key: idempotencyKey,
       status: "received",
       metadata_schema_version: (metadata.metadata_schema_version as string | undefined) ?? "2026-05-22",
-      metadata: { ...metadata, date: dateKey },
+      metadata: (() => {
+        const safe: Record<string, unknown> = { ...metadata };
+        delete safe._idempotency_fp;
+        return { ...safe, date: dateKey, _idempotency_fp: requestFingerprint };
+      })(),
     })
     .select("id, created_at")
     .single();
@@ -192,35 +239,37 @@ Deno.serve(async (req) => {
         requestId: rid, cors,
       });
     }
+    console.error("frame-submissions insert failed", { rid, err: subErr?.message });
     return problem({
-      status: 500, code: "internal_error", title: "Could not create submission",
-      detail: subErr?.message ?? "unknown", requestId: rid, cors,
+      status: 500, code: "internal_error", title: "Internal error",
+      detail: "An internal error occurred.", requestId: rid, cors,
     });
   }
 
-  const bytes = new Uint8Array(await file.arrayBuffer());
   const storagePath = `${key.tenant_id}/${sub.id}/original.png`;
   const { error: upErr } = await supabase.storage
     .from("frame-originals")
-    .upload(storagePath, bytes, { contentType: "image/png", upsert: false });
+    .upload(storagePath, fileBytes, { contentType: "image/png", upsert: false });
   if (upErr) {
+    console.error("frame-submissions storage upload failed", { rid, err: upErr.message });
     await supabase.from("frame_submissions").update({
       status: "failed",
       error: { stage: "storage_upload", message: upErr.message },
     }).eq("id", sub.id);
     return problem({
-      status: 500, code: "internal_error", title: "Storage upload failed",
-      detail: upErr.message, requestId: rid, cors,
+      status: 500, code: "internal_error", title: "Internal error",
+      detail: "An internal error occurred.", requestId: rid, cors,
     });
   }
 
   let imageId: string | null = null;
   try {
-    const uploaded = await uploadImage(bytes, "original.png", {
+    const uploaded = await uploadImage(fileBytes, "original.png", {
       tenant_id: key.tenant_id, submission_id: sub.id,
     });
     imageId = uploaded.id;
   } catch (e) {
+    console.error("frame-submissions images upload failed", { rid, err: (e as Error).message });
     await supabase.from("frame_submissions").update({
       status: "media_processing",
       error: { stage: "images_upload", message: (e as Error).message },

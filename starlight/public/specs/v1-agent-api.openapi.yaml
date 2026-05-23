@@ -28,11 +28,7 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: PNG or another configured image type for the normal frame path.
-                video:
-                  type: string
-                  format: binary
-                  description: Small configured video only. Large video uses media uploads.
+                  description: PNG image for the V1 frame path. Video is not accepted on this endpoint; use `POST /v1/media-uploads`.
             encoding:
               metadata:
                 contentType: application/json
@@ -97,8 +93,8 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateMediaUploadRequest"
       responses:
-        "201":
-          description: Direct upload session created.
+        "202":
+          description: Direct upload session created; submission is accepted and waiting for the agent to upload to `upload_url`.
           headers:
             X-Request-Id:
               $ref: "#/components/headers/RequestId"

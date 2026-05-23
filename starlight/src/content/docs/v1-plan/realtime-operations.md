@@ -31,7 +31,9 @@ Realtime payloads should be small. Event names use dotted form and match the can
 
 - `frame.submission.created`
 - `frame.submission.status_changed`
-- `frame.media.status_changed`
+- `frame.media.status_changed` (intermediate transitions)
+- `frame.media.ready` (terminal success)
+- `frame.media.failed` (terminal failure)
 - `frame.approval.changed`
 - `frame.promoted`
 - `frame.rejected`

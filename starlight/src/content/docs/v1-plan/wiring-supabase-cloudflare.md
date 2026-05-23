@@ -108,7 +108,7 @@ Top-to-bottom acceptance for the environment:
 2. **API key** — create a test key as `owner`, capture the one-time raw token, confirm only `prefix` + `hash` persisted.
 3. **Frame submission** — `POST /v1/frame-submissions` with multipart PNG; receive 202; see the `frame.submission.created` row in `frame_events`; the workbench updates via Postgres Changes.
 4. **Image variant** — workbench renders the frame from a signed Cloudflare Images URL (not from the Supabase original).
-5. **Large video** — `POST /v1/media-uploads`; upload directly to the returned Stream URL; the Stream webhook updates `frame_media.status`; the workbench emits `frame.media.status_changed`.
+5. **Large video** — `POST /v1/media-uploads`; upload directly to the returned Stream URL; the Stream webhook updates `frame_media.status` and emits `frame.media.ready` on success or `frame.media.failed` on error (intermediate transitions emit `frame.media.status_changed`).
 6. **Rate limit** — exceed the per-key bucket; receive `429 rate_limited` with a `Retry-After` header.
 7. **Observability** — every response carries `X-Request-Id`; that ID appears in Edge Function logs and on the frame detail screen.
 

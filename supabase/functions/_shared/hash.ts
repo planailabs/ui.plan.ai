@@ -25,6 +25,26 @@ export async function hmacSha256Hex(secret: string, data: string): Promise<strin
   return bytesToHex(sig);
 }
 
+export async function sha256Hex(data: string): Promise<string> {
+  const sig = await crypto.subtle.digest("SHA-256", encoder.encode(data));
+  return bytesToHex(sig);
+}
+
+function sortKeys(input: unknown): unknown {
+  if (Array.isArray(input)) return input.map(sortKeys);
+  if (input && typeof input === "object") {
+    return Object.keys(input as Record<string, unknown>).sort().reduce((acc, k) => {
+      (acc as Record<string, unknown>)[k] = sortKeys((input as Record<string, unknown>)[k]);
+      return acc;
+    }, {} as Record<string, unknown>);
+  }
+  return input;
+}
+
+export async function canonicalFingerprint(parts: Record<string, unknown>): Promise<string> {
+  return await sha256Hex(JSON.stringify(sortKeys(parts)));
+}
+
 export function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;

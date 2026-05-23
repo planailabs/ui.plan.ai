@@ -40,7 +40,8 @@ create table tenants (
   slug text not null unique,
   name text not null,
   settings jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table tenant_members (
@@ -58,7 +59,8 @@ create table agents (
   name text not null,
   description text,
   settings jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table agent_channels (
@@ -70,6 +72,7 @@ create table agent_channels (
   is_main boolean not null default false,
   settings jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
   unique (agent_id, slug)
 );
 
@@ -353,18 +356,24 @@ create policy "tenant_members member read"
 on tenant_members for select to authenticated
 using (is_tenant_member(tenant_id));
 
+create or replace function is_aal2() returns boolean
+language sql stable security definer set search_path = public, auth
+as $$
+  select coalesce(((select auth.jwt())->>'aal') = 'aal2', false);
+$$;
+
 create policy "tenant_members owner insert"
 on tenant_members for insert to authenticated
-with check (current_tenant_role(tenant_id) = 'owner');
+with check (current_tenant_role(tenant_id) = 'owner' and is_aal2());
 
 create policy "tenant_members owner update"
 on tenant_members for update to authenticated
-using (current_tenant_role(tenant_id) = 'owner')
-with check (current_tenant_role(tenant_id) = 'owner');
+using (current_tenant_role(tenant_id) = 'owner' and is_aal2())
+with check (current_tenant_role(tenant_id) = 'owner' and is_aal2());
 
 create policy "tenant_members owner delete not self"
 on tenant_members for delete to authenticated
-using (current_tenant_role(tenant_id) = 'owner' and user_id <> (select auth.uid()));
+using (current_tenant_role(tenant_id) = 'owner' and is_aal2() and user_id <> (select auth.uid()));
 
 create policy "agents member read"
 on agents for select to authenticated
@@ -432,8 +441,8 @@ using (current_tenant_role(tenant_id) = 'owner');
 
 create policy "tenant_invitations owner write"
 on tenant_invitations for all to authenticated
-using (current_tenant_role(tenant_id) = 'owner')
-with check (current_tenant_role(tenant_id) = 'owner');
+using (current_tenant_role(tenant_id) = 'owner' and is_aal2())
+with check (current_tenant_role(tenant_id) = 'owner' and is_aal2());
 
 alter publication supabase_realtime add table frame_events;
 alter publication supabase_realtime add table frame_submissions;

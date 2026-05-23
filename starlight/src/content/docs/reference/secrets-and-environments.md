@@ -39,6 +39,7 @@ The "Canonical name" column is the value's logical identity. The "Per-surface va
 | `CF_STREAM_WEBHOOK_SECRET` | `CF_STREAM_WEBHOOK_SECRET` | Edge Functions | Verifies `webhook-signature` on Stream callbacks. |
 | `TURNSTILE_SITE_KEY` | `PUBLIC_TURNSTILE_SITE_KEY` (Astro build env) | CF Pages env (public) | Login form widget. |
 | `TURNSTILE_SECRET_KEY` | `TURNSTILE_SECRET_KEY` | Edge Functions | Verifies Turnstile tokens server-side. |
+| `APP_ORIGINS` | `APP_ORIGINS` | Edge Functions | Comma-separated allowlist used by the shared CORS module and as `allowedOrigins` for Cloudflare Stream direct uploads. Must list every browser origin that talks to Edge Functions (e.g. `https://ui.plan.ai,https://preview.ui.plan.ai`). |
 
 Upstream references: [Supabase Edge Function secrets](https://supabase.com/docs/guides/functions/secrets), [Pages env vars](https://developers.cloudflare.com/pages/configuration/build-configuration/#environment-variables).
 

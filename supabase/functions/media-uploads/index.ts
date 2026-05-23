@@ -5,6 +5,9 @@ import { serviceClient } from "../_shared/supabase.ts";
 import { appendEvent } from "../_shared/events.ts";
 import { consume } from "../_shared/rate-limit.ts";
 import { createDirectUpload } from "../_shared/stream.ts";
+import { canonicalFingerprint } from "../_shared/hash.ts";
+
+const MAX_JSON_BYTES = 16 * 1024;
 
 Deno.serve(async (req) => {
   const pre = preflight(req);
@@ -48,9 +51,26 @@ Deno.serve(async (req) => {
     });
   }
 
+  const declaredLen = Number(req.headers.get("content-length") ?? 0);
+  if (declaredLen > MAX_JSON_BYTES) {
+    return problem({
+      status: 413, code: "validation_failed", title: "Payload too large",
+      detail: `JSON body exceeds ${MAX_JSON_BYTES} bytes.`,
+      requestId: rid, cors,
+    });
+  }
+
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
+    const raw = await req.text();
+    if (raw.length > MAX_JSON_BYTES) {
+      return problem({
+        status: 413, code: "validation_failed", title: "Payload too large",
+        detail: `JSON body exceeds ${MAX_JSON_BYTES} bytes.`,
+        requestId: rid, cors,
+      });
+    }
+    body = JSON.parse(raw);
   } catch (_) {
     return problem({
       status: 400, code: "validation_failed", title: "Invalid JSON",
@@ -80,6 +100,11 @@ Deno.serve(async (req) => {
   const agentSlug = body.agent_slug as string | undefined;
   const channelSlug = body.channel_slug as string | undefined;
 
+  const requestFingerprint = await canonicalFingerprint({
+    media_type: mediaType, filename, content_type: contentType, byte_size: byteSize,
+    max_duration_seconds: maxDurationSeconds, agent_slug: agentSlug ?? null, channel_slug: channelSlug ?? null,
+  });
+
   const supabase = serviceClient();
 
   const { data: existing } = await supabase
@@ -89,10 +114,19 @@ Deno.serve(async (req) => {
     .eq("idempotency_key", idempotencyKey)
     .maybeSingle();
   if (existing) {
+    const meta = (existing.metadata as Record<string, unknown> | null) ?? {};
+    const existingFp = meta._idempotency_fp as string | undefined;
+    if (existingFp && existingFp !== requestFingerprint) {
+      return problem({
+        status: 409, code: "conflict", title: "idempotency_conflict",
+        detail: "Idempotency-Key reused with different request parameters.",
+        requestId: rid, cors,
+      });
+    }
     return ok({
       id: existing.id, status: existing.status, provider: "cloudflare_stream",
-      upload_url: (existing.metadata as { _upload_url?: string })?._upload_url ?? null,
-      expires_at: (existing.metadata as { _upload_expires_at?: string })?._upload_expires_at ?? null,
+      upload_url: (meta._upload_url as string | undefined) ?? null,
+      expires_at: (meta._upload_expires_at as string | undefined) ?? null,
       idempotent: true,
     }, rid, cors, 202);
   }
@@ -150,9 +184,10 @@ Deno.serve(async (req) => {
       expirySeconds,
     });
   } catch (e) {
+    console.error("media-uploads stream direct-upload failed", { rid, err: (e as Error).message });
     return problem({
-      status: 502, code: "internal_error", title: "Stream direct-upload failed",
-      detail: (e as Error).message, requestId: rid, cors,
+      status: 502, code: "internal_error", title: "Upstream unavailable",
+      detail: "Could not create direct upload session.", requestId: rid, cors,
     });
   }
   const expiresAt = new Date(Date.now() + expirySeconds * 1000).toISOString();
@@ -167,9 +202,10 @@ Deno.serve(async (req) => {
       status: "waiting_for_upload",
       metadata_schema_version: (body.metadata_schema_version as string | undefined) ?? "2026-05-22",
       metadata: {
+        ...(body.metadata as Record<string, unknown> | undefined ?? {}),
         filename, content_type: contentType, byte_size: byteSize,
         _upload_url: upload.uploadURL, _upload_expires_at: expiresAt,
-        ...(body.metadata as Record<string, unknown> | undefined ?? {}),
+        _idempotency_fp: requestFingerprint,
       },
     })
     .select("id, created_at")
@@ -182,9 +218,10 @@ Deno.serve(async (req) => {
         requestId: rid, cors,
       });
     }
+    console.error("media-uploads insert failed", { rid, err: subErr?.message });
     return problem({
-      status: 500, code: "internal_error", title: "Could not create submission",
-      detail: subErr?.message ?? "unknown", requestId: rid, cors,
+      status: 500, code: "internal_error", title: "Internal error",
+      detail: "An internal error occurred.", requestId: rid, cors,
     });
   }
 

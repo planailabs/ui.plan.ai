@@ -41,7 +41,9 @@ Payloads are deliberately small (IDs, status, actor, timestamp). The client fetc
 |---|---|
 | `frame.submission.created` | A new `frame_submissions` row is inserted. |
 | `frame.submission.status_changed` | `frame_submissions.status` transitions. See [Promotion workflow](/process/promotion-workflow/). |
-| `frame.media.status_changed` | A `frame_media` row's processing state changes. |
+| `frame.media.status_changed` | A `frame_media` row's processing state changes to an intermediate state (`processing`). |
+| `frame.media.ready` | A `frame_media` row's processing reached `ready` (terminal success). |
+| `frame.media.failed` | A `frame_media` row's processing reached `failed` (terminal failure); `payload` includes `state` and stream `errorReasonText` is reflected on `frame_media.failure_reason`. |
 | `frame.approval.changed` | An approval policy or per-submission override is applied. |
 | `frame.promoted` | A frame reaches `promoted` and is published to the channel timeline. |
 | `frame.rejected` | A frame is moved to `rejected`. |

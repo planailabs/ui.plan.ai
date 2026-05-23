@@ -27,7 +27,9 @@ Realtime events are for awareness and refresh triggers, not large data transfer.
 
 - `frame.submission.created`
 - `frame.submission.status_changed`
-- `frame.media.status_changed`
+- `frame.media.status_changed` — intermediate `frame_media.status` transitions (e.g. `processing`)
+- `frame.media.ready` — terminal success transition (`frame_media.status` → `ready`)
+- `frame.media.failed` — terminal failure transition (`frame_media.status` → `failed`)
 - `frame.approval.changed`
 - `frame.promoted`
 - `frame.rejected`

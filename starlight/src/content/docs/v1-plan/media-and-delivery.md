@@ -57,7 +57,7 @@ Upstream: [serve private images](https://developers.cloudflare.com/images/manage
 - `POST /v1/media-uploads` calls Stream's Direct Creator Uploads API with `requireSignedURLs: true`, a configured `maxDurationSeconds`, `allowedOrigins` matching the env's domains, and a webhook target pointing at the `stream-webhook` Edge Function. Until the `api.ui.plan.ai` custom domain is bound (see [Wiring Phase 10 step 4](/v1-plan/wiring-supabase-cloudflare/#phase-10--cloudflare-pages-the-astro-app--agent-api-hostname)), that target is the raw `https://<project-ref>.supabase.co/functions/v1/stream-webhook` URL; afterwards, `https://api.ui.plan.ai/webhooks/stream` aliases the same Edge Function.
 - The agent uploads directly to the returned one-shot URL; Stream is the source of truth once that URL is consumed.
 - Playback uses Stream signed JWT tokens minted by an Edge Function with `exp ≤ 1h`. The HLS manifest URL never embeds a raw video UID without a signature.
-- The Stream `ready` webhook is verified against `CF_STREAM_WEBHOOK_SECRET`, then updates `frame_media.status` and emits `frame.media.status_changed` (see [Realtime operations](/v1-plan/realtime-operations/)).
+- The Stream webhook is verified against `CF_STREAM_WEBHOOK_SECRET`, then updates `frame_media.status` and emits `frame.media.ready` on the ready transition, `frame.media.failed` on error, and `frame.media.status_changed` on intermediate state changes (see [Realtime operations](/v1-plan/realtime-operations/)).
 
 Upstream: [direct creator uploads](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/), [securing your stream](https://developers.cloudflare.com/stream/viewing-videos/securing-your-stream/), [webhooks](https://developers.cloudflare.com/stream/manage-video-library/using-webhooks/).
 
@@ -89,9 +89,9 @@ Mapping into our schema:
 
 | Cloudflare `status.state` | `frame_media.status` | Realtime event |
 |---|---|---|
-| `ready` | `ready` | `frame.media.status_changed` |
+| `ready` | `ready` | `frame.media.ready` |
 | `inprogress` / `queued` / `pendingupload` | `processing` | `frame.media.status_changed` (debounced) |
-| `error` | `failed` (with `failure_reason` from `status.errorReasonText`) | `frame.media.status_changed` |
+| `error` | `failed` (with `failure_reason` from `status.errorReasonText`) | `frame.media.failed` |
 
 Verification + mapping rules:
 
