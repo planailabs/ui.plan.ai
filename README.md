@@ -26,7 +26,7 @@ pnpm install        # one install at the root sets up both projects
 pnpm dev            # main app on :4321, docs on :4322/docs/
 ```
 
-Open `http://localhost:4321/` for the main app and `http://localhost:4322/docs/` for the docs (the docs route under the main app at `:4321/docs/` is whatever was last built — use `:4322/docs/` for live editing).
+Open `http://localhost:4321/` for the main app and `http://localhost:4322/docs/` for the docs. On a fresh clone, the docs route under the main app at `:4321/docs/` 404s until `pnpm build:docs` has run once (it serves `public/docs/`, which is generated and gitignored); after that it shows whatever was last built. Use `:4322/docs/` for live editing.
 
 ## Local development
 
