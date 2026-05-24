@@ -2,6 +2,228 @@
 import Workbench from '../../layouts/Workbench.astro';
 ---
 <Workbench title="Inbox" spec="/docs/v1-plan/workbench/">
-  <p>Review queue for incoming frame submissions. Sort by agent, channel, status, created_at desc.</p>
-  <p style="color:var(--dim);">Scaffold only — list/realtime wiring lands in a follow-up loop. Backed by the <code>frame_submissions</code> table (see <a href="/docs/specifications/supabase-sql/" style="color:var(--accent)">SQL plan</a>).</p>
+  <p style="color:var(--dim);margin-top:0;">
+    Review queue for incoming frame submissions. Updates live via Postgres Changes on <code>frame_submissions</code>, <code>frame_media</code>, and <code>frame_events</code> — see
+    <a href="/docs/v1-plan/realtime-operations/" style="color:var(--accent)">Realtime operations</a>.
+  </p>
+
+  <div class="inbox-controls">
+    <label>
+      Tenant
+      <select id="tenant-select" disabled><option>loading…</option></select>
+    </label>
+    <label>
+      Status
+      <select id="status-filter">
+        <option value="">all</option>
+        <option value="received">received</option>
+        <option value="waiting_for_upload">waiting_for_upload</option>
+        <option value="media_processing">media_processing</option>
+        <option value="needs_review">needs_review</option>
+        <option value="team_visible">team_visible</option>
+        <option value="promotion_eligible">promotion_eligible</option>
+        <option value="promoted">promoted</option>
+        <option value="rejected">rejected</option>
+        <option value="failed">failed</option>
+      </select>
+    </label>
+    <span id="rt-indicator" class="rt-dot" data-state="off" title="realtime"></span>
+    <span id="rt-label" class="rt-label">offline</span>
+    <span id="last-event" class="last-event"></span>
+  </div>
+
+  <div id="inbox-status" class="inbox-status">Loading…</div>
+
+  <table class="inbox-table" hidden>
+    <thead>
+      <tr>
+        <th>Updated</th>
+        <th>Agent</th>
+        <th>Channel</th>
+        <th>Status</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody id="inbox-rows"></tbody>
+  </table>
+
+  <style>
+    .inbox-controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin: 16px 0; font-size: 12px; }
+    .inbox-controls label { display: flex; flex-direction: column; gap: 4px; color: var(--dim); }
+    .inbox-controls select { background: #0a0a0a; color: var(--fg); border: 1px solid var(--line); padding: 4px 8px; font: inherit; min-width: 220px; }
+    .rt-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #52525b; margin-top: 14px; }
+    .rt-dot[data-state="on"] { background: var(--accent-2); box-shadow: 0 0 6px var(--accent-2); }
+    .rt-dot[data-state="err"] { background: #f87171; }
+    .rt-label { color: var(--dim); margin-top: 14px; }
+    .last-event { color: var(--dim); margin-top: 14px; font-variant-numeric: tabular-nums; }
+    .inbox-status { color: var(--dim); padding: 16px 0; }
+    .inbox-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+    .inbox-table th { text-align: left; color: var(--dim); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+    .inbox-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    .inbox-table tr.flash { background: #0a1a0e; transition: background 1.5s; }
+    .inbox-table a { color: var(--accent); text-decoration: none; }
+    .status-pill { display: inline-block; padding: 2px 6px; border: 1px solid var(--line); font-size: 11px; color: var(--dim); }
+    .status-pill[data-s="promoted"] { color: var(--accent-2); border-color: var(--accent-2); }
+    .status-pill[data-s="rejected"], .status-pill[data-s="failed"] { color: #f87171; border-color: #f87171; }
+    .status-pill[data-s="needs_review"] { color: #fbbf24; border-color: #fbbf24; }
+    .status-pill[data-s="media_processing"], .status-pill[data-s="waiting_for_upload"] { color: var(--accent); border-color: var(--accent); }
+  </style>
+
+  <script>
+    import { getBrowserClient } from '../../lib/supabase';
+    import { listMyTenants, getActiveTenantId, setActiveTenantId } from '../../lib/tenant';
+    import { subscribeInbox, type FrameSubmissionRow } from '../../lib/realtime';
+
+    const PAGE_SIZE = 50;
+    const supabase = getBrowserClient();
+    const statusEl = document.getElementById('inbox-status') as HTMLDivElement;
+    const tableEl = document.querySelector('.inbox-table') as HTMLTableElement;
+    const tbodyEl = document.getElementById('inbox-rows') as HTMLTableSectionElement;
+    const tenantSel = document.getElementById('tenant-select') as HTMLSelectElement;
+    const statusSel = document.getElementById('status-filter') as HTMLSelectElement;
+    const rtDot = document.getElementById('rt-indicator') as HTMLSpanElement;
+    const rtLabel = document.getElementById('rt-label') as HTMLSpanElement;
+    const lastEvent = document.getElementById('last-event') as HTMLSpanElement;
+
+    if (!supabase) {
+      statusEl.textContent = 'Supabase env not configured — read-only build.';
+    } else {
+      void boot();
+    }
+
+    type AgentRow = { id: string; slug: string; display_name: string };
+    type ChannelRow = { id: string; slug: string };
+    const agents = new Map<string, AgentRow>();
+    const channels = new Map<string, ChannelRow>();
+    const rows = new Map<string, FrameSubmissionRow>();
+    let activeChannel: ReturnType<typeof subscribeInbox> | null = null;
+
+    function fmtTime(iso: string): string {
+      const d = new Date(iso);
+      return d.toLocaleString(undefined, { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function setRt(state: 'on' | 'off' | 'err', label: string) {
+      rtDot.dataset.state = state;
+      rtLabel.textContent = label;
+    }
+
+    function noteEvent(name: string) {
+      lastEvent.textContent = `${name} · ${new Date().toLocaleTimeString()}`;
+    }
+
+    function renderTable() {
+      const filter = statusSel.value;
+      const visible = [...rows.values()]
+        .filter((r) => !filter || r.status === filter)
+        .sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1));
+      if (visible.length === 0) {
+        tableEl.hidden = true;
+        statusEl.textContent = filter ? `No submissions with status "${filter}".` : 'No submissions yet.';
+        statusEl.hidden = false;
+        return;
+      }
+      statusEl.hidden = true;
+      tableEl.hidden = false;
+      tbodyEl.innerHTML = visible.map((r) => {
+        const agent = agents.get(r.agent_id);
+        const channel = channels.get(r.channel_id);
+        return `
+          <tr data-id="${r.id}">
+            <td>${fmtTime(r.updated_at)}</td>
+            <td>${agent ? `${agent.display_name} <span style="color:var(--dim)">(${agent.slug})</span>` : '<span style="color:var(--dim)">—</span>'}</td>
+            <td>${channel ? channel.slug : '<span style="color:var(--dim)">—</span>'}</td>
+            <td><span class="status-pill" data-s="${r.status}">${r.status}</span></td>
+            <td><a href="/workbench/frames/${r.id}/">${r.id.slice(0, 8)}…</a></td>
+          </tr>`;
+      }).join('');
+    }
+
+    function flashRow(id: string) {
+      const tr = tbodyEl.querySelector(`tr[data-id="${id}"]`) as HTMLTableRowElement | null;
+      if (!tr) return;
+      tr.classList.add('flash');
+      setTimeout(() => tr.classList.remove('flash'), 1500);
+    }
+
+    async function loadLookups(tenantId: string) {
+      const [a, c] = await Promise.all([
+        supabase!.from('agents').select('id, slug, display_name').eq('tenant_id', tenantId),
+        supabase!.from('agent_channels').select('id, slug').eq('tenant_id', tenantId),
+      ]);
+      agents.clear();
+      (a.data ?? []).forEach((r) => agents.set(r.id, r as AgentRow));
+      channels.clear();
+      (c.data ?? []).forEach((r) => channels.set(r.id, r as ChannelRow));
+    }
+
+    async function loadSubmissions(tenantId: string) {
+      const { data, error } = await supabase!
+        .from('frame_submissions')
+        .select('id, tenant_id, agent_id, channel_id, status, metadata, metadata_schema_version, error, created_at, updated_at')
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false })
+        .limit(PAGE_SIZE);
+      if (error) {
+        statusEl.textContent = `Load failed: ${error.message}`;
+        return;
+      }
+      rows.clear();
+      (data ?? []).forEach((r) => rows.set(r.id, r as FrameSubmissionRow));
+      renderTable();
+    }
+
+    async function switchTenant(tenantId: string) {
+      setActiveTenantId(tenantId);
+      statusEl.textContent = 'Loading…';
+      statusEl.hidden = false;
+      tableEl.hidden = true;
+      if (activeChannel) {
+        await supabase!.removeChannel(activeChannel);
+        activeChannel = null;
+        setRt('off', 'offline');
+      }
+      await loadLookups(tenantId);
+      await loadSubmissions(tenantId);
+      activeChannel = subscribeInbox(supabase!, tenantId, {
+        onSubmission: (eventName, type, row) => {
+          if (type === 'DELETE') {
+            rows.delete(row.id);
+          } else {
+            rows.set(row.id, row);
+          }
+          noteEvent(eventName);
+          renderTable();
+          if (type !== 'DELETE') flashRow(row.id);
+        },
+        onMedia: (eventName) => noteEvent(eventName),
+        onEvent: (row) => noteEvent(row.event_type),
+      });
+      // Surface subscription state.
+      // @ts-expect-error supabase-js does not type the system event well
+      activeChannel.on('system', { event: '*' }, (s: any) => {
+        if (s?.status === 'SUBSCRIBED' || s?.extension === 'postgres_changes') setRt('on', 'live');
+        else if (s?.status === 'CHANNEL_ERROR' || s?.status === 'TIMED_OUT') setRt('err', s.status.toLowerCase());
+      });
+      // Optimistic on after a tick: subscribe() resolves async; if no error fires, assume good.
+      setTimeout(() => { if (rtDot.dataset.state === 'off') setRt('on', 'live'); }, 1200);
+    }
+
+    async function boot() {
+      const tenants = await listMyTenants();
+      if (tenants.length === 0) {
+        statusEl.textContent = 'No tenant membership found for this account.';
+        return;
+      }
+      tenantSel.innerHTML = tenants
+        .map((t) => `<option value="${t.tenant_id}">${t.tenant_id.slice(0, 8)}… (${t.role})</option>`)
+        .join('');
+      tenantSel.disabled = false;
+      const active = (await getActiveTenantId()) ?? tenants[0].tenant_id;
+      tenantSel.value = active;
+      await switchTenant(active);
+      tenantSel.addEventListener('change', () => void switchTenant(tenantSel.value));
+      statusSel.addEventListener('change', () => renderTable());
+    }
+  </script>
 </Workbench>

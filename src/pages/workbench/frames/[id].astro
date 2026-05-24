@@ -5,6 +5,200 @@ export function getStaticPaths() {
 }
 ---
 <Workbench title="Frame detail" spec="/docs/v1-plan/workbench/">
-  <p>Media · metadata · click zones · license · events · approval history.</p>
-  <p style="color:var(--dim);">Scaffold only. Routed at <code>/workbench/frames/[id]/</code>; the <code>preview</code> path exists so static builds emit at least one variant.</p>
+  <p style="color:var(--dim);margin-top:0;">
+    Media · metadata · events · approval. Updates live via Postgres Changes on this submission's row, its <code>frame_media</code> rows, and the <code>frame_events</code> log.
+    Image variants and Stream playback URLs require a server-side signer Edge Function (out of scope for this loop) — V1 wiring shows raw IDs and statuses.
+  </p>
+
+  <div class="rt-row">
+    <span id="rt-dot" class="rt-dot" data-state="off" title="realtime"></span>
+    <span id="rt-label" class="rt-label">offline</span>
+    <span id="last-event" class="last-event"></span>
+  </div>
+
+  <section id="summary" class="card">Loading…</section>
+
+  <h2 class="h2">Media</h2>
+  <section id="media-list" class="card"><span class="dim">—</span></section>
+
+  <h2 class="h2">Events <span class="dim" style="font-weight:400;">(latest 100)</span></h2>
+  <section id="events-list" class="card events"><span class="dim">—</span></section>
+
+  <h2 class="h2">Raw metadata</h2>
+  <pre id="metadata-json" class="card pre"></pre>
+
+  <style>
+    .rt-row { display: flex; gap: 12px; align-items: center; margin: 12px 0; font-size: 12px; }
+    .rt-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #52525b; }
+    .rt-dot[data-state="on"] { background: var(--accent-2); box-shadow: 0 0 6px var(--accent-2); }
+    .rt-dot[data-state="err"] { background: #f87171; }
+    .rt-label, .last-event, .dim { color: var(--dim); }
+    .last-event { font-variant-numeric: tabular-nums; }
+    .h2 { font: 500 14px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.02em; text-transform: uppercase; color: var(--dim); margin: 24px 0 8px; }
+    .card { border: 1px solid var(--line); padding: 12px 16px; background: #0a0a0a; font-size: 12px; }
+    .card.events { padding: 0; }
+    .card.pre { white-space: pre-wrap; word-break: break-word; font: 11px/1.45 ui-monospace, monospace; max-height: 320px; overflow: auto; }
+    .kv { display: grid; grid-template-columns: 140px 1fr; gap: 4px 16px; font-variant-numeric: tabular-nums; }
+    .kv dt { color: var(--dim); }
+    .kv dd { margin: 0; word-break: break-all; }
+    .status-pill { display: inline-block; padding: 2px 6px; border: 1px solid var(--line); font-size: 11px; color: var(--dim); }
+    .status-pill[data-s="promoted"] { color: var(--accent-2); border-color: var(--accent-2); }
+    .status-pill[data-s="rejected"], .status-pill[data-s="failed"] { color: #f87171; border-color: #f87171; }
+    .status-pill[data-s="needs_review"] { color: #fbbf24; border-color: #fbbf24; }
+    .status-pill[data-s="media_processing"], .status-pill[data-s="waiting_for_upload"], .status-pill[data-s="ready"] { color: var(--accent); border-color: var(--accent); }
+    .media-item { padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .media-item:last-child { border-bottom: 0; }
+    .event-row { display: grid; grid-template-columns: 160px 200px 1fr; gap: 12px; padding: 6px 12px; border-bottom: 1px solid var(--line); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .event-row:last-child { border-bottom: 0; }
+    .event-row .ts { color: var(--dim); }
+    .event-row .name { color: var(--accent); }
+  </style>
+
+  <script>
+    import { getBrowserClient } from '../../../lib/supabase';
+    import {
+      subscribeFrame,
+      type FrameSubmissionRow,
+      type FrameMediaRow,
+      type FrameEventRow,
+    } from '../../../lib/realtime';
+
+    const id = window.location.pathname.replace(/\/$/, '').split('/').pop() || '';
+    const supabase = getBrowserClient();
+    const summaryEl = document.getElementById('summary') as HTMLElement;
+    const mediaEl = document.getElementById('media-list') as HTMLElement;
+    const eventsEl = document.getElementById('events-list') as HTMLElement;
+    const metaEl = document.getElementById('metadata-json') as HTMLElement;
+    const rtDot = document.getElementById('rt-dot') as HTMLSpanElement;
+    const rtLabel = document.getElementById('rt-label') as HTMLSpanElement;
+    const lastEvent = document.getElementById('last-event') as HTMLSpanElement;
+
+    if (!supabase) {
+      summaryEl.textContent = 'Supabase env not configured — read-only build.';
+    } else if (id === 'preview') {
+      summaryEl.innerHTML = '<span class="dim">Static preview path. Navigate from the inbox to load a real submission.</span>';
+    } else {
+      void boot(id);
+    }
+
+    let submission: FrameSubmissionRow | null = null;
+    const media = new Map<string, FrameMediaRow>();
+    const events: FrameEventRow[] = [];
+
+    function fmtTime(iso: string): string {
+      return new Date(iso).toLocaleString(undefined, { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function setRt(state: 'on' | 'off' | 'err', label: string) {
+      rtDot.dataset.state = state;
+      rtLabel.textContent = label;
+    }
+
+    function noteEvent(name: string) {
+      lastEvent.textContent = `${name} · ${new Date().toLocaleTimeString()}`;
+    }
+
+    function renderSummary() {
+      if (!submission) return;
+      const s = submission;
+      summaryEl.innerHTML = `
+        <dl class="kv">
+          <dt>id</dt><dd>${s.id}</dd>
+          <dt>status</dt><dd><span class="status-pill" data-s="${s.status}">${s.status}</span></dd>
+          <dt>agent_id</dt><dd>${s.agent_id}</dd>
+          <dt>channel_id</dt><dd>${s.channel_id}</dd>
+          <dt>created_at</dt><dd>${fmtTime(s.created_at)}</dd>
+          <dt>updated_at</dt><dd>${fmtTime(s.updated_at)}</dd>
+          <dt>schema</dt><dd>${s.metadata_schema_version}</dd>
+          ${s.error ? `<dt>error</dt><dd style="color:#f87171">${JSON.stringify(s.error)}</dd>` : ''}
+        </dl>`;
+      metaEl.textContent = JSON.stringify(s.metadata, null, 2);
+    }
+
+    function renderMedia() {
+      if (media.size === 0) {
+        mediaEl.innerHTML = '<span class="dim">No media rows yet.</span>';
+        return;
+      }
+      mediaEl.innerHTML = [...media.values()].map((m) => `
+        <div class="media-item">
+          <dl class="kv">
+            <dt>kind</dt><dd>${m.kind}</dd>
+            <dt>status</dt><dd><span class="status-pill" data-s="${m.status}">${m.status}</span>${m.failure_reason ? ` <span style="color:#f87171">${m.failure_reason}</span>` : ''}</dd>
+            <dt>provider</dt><dd>${m.storage_provider}</dd>
+            <dt>storage_key</dt><dd>${m.storage_key}</dd>
+            ${m.delivery_id ? `<dt>delivery_id</dt><dd>${m.delivery_id}</dd>` : ''}
+            <dt>updated_at</dt><dd>${fmtTime(m.updated_at)}</dd>
+          </dl>
+        </div>`).join('');
+    }
+
+    function renderEvents() {
+      if (events.length === 0) {
+        eventsEl.innerHTML = '<div style="padding:12px"><span class="dim">No events yet.</span></div>';
+        return;
+      }
+      eventsEl.innerHTML = events.slice(0, 100).map((e) => `
+        <div class="event-row">
+          <span class="ts">${fmtTime(e.created_at)}</span>
+          <span class="name">${e.event_type}</span>
+          <span>${e.actor_type}${e.request_id ? ` · req <span class="dim">${e.request_id}</span>` : ''}</span>
+        </div>`).join('');
+    }
+
+    async function boot(submissionId: string) {
+      const [s, m, e] = await Promise.all([
+        supabase!
+          .from('frame_submissions')
+          .select('id, tenant_id, agent_id, channel_id, status, metadata, metadata_schema_version, error, created_at, updated_at')
+          .eq('id', submissionId)
+          .maybeSingle(),
+        supabase!
+          .from('frame_media')
+          .select('id, tenant_id, submission_id, kind, storage_provider, storage_key, delivery_id, status, failure_reason, metadata, created_at, updated_at')
+          .eq('submission_id', submissionId),
+        supabase!
+          .from('frame_events')
+          .select('id, tenant_id, submission_id, event_type, actor_type, actor_id, request_id, payload, created_at')
+          .eq('submission_id', submissionId)
+          .order('created_at', { ascending: false })
+          .limit(100),
+      ]);
+
+      if (s.error || !s.data) {
+        summaryEl.innerHTML = `<span class="dim">Submission not found or not accessible to this account.</span>`;
+        return;
+      }
+      submission = s.data as FrameSubmissionRow;
+      (m.data ?? []).forEach((r) => media.set(r.id, r as FrameMediaRow));
+      events.push(...((e.data ?? []) as FrameEventRow[]));
+
+      renderSummary();
+      renderMedia();
+      renderEvents();
+
+      const ch = subscribeFrame(supabase!, submissionId, {
+        onSubmission: (name, row) => {
+          submission = row;
+          noteEvent(name);
+          renderSummary();
+        },
+        onMedia: (name, row) => {
+          media.set(row.id, row);
+          noteEvent(name);
+          renderMedia();
+        },
+        onEvent: (row) => {
+          events.unshift(row);
+          noteEvent(row.event_type);
+          renderEvents();
+        },
+      });
+      // @ts-expect-error system event is loosely typed
+      ch.on('system', { event: '*' }, (s: any) => {
+        if (s?.status === 'CHANNEL_ERROR' || s?.status === 'TIMED_OUT') setRt('err', s.status.toLowerCase());
+      });
+      setTimeout(() => { if (rtDot.dataset.state === 'off') setRt('on', 'live'); }, 1200);
+    }
+  </script>
 </Workbench>
