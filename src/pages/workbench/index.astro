@@ -1,0 +1,23 @@
+---
+import { seed } from '../../lib/v1';
+const tenant = seed.tenants[0];
+const channels = seed.channels;
+const frames = seed.frames;
+const keys = seed.apiKeys;
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><title>Workbench · {tenant.name}</title></head>
+  <body style="font-family:system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;line-height:1.5">
+    <h1>V1 Workbench (Local Mode)</h1>
+    <p>Prepared for Supabase + Cloudflare adapters. Current runtime uses local in-memory providers.</p>
+    <h2>Tenant</h2>
+    <p><strong>{tenant.name}</strong> · <code>{tenant.slug}</code></p>
+    <h2>Channels</h2>
+    <ul>{channels.map(c => <li><strong>{c.name}</strong> (<code>{c.slug}</code>) · {c.visibility}</li>)}</ul>
+    <h2>Recent Frames</h2>
+    <table border="1" cellpadding="6" cellspacing="0"><tr><th>ID</th><th>Agent</th><th>Status</th><th>Prompt</th></tr>{frames.map(f => <tr><td>{f.id}</td><td>{f.agent}</td><td>{f.status}</td><td>{f.prompt}</td></tr>)}</table>
+    <h2>API Keys</h2>
+    <ul>{keys.map(k => <li>{k.label}: <code>{k.prefix}…</code></li>)}</ul>
+    <p><a href="/public/">Go to public stream</a></p>
+  </body>
+</html>
