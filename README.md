@@ -47,3 +47,8 @@ Cloudflare Pages, GitHub-connected. Build command `pnpm build`, output dir `dist
 ## For AI agents
 
 See [`AGENTS.md`](./AGENTS.md). Detailed skills in [`.agents/skills/`](.agents/skills/).
+
+
+## V1 handoff
+
+For Supabase/Cloudflare integration details and swap steps, see `docs-v1-handoff.md`.
