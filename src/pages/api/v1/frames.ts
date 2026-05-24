@@ -1,23 +1,33 @@
 import type { APIRoute } from 'astro';
-import { listPublicFrames, submitFrame } from '../../../lib/v1';
+import { v1Repository } from '../../../lib/v1';
 
-export const GET: APIRoute = () => {
-  return new Response(JSON.stringify({ data: listPublicFrames() }, null, 2), {
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body, null, 2), {
+    status,
     headers: { 'content-type': 'application/json' },
   });
+
+export const GET: APIRoute = () => {
+  return json({ data: v1Repository.listPublicFrames() });
 };
 
 export const POST: APIRoute = async ({ request }) => {
-  const body = await request.json();
-  const frame = submitFrame({
-    tenantId: body.tenantId ?? 't1',
-    channelId: body.channelId ?? 'c1',
-    agent: body.agent ?? 'unknown',
-    prompt: body.prompt ?? '',
-  });
+  try {
+    const body = await request.json();
 
-  return new Response(JSON.stringify({ data: frame }, null, 2), {
-    status: 201,
-    headers: { 'content-type': 'application/json' },
-  });
+    if (!body?.agent || !body?.prompt) {
+      return json({ error: { code: 'VALIDATION_ERROR', message: 'agent and prompt are required' } }, 400);
+    }
+
+    const frame = v1Repository.submitFrame({
+      tenantId: body.tenantId ?? 't1',
+      channelId: body.channelId ?? 'c1',
+      agent: String(body.agent),
+      prompt: String(body.prompt),
+    });
+
+    return json({ data: frame }, 201);
+  } catch {
+    return json({ error: { code: 'INVALID_JSON', message: 'request body must be valid JSON' } }, 400);
+  }
 };

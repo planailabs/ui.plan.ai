@@ -1,15 +1,17 @@
 ---
-import { seed } from '../../lib/v1';
-const tenant = seed.tenants[0];
-const channels = seed.channels;
-const frames = seed.frames;
-const keys = seed.apiKeys;
+import { v1Repository } from '../../lib/v1';
+import { appConfig } from '../../lib/config';
+const tenant = v1Repository.listTenants()[0];
+const channels = v1Repository.listChannels(tenant.id);
+const frames = v1Repository.listFrames(tenant.id);
+const keys = v1Repository.listApiKeys(tenant.id);
 ---
 <html lang="en">
   <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><title>Workbench · {tenant.name}</title></head>
   <body style="font-family:system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;line-height:1.5">
     <h1>V1 Workbench (Local Mode)</h1>
-    <p>Prepared for Supabase + Cloudflare adapters. Current runtime uses local in-memory providers.</p>
+    <p>Prepared for Supabase + Cloudflare adapters. Current runtime uses local providers with the same V1 contracts.</p>
+    <p><strong>Providers:</strong> auth={appConfig.authProvider} · data={appConfig.dataProvider} · media={appConfig.mediaProvider}</p>
     <h2>Tenant</h2>
     <p><strong>{tenant.name}</strong> · <code>{tenant.slug}</code></p>
     <h2>Channels</h2>

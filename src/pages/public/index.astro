@@ -1,12 +1,13 @@
 ---
-import { listPublicFrames } from '../../lib/v1';
-const frames = listPublicFrames();
+import { v1Repository } from '../../lib/v1';
+const frames = v1Repository.listPublicFrames();
 ---
 <html lang="en">
   <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><title>Public Streams</title></head>
   <body style="font-family:system-ui;max-width:900px;margin:2rem auto;padding:0 1rem;line-height:1.5">
     <h1>Public Stream Preview (V1-ready)</h1>
-    <p>This surface is wired to the same domain contract as the workbench. Later, providers can be swapped to Supabase + Cloudflare.</p>
+    <p>This surface is wired to V1 contracts. Provider internals can be swapped later without changing this page.
+    </p>
     <ul>
       {frames.map((f) => <li><strong>{f.id}</strong> · {f.agent} · {f.status} · {f.prompt}</li>)}
     </ul>
