@@ -5,8 +5,9 @@ import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
 <Workbench title="Sign in" spec="/docs/v1-plan/auth-and-sessions/" guarded={false}>
   <p>Email OTP, then TOTP MFA if enrolled. No password.</p>
   <form id="otp-form" style="display:grid;gap:12px;max-width:380px;margin-top:16px;">
-    <label>Email
-      <input type="email" name="email" required autocomplete="email"
+    <label for="otp-email">Email
+      <input id="otp-email" type="email" name="email" required autocomplete="email"
+             aria-describedby="otp-msg"
              style="width:100%;padding:8px;background:#0a0a0a;color:var(--fg);border:1px solid var(--line);" />
     </label>
     {PUBLIC_TURNSTILE_SITE_KEY ? (
@@ -15,25 +16,27 @@ import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
       <p style="color:var(--dim);font-size:12px;">Turnstile site key not configured; CAPTCHA disabled in this build.</p>
     )}
     <button type="submit" style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">Send code</button>
-    <p id="otp-msg" style="color:var(--dim);font-size:12px;"></p>
+    <p id="otp-msg" role="status" aria-live="polite" style="color:var(--dim);font-size:12px;min-height:1em;"></p>
   </form>
 
   <form id="verify-form" hidden style="display:grid;gap:12px;max-width:380px;margin-top:16px;">
-    <label>6-digit code
-      <input type="text" name="token" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"
+    <label for="verify-token">6-digit code
+      <input id="verify-token" type="text" name="token" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"
+             autocomplete="one-time-code" aria-describedby="verify-msg"
              style="width:100%;padding:8px;background:#0a0a0a;color:var(--fg);border:1px solid var(--line);font-family:inherit;letter-spacing:0.4em;" />
     </label>
     <button type="submit" style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">Verify</button>
-    <p id="verify-msg" style="color:var(--dim);font-size:12px;"></p>
+    <p id="verify-msg" role="status" aria-live="polite" style="color:var(--dim);font-size:12px;min-height:1em;"></p>
   </form>
 
   <form id="mfa-form" hidden style="display:grid;gap:12px;max-width:380px;margin-top:16px;">
-    <label>TOTP code
-      <input type="text" name="code" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"
+    <label for="mfa-code">TOTP code
+      <input id="mfa-code" type="text" name="code" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6"
+             autocomplete="one-time-code" aria-describedby="mfa-msg"
              style="width:100%;padding:8px;background:#0a0a0a;color:var(--fg);border:1px solid var(--line);font-family:inherit;letter-spacing:0.4em;" />
     </label>
     <button type="submit" style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">Verify MFA</button>
-    <p id="mfa-msg" style="color:var(--dim);font-size:12px;"></p>
+    <p id="mfa-msg" role="status" aria-live="polite" style="color:var(--dim);font-size:12px;min-height:1em;"></p>
   </form>
 
   {PUBLIC_TURNSTILE_SITE_KEY && (

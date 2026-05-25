@@ -38,6 +38,28 @@ Before reading any branch, read these in order:
 
 The v1-plan files are the contract the synthesis must serve. When a branch contradicts the v1 plan, the v1 plan wins — unless the branch's idea is so clearly better that the v1 plan should be amended; in that case, amend the plan in the same commit as the implementing change.
 
+## ECC skills to load (read before Phase 1)
+
+Base path: `/Users/seb/.claude/plugins/cache/ecc/ecc/2.0.0-rc.1/skills/<name>/SKILL.md`
+
+Always:
+- council, agent-eval, agent-sort, plan-orchestrate,
+  iterative-retrieval, strategic-compact, context-budget
+
+Phase 2 (inventory):
+- codebase-onboarding, repo-scan, search-first,
+  documentation-lookup, architecture-decision-records
+
+Phase 3 (per-area):
+- api-design (specs), design-system + make-interfaces-feel-better
+  + accessibility + frontend-a11y + seo (perplexity polish),
+  vite-patterns (astro config), postgres-patterns
+  (only if adopting replit realtime), error-handling
+
+Phase 5 (verification + report):
+- verification-loop, production-audit,
+  skill-stocktake, skill-comply
+
 ## Hard rules (override any branch's choices)
 
 If a branch violates these, do not adopt that part verbatim — port the underlying idea in a rule-compliant way.
