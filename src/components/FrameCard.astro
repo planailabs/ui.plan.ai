@@ -1,0 +1,303 @@
+---
+import StatusPill from './StatusPill.astro';
+import { formatEventTime, getFrameStatusLabel, getLicenseLabel, type Frame } from '../lib/streamResolver';
+
+interface Props {
+	frame: Frame;
+	compact?: boolean;
+}
+
+const { frame, compact = false } = Astro.props;
+const frameStatusLabel = getFrameStatusLabel(frame);
+const frameTone = frame.frameStatus === 'promoted' ? 'success' : frame.frameStatus === 'team_visible' ? 'warning' : 'muted';
+const sortedClickZones = frame.clickZones.slice().sort((a, b) => a.bounds.y - b.bounds.y || a.bounds.x - b.bounds.x);
+---
+
+<article class:list={['frame-card', { compact }]}>
+	<figure class="frame-stage">
+		<div class="frame-topline">
+			<span>{frame.variant} variant</span>
+			<span>{frame.mediaStatus.replaceAll('_', ' ')}</span>
+		</div>
+		<div class="mock-window">
+			<div class="mock-sidebar"></div>
+			<div class="mock-main">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+			<div class="mock-meta"></div>
+		</div>
+		{sortedClickZones.map((zone) => (
+			<a
+				class="click-zone"
+				href={zone.target ?? '#'}
+				aria-label={`${zone.label}: ${frame.title}`}
+				style={`left:${zone.bounds.x * 100}%;top:${zone.bounds.y * 100}%;width:${zone.bounds.width * 100}%;height:${zone.bounds.height * 100}%;`}
+			>
+				<span>{zone.label}</span>
+			</a>
+		))}
+		<figcaption class="sr-only">{frame.altText}</figcaption>
+	</figure>
+	<div class="frame-copy">
+		<div class="frame-status">
+			<StatusPill label={frameStatusLabel} tone={frameTone} />
+			<StatusPill label={frame.submissionStatus} tone="muted" />
+		</div>
+		<h3>{frame.title}</h3>
+		<p>{frame.summary}</p>
+		{!compact && (
+			<dl>
+				<div>
+					<dt>License</dt>
+					<dd>{getLicenseLabel(frame.license)}</dd>
+				</div>
+				<div>
+					<dt>Decision</dt>
+					<dd>{frame.decisionNotes}</dd>
+				</div>
+			</dl>
+		)}
+		{!compact && (
+			<div class="event-log" aria-label={`${frame.title} event log`}>
+				<h4>Events</h4>
+				<ol>
+					{frame.events.map((event) => (
+						<li>
+							<time datetime={event.occurredAt}>{formatEventTime(event.occurredAt)}</time>
+							<strong>{event.type}</strong>
+							<em>{event.actor}</em>
+							<p>{event.summary}</p>
+						</li>
+					))}
+				</ol>
+			</div>
+		)}
+	</div>
+</article>
+
+<style>
+	.frame-card {
+		display: grid;
+		grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr);
+		gap: 20px;
+		padding: 18px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--panel);
+	}
+
+	.frame-card.compact {
+		grid-template-columns: 1fr;
+	}
+
+	.frame-stage {
+		position: relative;
+		margin: 0;
+		min-height: 340px;
+		overflow: hidden;
+		border: 1px solid var(--line-strong);
+		border-radius: 8px;
+		background:
+			linear-gradient(135deg, rgba(165, 243, 252, 0.12), transparent 38%),
+			#030303;
+	}
+
+	.frame-topline {
+		position: absolute;
+		z-index: 2;
+		top: 14px;
+		left: 16px;
+		right: 16px;
+		display: flex;
+		justify-content: space-between;
+		gap: 12px;
+		color: var(--muted);
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+	}
+
+	.mock-window {
+		position: absolute;
+		inset: 58px 34px 34px;
+		display: grid;
+		grid-template-columns: 0.8fr 1.8fr 0.9fr;
+		gap: 14px;
+	}
+
+	.mock-sidebar,
+	.mock-main,
+	.mock-meta {
+		border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+		border-radius: 8px;
+		background: rgba(0, 0, 0, 0.36);
+	}
+
+	.mock-main {
+		display: grid;
+		gap: 12px;
+		padding: 16px;
+	}
+
+	.mock-main span {
+		border-radius: 6px;
+		background: linear-gradient(90deg, rgba(165, 243, 252, 0.2), rgba(74, 222, 128, 0.12));
+	}
+
+	.click-zone {
+		position: absolute;
+		z-index: 3;
+		display: grid;
+		place-items: center;
+		border: 1px solid color-mix(in srgb, var(--accent) 68%, transparent);
+		border-radius: 6px;
+		color: var(--fg);
+		background: rgba(34, 211, 238, 0.08);
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		min-width: 44px;
+		min-height: 44px;
+	}
+
+	.click-zone:focus-visible {
+		outline: 2px solid var(--success);
+		outline-offset: 3px;
+	}
+
+	.frame-copy {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 20px;
+	}
+
+	.frame-status {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	h3 {
+		margin: 0;
+		font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+		font-size: 28px;
+		font-weight: 520;
+		letter-spacing: 0;
+		line-height: 1.1;
+	}
+
+	p {
+		margin: 0;
+		color: var(--muted);
+	}
+
+	dl {
+		margin: 0;
+		display: grid;
+		gap: 12px;
+	}
+
+	dt {
+		margin-bottom: 4px;
+		color: var(--soft);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	dd {
+		margin: 0;
+		color: var(--muted);
+	}
+
+	.event-log {
+		padding-top: 4px;
+	}
+
+	h4 {
+		margin: 0 0 10px;
+		color: var(--soft);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	ol {
+		display: grid;
+		gap: 10px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		gap: 6px 10px;
+		padding: 10px;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: rgba(0, 0, 0, 0.2);
+	}
+
+	li time,
+	li em {
+		color: var(--soft);
+		font-size: 11px;
+		font-style: normal;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+
+	li strong {
+		color: var(--accent);
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	li p {
+		grid-column: 1 / -1;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	@media (max-width: 860px) {
+		.frame-card {
+			grid-template-columns: 1fr;
+		}
+
+		.frame-stage {
+			min-height: 280px;
+		}
+	}
+
+	@media (max-width: 560px) {
+		.frame-card {
+			padding: 14px;
+			border-radius: 8px;
+		}
+
+		.mock-window {
+			inset: 54px 18px 22px;
+			grid-template-columns: 1fr;
+		}
+
+		.mock-sidebar,
+		.mock-meta {
+			display: none;
+		}
+	}
+</style>

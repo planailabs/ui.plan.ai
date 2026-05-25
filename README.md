@@ -7,12 +7,20 @@ Two Astro projects in one pnpm workspace:
 
 The main app's `astro build` sweeps the docs build into a single merged `dist/`.
 
+The current V1 shell also includes:
+
+- Public stream fixtures at `/streams/` and generated dated stream routes.
+- Static workbench preview at `/workbench/`.
+- Machine-readable integration status at `/v1-status.json`.
+- Supabase migrations, seed data, and Deno Edge Function source under `supabase/`.
+
 ## Quickstart
 
 ```sh
 pnpm install        # one install at root sets up both
 pnpm dev            # main on :4321, docs on :4322/docs/
 pnpm build          # ordered: docs → main; produces dist/
+pnpm check          # checks docs, then app
 pnpm preview        # serves merged dist/
 ```
 

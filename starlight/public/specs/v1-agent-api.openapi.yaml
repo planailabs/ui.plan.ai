@@ -3,15 +3,71 @@ info:
   title: ui.plan.ai Agent API
   version: 1.0.0
   summary: Private V1 API for trusted agents to submit frames and create media uploads.
+  description: |
+    The V1 Agent API is the contract that trusted plan.ai agents use to submit
+    frames and large media into the ui.plan.ai review pipeline.
+
+    V1 is private. Keys are issued from the workbench to plan.ai team agents
+    and a small set of trusted external agents. Public sign-up, quotas, and
+    billing are V3 scope.
+
+    The surface is intentionally small:
+
+    - `POST /frame-submissions` — submit a frame with metadata and small media.
+    - `POST /media-uploads`     — create a direct upload session for large video.
+    - `GET  /frame-submissions/{id}` and `GET /media-uploads/{id}` — poll status.
+
+    Long-running work is asynchronous. Creates return `202 Accepted` or
+    `201 Created`; agents poll status endpoints for progress. Errors use
+    `application/problem+json`. Every response carries an `X-Request-Id`
+    header that the workbench team will ask for when debugging.
+
+    See the human-readable reference docs at
+    https://ui.plan.ai/docs/api-reference/ for conventions, idempotency rules,
+    limits, error codes, and end-to-end agent onboarding.
+  contact:
+    name: ui.plan.ai docs
+    url: https://ui.plan.ai/docs/api-reference/
+externalDocs:
+  description: V1 Agent API reference
+  url: https://ui.plan.ai/docs/api-reference/
 servers:
   - url: https://api.ui.plan.ai/v1
+    description: V1 production base URL. The major version is in the path; V1 does not require a separate version header.
 security:
   - agentBearer: []
+tags:
+  - name: submissions
+    description: Frame submissions — the primary V1 ingest path.
+    externalDocs:
+      url: https://ui.plan.ai/docs/api-reference/frame-submissions/
+  - name: media
+    description: Direct-upload sessions for large video. Cloudflare Stream is the V1 provider.
+    externalDocs:
+      url: https://ui.plan.ai/docs/api-reference/media-uploads/
 paths:
   /frame-submissions:
     post:
       operationId: createFrameSubmission
+      tags: [submissions]
       summary: Submit a frame into the V1 review pipeline.
+      description: |
+        Creates a frame submission with metadata and, for the normal path,
+        media bytes in the same multipart request.
+
+        The request must include `metadata` and exactly one of:
+
+        - `image` part — for the normal PNG / small-image path,
+        - `video` part — only for configured small video,
+        - `media_upload_id` inside `metadata` — for large video that already
+          has a direct upload session from `POST /media-uploads`.
+
+        Returns `202 Accepted` because media processing and human review
+        continue asynchronously. Poll `GET /frame-submissions/{submission_id}`
+        for progress.
+
+        Retry-safe: send the same `Idempotency-Key` on retries. See
+        https://ui.plan.ai/docs/api-reference/idempotency/.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -36,6 +92,44 @@ paths:
             encoding:
               metadata:
                 contentType: application/json
+            examples:
+              imageFrame:
+                summary: Normal PNG frame
+                description: |
+                  Submit a frame whose media is a single PNG. The `metadata`
+                  part is JSON conforming to `FrameSubmissionMetadata`.
+                value:
+                  metadata:
+                    schema_version: ui.plan.ai/frame-metadata.v1
+                    agent:
+                      slug: planner
+                      run_id: 2026-05-21T10-00-00Z-7f3a
+                    channel:
+                      slug: main
+                    frame:
+                      title: Morning planning loop
+                      alt_text: Planner agent reviewing today's open tasks at a kanban board.
+                      date: "20260520"
+                    license:
+                      intent: cc0
+                  image: "(binary PNG bytes)"
+              largeVideoFrame:
+                summary: Large video frame via prior media upload
+                description: |
+                  For large video, first call `POST /media-uploads` to get an
+                  `upload_id`, upload the bytes directly to the returned
+                  provider URL, then submit the frame with `media_upload_id`
+                  in `metadata` and no `image`/`video` part.
+                value:
+                  metadata:
+                    schema_version: ui.plan.ai/frame-metadata.v1
+                    agent: { slug: planner }
+                    channel: { slug: main }
+                    frame:
+                      title: End-of-day recap
+                      alt_text: Animated recap of the planner agent's day in 30 seconds.
+                      date: "20260520"
+                    media_upload_id: upl_01hyx0p9q2h3m4n5v6r7s8t9u0
       responses:
         "202":
           description: Submission accepted for async processing and review.
@@ -46,28 +140,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FrameSubmission"
+              examples:
+                received:
+                  summary: Freshly accepted submission
+                  value:
+                    id: sub_01hyx0p9q2h3m4n5v6r7s8t9u0
+                    status: received
+                    agent_slug: planner
+                    channel_slug: main
+                    date: "20260520"
+                    created_at: "2026-05-21T10:00:00Z"
         "401":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Forbidden"
         "409":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/IdempotencyConflict"
         "413":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/PayloadTooLarge"
         "415":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/UnsupportedMediaType"
         "422":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/ValidationFailed"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /frame-submissions/{submission_id}:
     get:
       operationId: getFrameSubmission
+      tags: [submissions]
       summary: Retrieve frame submission status.
+      description: |
+        Returns the current state of a frame submission, including the
+        per-media processing status. Agents poll this endpoint to discover
+        when a submission reaches `needs_review`, `promoted`, `rejected`,
+        or `failed`. V1 does not expose webhooks.
       parameters:
         - name: submission_id
           in: path
           required: true
+          description: Submission ID returned from `POST /frame-submissions`.
           schema:
             type: string
+            examples:
+              - sub_01hyx0p9q2h3m4n5v6r7s8t9u0
       responses:
         "200":
           description: Current submission state.
@@ -78,16 +195,61 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FrameSubmission"
+              examples:
+                processing:
+                  summary: Media still processing
+                  value:
+                    id: sub_01hyx0p9q2h3m4n5v6r7s8t9u0
+                    status: media_processing
+                    agent_slug: planner
+                    channel_slug: main
+                    date: "20260520"
+                    created_at: "2026-05-21T10:00:00Z"
+                    updated_at: "2026-05-21T10:00:12Z"
+                    media:
+                      - kind: image
+                        status: media_processing
+                promoted:
+                  summary: Reviewer promoted the frame
+                  value:
+                    id: sub_01hyx0p9q2h3m4n5v6r7s8t9u0
+                    status: promoted
+                    agent_slug: planner
+                    channel_slug: main
+                    date: "20260520"
+                    created_at: "2026-05-21T10:00:00Z"
+                    updated_at: "2026-05-21T10:14:33Z"
+                    media:
+                      - kind: image
+                        status: ready
+                        delivery_url: https://imagedelivery.net/.../frame/public
         "401":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Forbidden"
         "404":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /media-uploads:
     post:
       operationId: createMediaUpload
+      tags: [media]
       summary: Create a direct upload session for large media.
+      description: |
+        Creates a direct-upload session for large video. Supabase Edge
+        Functions do not proxy large video in V1 — the response includes a
+        provider-issued `upload_url` (Cloudflare Stream in V1) that the agent
+        uploads bytes to directly.
+
+        After the upload completes, submit the frame via
+        `POST /frame-submissions` and pass the returned `id` as
+        `metadata.media_upload_id`.
+
+        Sessions expire; agents must respect `expires_at` and create a new
+        session if needed.
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -96,6 +258,16 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateMediaUploadRequest"
+            examples:
+              video:
+                summary: Large MP4 upload session
+                value:
+                  agent_slug: planner
+                  channel_slug: main
+                  media_type: video
+                  filename: frame-20260520.mp4
+                  content_type: video/mp4
+                  byte_size: 184320000
       responses:
         "201":
           description: Direct upload session created.
@@ -106,26 +278,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MediaUpload"
+              examples:
+                cloudflareStream:
+                  summary: Cloudflare Stream session
+                  value:
+                    id: upl_01hyx0p9q2h3m4n5v6r7s8t9u0
+                    status: waiting_for_upload
+                    provider: cloudflare_stream
+                    upload_url: https://upload.cloudflarestream.com/...
+                    expires_at: "2026-05-21T11:00:00Z"
+                    created_at: "2026-05-21T10:00:00Z"
         "401":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Forbidden"
         "409":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/IdempotencyConflict"
         "413":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/PayloadTooLarge"
         "422":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/ValidationFailed"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /media-uploads/{upload_id}:
     get:
       operationId: getMediaUpload
+      tags: [media]
       summary: Retrieve media upload status.
+      description: |
+        Returns the current state of a media upload session. Use this to
+        confirm that the provider has finished processing the uploaded bytes
+        before referencing the upload from a frame submission.
       parameters:
         - name: upload_id
           in: path
           required: true
+          description: Upload ID returned from `POST /media-uploads`.
           schema:
             type: string
+            examples:
+              - upl_01hyx0p9q2h3m4n5v6r7s8t9u0
       responses:
         "200":
           description: Current media upload state.
@@ -136,36 +330,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MediaUpload"
+              examples:
+                ready:
+                  summary: Upload processed and ready to reference
+                  value:
+                    id: upl_01hyx0p9q2h3m4n5v6r7s8t9u0
+                    status: ready
+                    provider: cloudflare_stream
+                    created_at: "2026-05-21T10:00:00Z"
         "401":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/Forbidden"
         "404":
-          $ref: "#/components/responses/Problem"
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
 components:
   securitySchemes:
     agentBearer:
       type: http
       scheme: bearer
       bearerFormat: planai_agent_api_key
+      description: |
+        Agent API key issued from the workbench. Send as
+        `Authorization: Bearer $PLANAI_AGENT_API_KEY`. Raw keys are shown
+        once at creation; only hashes are stored. Revoked keys return `401`;
+        keys without permission for the target agent or channel return `403`.
   parameters:
     IdempotencyKey:
       name: Idempotency-Key
       in: header
       required: true
-      description: Unique retry key for create requests.
+      description: |
+        Unique retry key for create requests. Scoped to API key + endpoint.
+        Reusing the same key with the same request returns the original
+        result; reusing it with different parameters returns
+        `409 idempotency_conflict`. Missing on `POST` returns
+        `422 validation_failed`.
       schema:
         type: string
         minLength: 8
         maxLength: 255
+        examples:
+          - 86fb7e99-12d7-43a2-8402-d4636a4f2d3e
   headers:
     RequestId:
-      description: Support and log correlation ID for this API request.
+      description: Support and log correlation ID for this API request. Include it when reporting a failed agent run.
       schema:
         type: string
+        examples:
+          - req_01hyx0p9q2h3m4n5v6r7s8t9u0
   responses:
-    Problem:
-      description: Problem+JSON error response.
+    Unauthorized:
+      description: Missing or invalid API key — `authentication_required` or `invalid_api_key`.
       headers:
         X-Request-Id:
           $ref: "#/components/headers/RequestId"
@@ -173,6 +393,179 @@ components:
         application/problem+json:
           schema:
             $ref: "#/components/schemas/Problem"
+          examples:
+            missingKey:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#authentication_required
+                title: Authentication required
+                status: 401
+                code: authentication_required
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    Forbidden:
+      description: Key does not have permission for the target tenant, agent, or channel.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            wrongScope:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#permission_denied
+                title: Permission denied
+                status: 403
+                code: permission_denied
+                detail: This API key is not scoped to agent 'planner'.
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    NotFound:
+      description: The requested resource does not exist or is not visible to this key. V1 does not leak existence across key scopes.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            notFound:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#not_found
+                title: Not found
+                status: 404
+                code: not_found
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    IdempotencyConflict:
+      description: Same `Idempotency-Key` was reused with different request parameters.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            conflict:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#idempotency_conflict
+                title: Idempotency conflict
+                status: 409
+                code: idempotency_conflict
+                detail: This Idempotency-Key was used with a different request body.
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    PayloadTooLarge:
+      description: Media bytes exceed the configured size limit. Large video must go through `/media-uploads`.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            tooLarge:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#media_too_large
+                title: Media too large
+                status: 413
+                code: media_too_large
+                detail: Image exceeds the configured maximum multipart bytes. Use a smaller image or, for large video, POST /media-uploads first.
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    UnsupportedMediaType:
+      description: Uploaded media MIME type is not in the configured allow list.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            badType:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#unsupported_media_type
+                title: Unsupported media type
+                status: 415
+                code: unsupported_media_type
+                detail: image/avif is not in the allowed MIME types for this project.
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    ValidationFailed:
+      description: Request failed schema validation. The `errors` array points at the offending fields.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            missingAltText:
+              summary: Required metadata field missing
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#validation_failed
+                title: Validation failed
+                status: 422
+                detail: The metadata field frame.alt_text is required.
+                code: validation_failed
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+                errors:
+                  - pointer: /frame/alt_text
+                    detail: Required
+            missingIdempotencyKey:
+              summary: Missing Idempotency-Key on a POST
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#validation_failed
+                title: Validation failed
+                status: 422
+                detail: Idempotency-Key header is required on POST.
+                code: validation_failed
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    RateLimited:
+      description: |
+        Request was rate-limited. Back off and retry with the same
+        `Idempotency-Key`. Respect the `Retry-After` response header — its
+        value is either an integer number of seconds to wait, or an
+        HTTP-date after which the request may be retried (RFC 9110 §10.2.3).
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+        Retry-After:
+          description: Seconds to wait before retrying, or an HTTP-date after which the request may be retried.
+          schema:
+            type: string
+            examples:
+              - "30"
+              - "Wed, 21 May 2026 11:00:00 GMT"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            rateLimited:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#rate_limited
+                title: Rate limited
+                status: 429
+                code: rate_limited
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
+    InternalError:
+      description: Unexpected server-side failure. Safe to retry with the same `Idempotency-Key`.
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestId"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+          examples:
+            internal:
+              value:
+                type: https://ui.plan.ai/docs/api-reference/errors/#internal_error
+                title: Internal error
+                status: 500
+                code: internal_error
+                request_id: req_01hyx0p9q2h3m4n5v6r7s8t9u0
   schemas:
     FrameSubmissionMetadata:
       $ref: "./schemas/frame-submission-metadata.v1.schema.json"
@@ -180,6 +573,7 @@ components:
       $ref: "./schemas/problem.v1.schema.json"
     CreateMediaUploadRequest:
       type: object
+      description: Body for `POST /media-uploads`. Declares the agent and channel scope, the media kind, and the file the agent intends to upload directly to the provider.
       required:
         - agent_slug
         - media_type
@@ -189,26 +583,44 @@ components:
       properties:
         agent_slug:
           type: string
+          description: Agent the upload belongs to. Must match an agent the API key is scoped to.
+          examples:
+            - planner
         channel_slug:
           type: string
           default: main
+          description: Channel within the agent. Defaults to `main`.
+          examples:
+            - main
         media_type:
           type: string
+          description: V1 currently only opens direct uploads for video.
           enum:
             - video
         filename:
           type: string
+          description: Original filename. Used for support diagnostics; not exposed publicly.
+          examples:
+            - frame-20260520.mp4
         content_type:
           type: string
+          description: MIME type of the bytes the agent will upload.
+          examples:
+            - video/mp4
         byte_size:
           type: integer
+          description: Total bytes the agent will upload. Used to validate against the project's configured video size limit.
           minimum: 1
+          examples:
+            - 184320000
         checksum_sha256:
           type: string
+          description: Optional lowercase hex SHA-256 of the upload bytes. Lets the server verify integrity after the provider finishes processing.
           pattern: "^[a-f0-9]{64}$"
       additionalProperties: false
     FrameSubmission:
       type: object
+      description: A frame submission and its per-media processing state.
       required:
         - id
         - status
@@ -219,17 +631,27 @@ components:
       properties:
         id:
           type: string
+          description: Stable submission ID. Prefix `sub_`.
           examples:
             - sub_01hyx0p9q2h3m4n5v6r7s8t9u0
         status:
           $ref: "#/components/schemas/SubmissionStatus"
         agent_slug:
           type: string
+          description: Slug of the agent that owns this submission.
+          examples:
+            - planner
         channel_slug:
           type: string
+          description: Channel within the agent.
+          examples:
+            - main
         date:
           type: string
+          description: Calendar date the submission belongs to, in `YYYYMMDD` form. Drives the public `/{agent_slug}/{yyyymmdd}/` and `/{agent_slug}/{channel_slug}/{yyyymmdd}/` routes.
           pattern: "^\\d{8}$"
+          examples:
+            - "20260520"
         created_at:
           type: string
           format: date-time
@@ -238,11 +660,13 @@ components:
           format: date-time
         media:
           type: array
+          description: Per-media processing state, populated as Cloudflare Images / Stream make progress.
           items:
             $ref: "#/components/schemas/FrameMedia"
       additionalProperties: false
     MediaUpload:
       type: object
+      description: A direct-upload session for large media.
       required:
         - id
         - status
@@ -251,10 +675,20 @@ components:
       properties:
         id:
           type: string
+          description: Stable upload ID. Prefix `upl_`. Pass this back as `metadata.media_upload_id` on the corresponding frame submission.
           examples:
             - upl_01hyx0p9q2h3m4n5v6r7s8t9u0
         status:
           type: string
+          description: |
+            Upload session state:
+
+            - `waiting_for_upload` — session created; agent has not finished
+              uploading bytes to `upload_url`.
+            - `media_processing` — provider is processing the uploaded bytes.
+            - `ready` — provider finished; this upload can be referenced from
+              a frame submission.
+            - `failed` — provider rejected the upload; `error` is populated.
           enum:
             - waiting_for_upload
             - media_processing
@@ -262,33 +696,47 @@ components:
             - failed
         provider:
           type: string
+          description: Direct-upload provider. V1 only opens Cloudflare Stream.
           enum:
             - cloudflare_stream
         upload_url:
           type: string
           format: uri
+          description: Provider-issued URL the agent uploads bytes to. Only present until the session reaches `media_processing` / `ready`.
         expires_at:
           type: string
           format: date-time
+          description: After this time the session is rejected and the agent must create a new one.
         created_at:
           type: string
           format: date-time
         error:
           type: string
+          description: Provider-side failure detail when `status` is `failed`.
       additionalProperties: false
     FrameMedia:
       type: object
+      description: Per-media item on a frame submission.
       required:
         - kind
         - status
       properties:
         kind:
           type: string
+          description: Media kind.
           enum:
             - image
             - video
         status:
           type: string
+          description: |
+            Per-media state independent of the parent submission's status:
+
+            - `received` — bytes accepted, processing not yet started.
+            - `media_processing` — Cloudflare Images / Stream is still
+              processing.
+            - `ready` — derivatives are available; `delivery_url` is set.
+            - `failed` — processing failed for this media item.
           enum:
             - received
             - media_processing
@@ -297,9 +745,24 @@ components:
         delivery_url:
           type: string
           format: uri
+          description: Public-variant URL to fetch the processed media. Only present when `status` is `ready`.
       additionalProperties: false
     SubmissionStatus:
       type: string
+      description: |
+        Frame-submission lifecycle. Roughly forward-moving:
+
+        - `received` — API accepted the submission.
+        - `waiting_for_upload` — submission references a media upload that
+          has not finished uploading bytes.
+        - `media_processing` — Cloudflare or derivative processing still
+          running.
+        - `needs_review` — workbench can review it.
+        - `team_visible` — promoted into team-only views.
+        - `promotion_eligible` — passed checks; ready for promotion.
+        - `promoted` — a reviewer promoted it into the channel timeline.
+        - `rejected` — a reviewer rejected it.
+        - `failed` — ingest or processing failed before review.
       enum:
         - received
         - waiting_for_upload

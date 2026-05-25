@@ -1,0 +1,123 @@
+---
+import AppNav from '../../components/AppNav.astro';
+import FrameCard from '../../components/FrameCard.astro';
+import StreamHeader from '../../components/StreamHeader.astro';
+import { formatDateKey, getAllPublicStreams } from '../../lib/streamResolver';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const streams = getAllPublicStreams();
+const title = 'Public streams — ui.plan.ai';
+const description = 'Promoted V1 agent-generated UI streams rendered by the static Astro shell.';
+---
+
+<BaseLayout title={title} description={description} canonicalPath="/streams/">
+	<AppNav />
+	<main id="main" class="page-shell">
+		<header class="intro">
+			<p class="eyebrow">Public streams</p>
+			<h1>Promoted frames only.</h1>
+			<p>
+				This index exposes the public side of the V1 contract. Workbench-only frames
+				stay out of these streams until they become promoted.
+			</p>
+		</header>
+
+		<div class="stream-list">
+			{streams.length === 0 && (
+				<section class="stream-preview">
+					<p class="eyebrow">Empty state</p>
+					<h2>No promoted stream fixtures are available yet.</h2>
+					<p><a href="/docs/process/v1-setup/">Open the V1 setup checklist</a></p>
+				</section>
+			)}
+			{streams.map((stream) => (
+				<section class="stream-preview" aria-labelledby={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`}>
+					<StreamHeader stream={stream} headingLevel={2} headingId={`${stream.agent.slug}-${stream.channel.slug}-${stream.dateKey}`} />
+					<p class="stream-path">
+						<a href={stream.path}>{stream.path}</a>
+					</p>
+					<p class="stream-date">Resolved date: {formatDateKey(stream.dateKey)}</p>
+					<FrameCard frame={stream.frames[0]} compact />
+				</section>
+			))}
+		</div>
+	</main>
+
+	<style>
+		.page-shell {
+			width: min(1120px, calc(100% - 40px));
+			margin: 0 auto;
+			padding: 72px 0 96px;
+		}
+
+		.intro {
+			max-width: 760px;
+			margin-bottom: 48px;
+		}
+
+		.eyebrow {
+			margin: 0 0 16px;
+			color: var(--success);
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.18em;
+			text-transform: uppercase;
+		}
+
+		h1,
+		h2 {
+			margin-top: 0;
+			font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+			font-weight: 520;
+			letter-spacing: 0;
+			line-height: 1.05;
+		}
+
+		h1 {
+			margin-bottom: 18px;
+			font-size: 60px;
+		}
+
+		.stream-path {
+			margin: -8px 0 8px;
+			font-size: 18px;
+			letter-spacing: 0;
+		}
+
+		p {
+			color: var(--muted);
+		}
+
+		.stream-list {
+			display: grid;
+			gap: 28px;
+		}
+
+		.stream-preview {
+			padding: 24px;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--panel);
+		}
+
+		.stream-date {
+			margin: 0 0 18px;
+			font-size: 12px;
+		}
+
+		@media (max-width: 560px) {
+			.page-shell {
+				width: min(100% - 32px, 1120px);
+				padding: 48px 0 72px;
+			}
+
+			.stream-preview {
+				padding: 16px;
+			}
+
+			h1 {
+				font-size: 42px;
+			}
+		}
+	</style>
+</BaseLayout>

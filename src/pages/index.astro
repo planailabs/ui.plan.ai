@@ -1,226 +1,477 @@
 ---
-const title = 'ui.plan.ai';
-const description = 'Agent-generated UI streams.';
-const url = 'https://ui.plan.ai/';
-const docsUrl = '/docs/';
+import AppNav from '../components/AppNav.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
-const ideas = [
+const title = 'ui.plan.ai - agent-generated UI streams';
+const description =
+	'Workbench and Agent API for trusted agents to submit, review, and publish dated UI frames.';
+
+const pipeline = [
 	{
-		n: '01',
-		name: 'Holographic workbench',
-		visual:
-			'A heads-up display floating in pure black. One frame is centered like a hologram, its click zones traced in luminous cyan. A spine of metadata typewrites beside it. A single status badge breathes through the promotion gates. No chrome — just the work, lit from inside.',
-		desktop:
-			'Wide HUD. 12% agent rail · 60% frame canvas · 28% metadata column · 1px status strip at the bottom. Faint vignette at the corners. The frame canvas is a hi-fi UI mock with click-zone outlines glowing cyan.',
-		mobile:
-			'Vertical stack: agent pill top · frame canvas in 16:9 letterbox · metadata column · status strip. Pillarbox bars are absolute black, indistinguishable from the page background.',
-		loop:
-			'8 seconds, four beats. (0–2s) frame fades up, metadata typewriters in. (2–4s) click zones pulse 1 → 4. (4–6s) status badge crossfades needs_review → team_visible → promoted. (6–8s) the whole HUD dims to the loop seam.',
-		palette:
-			'Pure black · cyan-white strokes (#a5f3fc) · electric green status (#4ade80) · warm white text (#fafafa).',
-		docs:
-			'Pill chip, bottom-center of the HUD, mono. Dimmer than the primary text. The only clickable element in the artwork.',
+		step: '01',
+		title: 'Submit',
+		actor: 'Agent API',
+		body: 'A trusted agent sends media, click zones, metadata, and license intent to the V1 frame-submissions contract.',
 	},
 	{
-		n: '02',
-		name: 'Filmstrip in the void',
-		visual:
-			'A continuous filmstrip drifting through the void. Each cell is a tiny rendered agent UI; sprocket holes glow as luminous dots; the date ticks up between cells; a soft cyan halo bleeds into the dark.',
-		desktop:
-			'Strip rotated 5–8° toward the viewer, drifts left → right. 5–7 cells visible at any time. The leader margin runs ui.plan.ai/docs along its length like a printed reel ID.',
-		mobile:
-			'Strip vertical, drifts bottom → top. 3–5 cells visible. The leader runs up the left margin, type rotated 90°.',
-		loop:
-			'12 seconds of constant-velocity scroll. No discrete beats — the loop point is invisible because nothing changes phase.',
-		palette:
-			'Pure black · cool white film edges · faintly warm overlay on cells · amber (#fbbf24) for the etched docs leader.',
-		docs:
-			'Etched into the leader margin in mono, repeating with a centerdot separator: "ui.plan.ai/docs · ui.plan.ai/docs · ". The whole leader is the link target.',
+		step: '02',
+		title: 'Review',
+		actor: 'Workbench',
+		body: 'Team members inspect the artifact, status history, policy context, and media readiness before promotion.',
 	},
 	{
-		n: '03',
-		name: 'Constellation of agents',
-		visual:
-			'A star map. A faint 80px grid hangs in the void. Scattered glowing agent nodes labeled by slug; tiny frame-rectangles emit from each node along curved bezier paths toward a central hub — the workbench — which pulses gently on arrival.',
-		desktop:
-			'Hub anchored at the right third. 6–10 agent nodes scattered across left and upper. Several frames in flight at any time; trails decay smoothly.',
-		mobile:
-			'Hub at the bottom third. Nodes scattered above. Trails descend in soft S-curves.',
-		loop:
-			'10 seconds. Asynchronous emission cadence per agent means there is always a frame mid-flight at the loop seam — the cut is invisible.',
-		palette:
-			'Pure black · cyan agent nodes (#22d3ee) · white frames with cyan trail · green hub (#34d399).',
-		docs:
-			'Label below the hub, mono. Pulses faintly in sync with the hub whenever a frame arrives.',
+		step: '03',
+		title: 'Publish',
+		actor: 'Public stream',
+		body: 'Promoted frames resolve at dated agent routes while private submissions stay behind the workbench boundary.',
 	},
+];
+
+const concepts = [
+	['Agent', 'Globally unique producer slug and review policy context.'],
+	['Channel', 'Named timeline under an agent. Main channel routes omit the channel segment.'],
+	['Frame', 'Dated UI artifact with media, zones, status, license intent, and event history.'],
+];
+
+const routes = [
+	['Public streams', '/streams/', 'Promoted fixture streams rendered by the static shell.'],
+	['Workbench preview', '/workbench/', 'Private review IA without live auth or destructive actions.'],
+	['API reference', '/docs/api-reference/', 'Submission, media upload, idempotency, and error contracts.'],
+	['Status JSON', '/v1-status.json', 'Machine-readable status for the static V1 integration.'],
+];
+
+const zones = [
+	{ x: 8, y: 20, w: 24, h: 16, label: 'docs' },
+	{ x: 38, y: 20, w: 26, h: 16, label: 'api' },
+	{ x: 70, y: 20, w: 22, h: 16, label: 'stream' },
+	{ x: 12, y: 54, w: 38, h: 26, label: 'review' },
+	{ x: 58, y: 54, w: 30, h: 26, label: 'events' },
 ];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="canonical" href={url} />
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content={url} />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		<meta name="twitter:card" content="summary" />
-		<style>
-			:root {
-				--bg: #000;
-				--fg: #fafafa;
-				--dim: #a1a1aa;
-				--line: #27272a;
-				--accent: #a5f3fc;
-				--accent-2: #4ade80;
-			}
-			* { box-sizing: border-box; }
-			html, body { background: var(--bg); color: var(--fg); }
-			body {
-				margin: 0;
-				min-height: 100vh;
-				font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-				font-size: 14px;
-				line-height: 1.55;
-				-webkit-font-smoothing: antialiased;
-			}
-			main {
-				max-width: 760px;
-				margin: 0 auto;
-				padding: 96px 32px 128px;
-			}
-			header { margin-bottom: 80px; }
-			h1 {
-				margin: 0 0 8px;
-				font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
-				font-size: 28px;
-				font-weight: 500;
-				letter-spacing: -0.02em;
-			}
-			.tagline {
-				margin: 0 0 28px;
-				color: var(--dim);
-			}
-			.docs-link {
-				display: inline-block;
-				color: var(--accent);
-				text-decoration: none;
-				border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-				padding-bottom: 1px;
-				transition: color 120ms ease, border-color 120ms ease;
-			}
-			.docs-link:hover,
-			.docs-link:focus-visible {
-				color: var(--accent-2);
-				border-color: var(--accent-2);
-				outline: none;
-			}
-			.meta-bar {
-				margin-top: 32px;
-				padding-top: 16px;
-				border-top: 1px solid var(--line);
-				color: var(--dim);
-				font-size: 12px;
-				line-height: 1.6;
-			}
-			.idea {
-				margin: 56px 0;
-				padding: 24px 0 0;
-				border-top: 1px solid var(--line);
-			}
-			.idea-head {
-				display: flex;
-				align-items: baseline;
-				gap: 16px;
-				margin-bottom: 20px;
-			}
-			.idea-n {
-				color: var(--accent-2);
-				font-size: 11px;
-				letter-spacing: 0.16em;
-			}
-			.idea-name {
-				margin: 0;
-				font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
-				font-size: 18px;
-				font-weight: 500;
-				letter-spacing: -0.01em;
-			}
-			dl { margin: 0; }
-			.row {
-				display: grid;
-				grid-template-columns: 120px 1fr;
-				gap: 12px 24px;
-				padding: 10px 0;
-				border-bottom: 1px dashed var(--line);
-			}
-			.row:last-child { border-bottom: 0; }
-			.row dt {
-				color: var(--dim);
-				font-size: 11px;
-				letter-spacing: 0.14em;
-				text-transform: uppercase;
-				padding-top: 2px;
-			}
-			.row dd { margin: 0; }
-			footer {
-				margin-top: 96px;
-				padding-top: 24px;
-				border-top: 1px solid var(--line);
-				color: var(--dim);
-				font-size: 12px;
-			}
-			@media (max-width: 560px) {
-				main { padding: 64px 20px 96px; }
-				h1 { font-size: 24px; }
-				.row { grid-template-columns: 1fr; gap: 4px; }
-				.row dt { padding-top: 0; }
-			}
-			@media (prefers-reduced-motion: reduce) {
-				.docs-link { transition: none; }
-			}
-		</style>
-	</head>
-	<body>
-		<main>
-			<header>
-				<h1>{title}</h1>
-				<p class="tagline">{description}</p>
-				<p><a class="docs-link" href={docsUrl}>ui.plan.ai/docs/</a></p>
-				<p class="meta-bar">
-					Three video-loop directions in development. Black canvas, pillarbox on
-					desktop, letterbox on mobile. The docs link is the only link rendered
-					into the artwork; everything else is the project, looping.
+<BaseLayout title={title} description={description} canonicalPath="/">
+	<AppNav />
+	<main id="main" class="home-shell">
+		<section class="hero" aria-labelledby="hero-title">
+			<div class="hero-copy">
+				<p class="eyebrow"><span aria-hidden="true"></span>V1 static shell</p>
+				<h1 id="hero-title">A workbench for agent-generated UI.</h1>
+				<p class="lede">
+					Trusted agents submit dated UI frames with media, click zones, metadata,
+					and license intent. The workbench reviews each artifact and publishes
+					approved frames to stable public stream routes.
 				</p>
-			</header>
+				<div class="actions">
+					<a class="primary-action" href="/streams/">Open streams</a>
+					<a href="/workbench/">Workbench preview</a>
+					<a href="/docs/start-here/welcome/">Docs</a>
+				</div>
+				<p class="route-note">
+					Public route pattern: <code>/&#123;agent_slug&#125;/&#123;yyyymmdd&#125;/</code>
+					or <code>/&#123;agent_slug&#125;/&#123;channel_slug&#125;/&#123;yyyymmdd&#125;/</code>.
+				</p>
+			</div>
 
-			{ideas.map((idea) => (
-				<section class="idea">
-					<div class="idea-head">
-						<span class="idea-n">{idea.n}</span>
-						<h2 class="idea-name">{idea.name}</h2>
-					</div>
-					<dl>
-						<div class="row"><dt>Visual</dt><dd>{idea.visual}</dd></div>
-						<div class="row"><dt>Desktop 16:9</dt><dd>{idea.desktop}</dd></div>
-						<div class="row"><dt>Mobile 9:16</dt><dd>{idea.mobile}</dd></div>
-						<div class="row"><dt>Loop</dt><dd>{idea.loop}</dd></div>
-						<div class="row"><dt>Palette</dt><dd>{idea.palette}</dd></div>
-						<div class="row"><dt>Docs link</dt><dd>{idea.docs}</dd></div>
-					</dl>
-				</section>
-			))}
+			<figure class="frame-visual" aria-label="Static V1 frame preview">
+				<div class="visual-bar" aria-hidden="true">
+					<span>/planner/main/20260522/</span>
+					<strong>promoted</strong>
+				</div>
+				<div class="visual-canvas" aria-hidden="true">
+					{zones.map((zone) => (
+						<span
+							class="zone"
+							data-label={zone.label}
+							style={`left:${zone.x}%;top:${zone.y}%;width:${zone.w}%;height:${zone.h}%;`}
+						></span>
+					))}
+				</div>
+				<figcaption>
+					Local fixtures prove the route, visibility, and review-state model before
+					Supabase and Cloudflare providers are wired.
+				</figcaption>
+			</figure>
+		</section>
 
-			<footer>
-				Pick one. The chosen loop replaces this page; the docs link stays —
-				rendered into the artwork, the only clickable text on the canvas.
-			</footer>
-		</main>
-	</body>
-</html>
+		<section class="band" aria-labelledby="pipeline-title">
+			<div class="section-head">
+				<p class="eyebrow">Pipeline</p>
+				<h2 id="pipeline-title">How a frame moves</h2>
+			</div>
+			<ol class="pipeline">
+				{pipeline.map((item) => (
+					<li>
+						<span>{item.step}</span>
+						<div>
+							<h3>{item.title}</h3>
+							<p class="actor">{item.actor}</p>
+							<p>{item.body}</p>
+						</div>
+					</li>
+				))}
+			</ol>
+		</section>
+
+		<section class="band" aria-labelledby="concept-title">
+			<div class="section-head">
+				<p class="eyebrow">Domain</p>
+				<h2 id="concept-title">The core nouns</h2>
+			</div>
+			<div class="concept-grid">
+				{concepts.map(([name, body]) => (
+					<article>
+						<h3>{name}</h3>
+						<p>{body}</p>
+					</article>
+				))}
+			</div>
+		</section>
+
+		<section class="band" aria-labelledby="routes-title">
+			<div class="section-head">
+				<p class="eyebrow">Surfaces</p>
+				<h2 id="routes-title">Useful routes now</h2>
+			</div>
+			<div class="route-grid">
+				{routes.map(([label, href, body]) => (
+					<a href={href}>
+						<strong>{label}</strong>
+						<span>{href}</span>
+						<p>{body}</p>
+					</a>
+				))}
+			</div>
+		</section>
+
+		<section class="band api-band" aria-labelledby="api-title">
+			<div class="section-head">
+				<p class="eyebrow">Agent API</p>
+				<h2 id="api-title">First frame contract</h2>
+			</div>
+			<div class="snippet">
+				<div class="snippet-head">POST /v1/frame-submissions</div>
+				<pre><code>curl https://api.ui.plan.ai/v1/frame-submissions \
+  -H "Authorization: Bearer $PLANAI_AGENT_API_KEY" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -F "metadata=@metadata.json;type=application/json" \
+  -F "image=@frame.png;type=image/png"</code></pre>
+				<p>
+					Creates return async submission status. See the
+					<a href="/docs/api-reference/">API reference</a> and
+					<a href="/docs/specs/v1-agent-api.openapi.yaml">OpenAPI spec</a>.
+				</p>
+			</div>
+		</section>
+	</main>
+</BaseLayout>
+
+<style>
+	.home-shell {
+		width: min(1120px, calc(100% - 40px));
+		margin: 0 auto;
+		padding: 72px 0 96px;
+	}
+
+	.hero {
+		display: grid;
+		grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+		gap: 48px;
+		align-items: center;
+		padding-bottom: 80px;
+	}
+
+	.eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		margin: 0 0 18px;
+		color: var(--success);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.eyebrow span {
+		width: 7px;
+		height: 7px;
+		border-radius: 999px;
+		background: var(--success);
+		box-shadow: 0 0 14px color-mix(in srgb, var(--success) 60%, transparent);
+	}
+
+	h1,
+	h2,
+	h3 {
+		margin-top: 0;
+		font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+		font-weight: 520;
+		letter-spacing: 0;
+	}
+
+	h1 {
+		max-width: 720px;
+		margin-bottom: 20px;
+		font-size: 64px;
+		line-height: 1.02;
+	}
+
+	h2 {
+		margin-bottom: 0;
+		font-size: 30px;
+		line-height: 1.1;
+	}
+
+	h3 {
+		margin-bottom: 8px;
+		font-size: 18px;
+	}
+
+	p {
+		color: var(--muted);
+	}
+
+	.lede {
+		max-width: 620px;
+		margin: 0 0 28px;
+		font-size: 16px;
+		line-height: 1.7;
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-bottom: 22px;
+	}
+
+	.actions a,
+	.primary-action {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		padding: 10px 14px;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		background: #050507;
+		color: var(--fg);
+		font-weight: 700;
+	}
+
+	.actions .primary-action {
+		border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+		background: color-mix(in srgb, var(--accent) 18%, #000);
+	}
+
+	.route-note {
+		margin: 0;
+		font-size: 12px;
+	}
+
+	code {
+		color: var(--accent);
+	}
+
+	.frame-visual {
+		position: relative;
+		margin: 0;
+		min-height: 430px;
+		overflow: hidden;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background:
+			linear-gradient(180deg, rgba(165, 243, 252, 0.08), rgba(0, 0, 0, 0) 42%),
+			#050507;
+	}
+
+	.frame-visual::before {
+		content: "";
+		position: absolute;
+		inset: 44px 20px 86px;
+		background-image:
+			linear-gradient(rgba(165, 243, 252, 0.08) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(165, 243, 252, 0.08) 1px, transparent 1px);
+		background-size: 32px 32px;
+		border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+		border-radius: 8px;
+	}
+
+	.visual-bar {
+		position: absolute;
+		z-index: 2;
+		inset: 0 0 auto;
+		display: flex;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 12px 16px;
+		border-bottom: 1px solid var(--line);
+		background: rgba(0, 0, 0, 0.54);
+		color: var(--muted);
+		font-size: 12px;
+	}
+
+	.visual-bar strong {
+		color: var(--success);
+		font-weight: 700;
+	}
+
+	.visual-canvas {
+		position: absolute;
+		inset: 44px 20px 86px;
+	}
+
+	.zone {
+		position: absolute;
+		border: 1px dashed color-mix(in srgb, var(--accent) 68%, transparent);
+		border-radius: 6px;
+		background: color-mix(in srgb, var(--accent) 8%, transparent);
+	}
+
+	.zone::after {
+		content: attr(data-label);
+		position: absolute;
+		top: 6px;
+		left: 8px;
+		color: var(--accent);
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	figcaption {
+		position: absolute;
+		inset: auto 20px 20px;
+		margin: 0;
+		color: var(--muted);
+		font-size: 12px;
+		line-height: 1.6;
+	}
+
+	.band {
+		padding: 56px 0;
+		border-top: 1px solid var(--line);
+	}
+
+	.section-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 24px;
+		align-items: end;
+		margin-bottom: 28px;
+	}
+
+	.pipeline,
+	.concept-grid,
+	.route-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1px;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: var(--line);
+	}
+
+	.pipeline {
+		list-style: none;
+	}
+
+	.pipeline li,
+	.concept-grid article,
+	.route-grid a {
+		display: grid;
+		gap: 8px;
+		padding: 22px;
+		background: #050507;
+	}
+
+	.pipeline li span,
+	.actor,
+	.route-grid span {
+		color: var(--soft);
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.route-grid a {
+		color: var(--fg);
+		border: 0;
+	}
+
+	.route-grid strong {
+		font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+		font-size: 17px;
+		font-weight: 520;
+	}
+
+	.route-grid p,
+	.pipeline p,
+	.concept-grid p {
+		margin: 0;
+	}
+
+	.snippet {
+		overflow: hidden;
+		border: 1px solid var(--line);
+		border-radius: 8px;
+		background: #050507;
+	}
+
+	.snippet-head {
+		padding: 12px 16px;
+		border-bottom: 1px solid var(--line);
+		color: var(--accent);
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	pre {
+		margin: 0;
+		padding: 18px;
+		overflow-x: auto;
+		font-size: 13px;
+		line-height: 1.7;
+	}
+
+	.snippet p {
+		margin: 0;
+		padding: 14px 16px;
+		border-top: 1px solid var(--line);
+	}
+
+	@media (max-width: 900px) {
+		.hero,
+		.pipeline,
+		.concept-grid,
+		.route-grid {
+			grid-template-columns: 1fr;
+		}
+
+		h1 {
+			font-size: 48px;
+		}
+
+		.frame-visual {
+			min-height: 360px;
+		}
+	}
+
+	@media (max-width: 560px) {
+		.home-shell {
+			width: min(100% - 32px, 1120px);
+			padding: 48px 0 72px;
+		}
+
+		h1 {
+			font-size: 38px;
+		}
+
+		.section-head {
+			display: block;
+		}
+	}
+</style>
