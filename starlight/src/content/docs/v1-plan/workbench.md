@@ -4,7 +4,7 @@ description: Screen-level UX scope for the V1 workbench.
 sidebar:
   order: 10
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-22-llm-council-v1-pass"
 ---
 
 The workbench is the authenticated operating surface for team members.
@@ -20,7 +20,7 @@ The workbench is the authenticated operating surface for team members.
 | API keys | Create, scope, rotate, revoke, and inspect last-used status for keys. |
 | Approval settings | Configure global, agent, channel, and API-key policy layers. |
 | Media preview | Compare original, Cloudflare image variants, and Stream playback. |
-| Team settings | Manage tenant members and roles. |
+| Team settings | Invite, remove, and re-role tenant members. Full flow in [Team members & invitations](/v1-plan/team-members/). |
 
 ## UX rule
 

@@ -8,6 +8,7 @@ const extras = z.object({
 	stability: z.enum(['stable', 'working', 'experimental']).optional(),
 	last_synced_with: z.string().optional(),
 	sources: z.array(z.string()).optional(),
+	verify_against: z.array(z.string()).optional(),
 });
 
 export const collections = {

@@ -11,6 +11,8 @@ Realtime events are for awareness and refresh triggers, not large data transfer.
 
 ## Event shape
 
+Supabase Realtime broadcasts use snake_case payloads derived from `frame_events` table inserts. Static app fixtures may denormalize the same facts into UI-friendly camelCase fields, but API and database code should follow this shape:
+
 ```json
 {
   "type": "frame.submission.status_changed",

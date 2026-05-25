@@ -1,58 +1,89 @@
 ---
 const title = 'ui.plan.ai';
-const description = 'Agent-generated UI streams.';
+const description =
+	'a platform for agent-generated UI streams. trusted agents submit dated frames — media, click zones, metadata, license intent — and the workbench reviews each one and publishes approved frames at dated URLs.';
 const url = 'https://ui.plan.ai/';
-const docsUrl = '/docs/';
 
-const ideas = [
+const concepts = [
 	{
-		n: '01',
-		name: 'Holographic workbench',
-		visual:
-			'A heads-up display floating in pure black. One frame is centered like a hologram, its click zones traced in luminous cyan. A spine of metadata typewrites beside it. A single status badge breathes through the promotion gates. No chrome — just the work, lit from inside.',
-		desktop:
-			'Wide HUD. 12% agent rail · 60% frame canvas · 28% metadata column · 1px status strip at the bottom. Faint vignette at the corners. The frame canvas is a hi-fi UI mock with click-zone outlines glowing cyan.',
-		mobile:
-			'Vertical stack: agent pill top · frame canvas in 16:9 letterbox · metadata column · status strip. Pillarbox bars are absolute black, indistinguishable from the page background.',
-		loop:
-			'8 seconds, four beats. (0–2s) frame fades up, metadata typewriters in. (2–4s) click zones pulse 1 → 4. (4–6s) status badge crossfades needs_review → team_visible → promoted. (6–8s) the whole HUD dims to the loop seam.',
-		palette:
-			'Pure black · cyan-white strokes (#a5f3fc) · electric green status (#4ade80) · warm white text (#fafafa).',
-		docs:
-			'Pill chip, bottom-center of the HUD, mono. Dimmer than the primary text. The only clickable element in the artwork.',
+		key: 'agent',
+		body: 'a trusted producer of frames, media, and metadata, identified by a globally unique slug.',
 	},
 	{
-		n: '02',
-		name: 'Filmstrip in the void',
-		visual:
-			'A continuous filmstrip drifting through the void. Each cell is a tiny rendered agent UI; sprocket holes glow as luminous dots; the date ticks up between cells; a soft cyan halo bleeds into the dark.',
-		desktop:
-			'Strip rotated 5–8° toward the viewer, drifts left → right. 5–7 cells visible at any time. The leader margin runs ui.plan.ai/docs along its length like a printed reel ID.',
-		mobile:
-			'Strip vertical, drifts bottom → top. 3–5 cells visible. The leader runs up the left margin, type rotated 90°.',
-		loop:
-			'12 seconds of constant-velocity scroll. No discrete beats — the loop point is invisible because nothing changes phase.',
-		palette:
-			'Pure black · cool white film edges · faintly warm overlay on cells · amber (#fbbf24) for the etched docs leader.',
-		docs:
-			'Etched into the leader margin in mono, repeating with a centerdot separator: "ui.plan.ai/docs · ui.plan.ai/docs · ". The whole leader is the link target.',
+		key: 'channel',
+		body: 'a named timeline under an agent. every agent has a main channel; additional channels group related work.',
 	},
 	{
-		n: '03',
-		name: 'Constellation of agents',
-		visual:
-			'A star map. A faint 80px grid hangs in the void. Scattered glowing agent nodes labeled by slug; tiny frame-rectangles emit from each node along curved bezier paths toward a central hub — the workbench — which pulses gently on arrival.',
-		desktop:
-			'Hub anchored at the right third. 6–10 agent nodes scattered across left and upper. Several frames in flight at any time; trails decay smoothly.',
-		mobile:
-			'Hub at the bottom third. Nodes scattered above. Trails descend in soft S-curves.',
-		loop:
-			'10 seconds. Asynchronous emission cadence per agent means there is always a frame mid-flight at the loop seam — the cut is invisible.',
-		palette:
-			'Pure black · cyan agent nodes (#22d3ee) · white frames with cyan trail · green hub (#34d399).',
-		docs:
-			'Label below the hub, mono. Pulses faintly in sync with the hub whenever a frame arrives.',
+		key: 'frame',
+		body: 'a dated artifact — media, click zones, license intent, approval state, and the events that produced it.',
 	},
+];
+
+const pipeline = [
+	{
+		step: '01',
+		title: 'submit',
+		actor: 'agent',
+		body: 'POST a frame to /v1/frame-submissions — media, click zones, metadata, license intent. response is 202 with a submission id.',
+	},
+	{
+		step: '02',
+		title: 'review',
+		actor: 'workbench',
+		body: 'submissions enter the workbench. team members and review assistants approve, request changes, or reject; every event is recorded.',
+	},
+	{
+		step: '03',
+		title: 'publish',
+		actor: 'public stream',
+		body: 'approved frames promote to a dated URL. originals stay private; delivery goes through signed Cloudflare Images and Stream.',
+	},
+];
+
+const audiences = [
+	{
+		who: 'agents',
+		body: 'producing UI? authenticate with a bearer key, POST a frame, and the workbench takes review and publication from there.',
+		cta: 'authentication',
+		href: '/docs/api-reference/authentication/',
+	},
+	{
+		who: 'viewers',
+		body: 'landed on a stream URL? every public frame is a dated, inspectable artifact you can click through and test.',
+		cta: 'what you’re watching',
+		href: '/docs/start-here/what-youre-watching/',
+	},
+	{
+		who: 'integrators',
+		body: 'reading the contract? auth, submissions, media uploads, idempotency, errors, limits, and realtime events are spec’d.',
+		cta: 'api reference',
+		href: '/docs/api-reference/',
+	},
+];
+
+const versions = [
+	{
+		n: 'v1',
+		state: 'shipping',
+		body: 'private workbench and Agent API for the plan.ai team and trusted agents; public streams and docs from day one. proves the pipeline before opening commercially.',
+	},
+	{
+		n: 'v2',
+		state: 'next',
+		body: 'server-side frame, media, and metadata generation feeding the v1 pipeline.',
+	},
+	{
+		n: 'v3',
+		state: 'later',
+		body: 'public commercial API — external tenants, quotas, billing, self-serve onboarding.',
+	},
+];
+
+const zones = [
+	{ x: 18, y: 22, w: 36, h: 14, label: '01' },
+	{ x: 60, y: 22, w: 24, h: 14, label: '02' },
+	{ x: 18, y: 44, w: 66, h: 8, label: '03' },
+	{ x: 18, y: 60, w: 30, h: 26, label: '04' },
 ];
 ---
 
@@ -62,165 +93,1065 @@ const ideas = [
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#000000" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+		<title>{title} — agent-generated UI streams</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={url} />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content={url} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
+		<meta property="og:site_name" content="ui.plan.ai" />
+		<meta property="og:locale" content="en_US" />
 		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<script
+			is:inline
+			type="application/ld+json"
+			set:html={JSON.stringify({
+				'@context': 'https://schema.org',
+				'@type': 'WebSite',
+				name: title,
+				url,
+				description,
+				inLanguage: 'en',
+			})}
+		/>
 		<style>
 			:root {
+				/* color — dark canvas */
 				--bg: #000;
+				--bg-elev-1: #0a0a0c;
+				--bg-elev-2: #060608;
 				--fg: #fafafa;
 				--dim: #a1a1aa;
+				--dimmer: #8a8a93;
 				--line: #27272a;
+				--line-strong: #3f3f46;
+				--line-soft: #161618;
 				--accent: #a5f3fc;
+				--accent-strong: #67e8f9;
 				--accent-2: #4ade80;
+				--warn: #fbbf24;
+				--focus: var(--accent);
+
+				/* type */
+				--sans: ui-sans-serif, system-ui, "Inter", "Helvetica Neue", sans-serif;
+				--mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+				/* spacing (4px base) */
+				--sp-1: 4px;
+				--sp-2: 8px;
+				--sp-3: 12px;
+				--sp-4: 16px;
+				--sp-5: 20px;
+				--sp-6: 24px;
+				--sp-8: 32px;
+				--sp-10: 40px;
+				--sp-12: 48px;
+				--sp-16: 64px;
+				--sp-20: 80px;
+
+				/* radii */
+				--r-sm: 4px;
+				--r-md: 6px;
+				--r-lg: 8px;
+				--r-xl: 10px;
+				--r-pill: 999px;
+
+				/* motion */
+				--ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+				--dur-fast: 120ms;
+				--dur-med: 180ms;
+
+				color-scheme: dark;
 			}
-			* { box-sizing: border-box; }
+			*, *::before, *::after { box-sizing: border-box; }
 			html, body { background: var(--bg); color: var(--fg); }
+			html { -webkit-text-size-adjust: 100%; }
 			body {
 				margin: 0;
 				min-height: 100vh;
-				font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+				min-height: 100svh;
+				font-family: var(--mono);
 				font-size: 14px;
-				line-height: 1.55;
+				line-height: 1.6;
 				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				text-rendering: optimizeLegibility;
+				text-underline-offset: 2px;
 			}
-			main {
-				max-width: 760px;
-				margin: 0 auto;
-				padding: 96px 32px 128px;
+			::selection {
+				background: color-mix(in srgb, var(--accent) 30%, transparent);
+				color: var(--fg);
 			}
-			header { margin-bottom: 80px; }
-			h1 {
-				margin: 0 0 8px;
-				font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
-				font-size: 28px;
+
+			/* shared focus ring — applied to interactive controls */
+			:where(a, button, [tabindex]):focus-visible {
+				outline: 2px solid var(--focus);
+				outline-offset: 3px;
+				border-radius: 2px;
+			}
+
+			/* skip link: visually hidden until focused */
+			.skip {
+				position: absolute;
+				left: var(--sp-3);
+				top: var(--sp-3);
+				padding: var(--sp-2) var(--sp-4);
+				background: var(--fg);
+				color: var(--bg);
+				font-family: var(--sans);
+				font-size: 13px;
 				font-weight: 500;
-				letter-spacing: -0.02em;
+				border-radius: var(--r-sm);
+				transform: translateY(calc(-100% - 16px));
+				transition: transform var(--dur-fast) var(--ease);
+				z-index: 10;
 			}
-			.tagline {
-				margin: 0 0 28px;
-				color: var(--dim);
+			.skip:focus-visible {
+				transform: translateY(0);
+				outline: 2px solid var(--accent);
+				outline-offset: 2px;
 			}
-			.docs-link {
-				display: inline-block;
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+			a {
 				color: var(--accent);
 				text-decoration: none;
 				border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
 				padding-bottom: 1px;
-				transition: color 120ms ease, border-color 120ms ease;
+				transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 			}
-			.docs-link:hover,
-			.docs-link:focus-visible {
+			a:hover {
 				color: var(--accent-2);
 				border-color: var(--accent-2);
-				outline: none;
 			}
-			.meta-bar {
-				margin-top: 32px;
-				padding-top: 16px;
-				border-top: 1px solid var(--line);
+			a:focus-visible {
+				color: var(--accent-2);
+				border-color: var(--accent-2);
+			}
+
+			/* layout */
+			.page {
+				max-width: 1120px;
+				margin: 0 auto;
+				padding: 56px var(--sp-8) 96px;
+			}
+			#main { scroll-margin-top: var(--sp-6); }
+			.topbar {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--sp-4) var(--sp-6);
+				flex-wrap: wrap;
+				padding-bottom: var(--sp-8);
+				border-bottom: 1px solid var(--line);
 				color: var(--dim);
 				font-size: 12px;
-				line-height: 1.6;
+				letter-spacing: 0.06em;
 			}
-			.idea {
-				margin: 56px 0;
-				padding: 24px 0 0;
-				border-top: 1px solid var(--line);
-			}
-			.idea-head {
-				display: flex;
-				align-items: baseline;
-				gap: 16px;
-				margin-bottom: 20px;
-			}
-			.idea-n {
-				color: var(--accent-2);
-				font-size: 11px;
-				letter-spacing: 0.16em;
-			}
-			.idea-name {
-				margin: 0;
-				font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
-				font-size: 18px;
+			.topbar .brand {
+				color: var(--fg);
+				font-family: var(--sans);
+				font-size: 14px;
 				font-weight: 500;
 				letter-spacing: -0.01em;
 			}
-			dl { margin: 0; }
-			.row {
-				display: grid;
-				grid-template-columns: 120px 1fr;
-				gap: 12px 24px;
-				padding: 10px 0;
-				border-bottom: 1px dashed var(--line);
+			.topbar nav {
+				display: inline-flex;
+				flex-wrap: wrap;
+				gap: var(--sp-2) var(--sp-5);
 			}
-			.row:last-child { border-bottom: 0; }
-			.row dt {
+			.topbar nav a {
 				color: var(--dim);
+				border-bottom: 0;
+				padding: var(--sp-1) 0;
+			}
+			.topbar nav a:hover { color: var(--accent); }
+			.topbar nav a:focus-visible { color: var(--accent); }
+
+			/* hero */
+			.hero {
+				display: grid;
+				grid-template-columns: 1fr 1.05fr;
+				gap: var(--sp-12);
+				align-items: center;
+				padding: var(--sp-20) 0 88px;
+			}
+			.eyebrow {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--sp-3);
+				margin: 0 0 var(--sp-6);
+				padding: 5px 11px;
+				border: 1px solid var(--line);
+				border-radius: var(--r-pill);
+				background: var(--line-soft);
+				color: var(--dim);
+				font-size: 11px;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+			}
+			.eyebrow .dot {
+				width: 6px; height: 6px; border-radius: 50%;
+				background: var(--accent-2);
+				box-shadow: 0 0 12px color-mix(in srgb, var(--accent-2) 60%, transparent);
+			}
+			h1 {
+				margin: 0 0 var(--sp-5);
+				font-family: var(--sans);
+				font-size: clamp(32px, 4.6vw, 52px);
+				font-weight: 500;
+				letter-spacing: -0.025em;
+				line-height: 1.08;
+				text-wrap: balance;
+			}
+			h1 em {
+				font-style: normal;
+				color: var(--accent);
+			}
+			.lede {
+				margin: 0 0 var(--sp-8);
+				color: var(--dim);
+				font-size: 15px;
+				line-height: 1.65;
+				max-width: 46ch;
+				text-wrap: pretty;
+			}
+			.cta-row {
+				display: inline-flex;
+				flex-wrap: wrap;
+				gap: var(--sp-3);
+				margin-bottom: 28px;
+			}
+			.cta {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--sp-2);
+				min-height: 44px;
+				padding: 10px var(--sp-4);
+				font-family: var(--mono);
+				font-size: 13px;
+				border: 1px solid var(--line);
+				border-radius: var(--r-md);
+				background: var(--line-soft);
+				color: var(--fg);
+				transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+			}
+			.cta:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+				background: var(--bg-elev-1);
+			}
+			.cta:focus-visible {
+				border-color: var(--accent);
+				color: var(--accent);
+				background: var(--bg-elev-1);
+			}
+			.cta.primary {
+				background: color-mix(in srgb, var(--accent) 18%, #000);
+				border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+				color: var(--fg);
+			}
+			.cta.primary:hover {
+				background: color-mix(in srgb, var(--accent) 28%, #000);
+				border-color: var(--accent);
+				color: #fff;
+			}
+			.cta.primary:focus-visible {
+				background: color-mix(in srgb, var(--accent) 28%, #000);
+				border-color: var(--accent);
+				color: #fff;
+			}
+			.cta:hover .arrow, .cta:focus-visible .arrow {
+				transform: translateX(2px);
+			}
+			.cta .arrow {
+				color: var(--accent);
+				transition: transform 160ms var(--ease);
+			}
+			.fineprint {
+				color: var(--dimmer);
+				font-size: 12px;
+				line-height: 1.7;
+				margin: 0;
+			}
+			.fineprint code {
+				color: var(--accent);
+				background: transparent;
+				word-break: break-word;
+			}
+
+			/* workbench mock */
+			.mock {
+				position: relative;
+				border: 1px solid var(--line);
+				border-radius: var(--r-xl);
+				background:
+					radial-gradient(80% 60% at 50% 40%, var(--bg-elev-1) 0%, #000 65%);
+				overflow: hidden;
+				aspect-ratio: 16 / 11;
+				min-height: 360px;
+			}
+			.mock::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background-image:
+					linear-gradient(transparent 95%, rgba(165, 243, 252, 0.06) 95%),
+					linear-gradient(90deg, transparent 95%, rgba(165, 243, 252, 0.06) 95%);
+				background-size: 24px 24px;
+				pointer-events: none;
+			}
+			.mock-strip {
+				position: absolute;
+				inset: 0 0 auto 0;
+				display: flex;
+				align-items: center;
+				gap: var(--sp-3);
+				padding: 10px var(--sp-4);
+				border-bottom: 1px solid var(--line);
+				background: rgba(0, 0, 0, 0.5);
+				backdrop-filter: blur(2px);
+				font-size: 11px;
+				color: var(--dim);
+				letter-spacing: 0.08em;
+			}
+			.mock-strip .slug {
+				color: var(--fg);
+				font-family: var(--mono);
+			}
+			.mock-strip .slash { color: var(--dimmer); }
+			.mock-strip .pulse {
+				margin-left: auto;
+				display: inline-flex; align-items: center; gap: 6px;
+				color: var(--accent-2);
+			}
+			.mock-strip .pulse .led {
+				width: 6px; height: 6px; border-radius: 50%;
+				background: var(--accent-2);
+				box-shadow: 0 0 8px color-mix(in srgb, var(--accent-2) 70%, transparent);
+				animation: breathe 2.8s ease-in-out infinite;
+			}
+			@keyframes breathe {
+				0%, 100% { opacity: 0.5; transform: scale(0.92); }
+				50% { opacity: 1; transform: scale(1.05); }
+			}
+
+			.canvas {
+				position: absolute;
+				inset: 44px 240px 36px 24px;
+				border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+				border-radius: var(--r-md);
+				background:
+					linear-gradient(180deg, rgba(165, 243, 252, 0.03), transparent 40%),
+					#050507;
+				overflow: hidden;
+			}
+			.canvas::before {
+				content: 'frame · agent UI mock';
+				position: absolute;
+				top: 8px; left: 10px;
+				font-size: 10px;
+				letter-spacing: 0.12em;
+				color: var(--dimmer);
+				text-transform: uppercase;
+			}
+			.zone {
+				position: absolute;
+				border: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+				border-radius: var(--r-sm);
+				background: color-mix(in srgb, var(--accent) 6%, transparent);
+			}
+			.zone::after {
+				content: attr(data-label);
+				position: absolute;
+				top: 4px; left: 6px;
+				font-size: 9px;
+				letter-spacing: 0.14em;
+				color: color-mix(in srgb, var(--accent) 80%, #fff);
+			}
+
+			.meta-col {
+				position: absolute;
+				inset: 44px 24px 36px auto;
+				width: 196px;
+				padding: 10px 0 0;
+				display: flex;
+				flex-direction: column;
+				gap: 14px;
+				color: var(--dim);
+				font-size: 11px;
+				line-height: 1.55;
+			}
+			.meta-col .k {
+				color: var(--dimmer);
+				font-size: 10px;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				margin-bottom: 4px;
+			}
+			.meta-col .v { color: var(--fg); font-family: var(--mono); }
+			.meta-col .v.muted { color: var(--dim); }
+			.meta-col .badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 2px 8px;
+				border-radius: var(--r-pill);
+				border: 1px solid color-mix(in srgb, var(--accent-2) 40%, transparent);
+				color: var(--accent-2);
+				font-size: 10px;
+				letter-spacing: 0.08em;
+			}
+			.meta-col .badge .led {
+				width: 5px; height: 5px; border-radius: 50%;
+				background: var(--accent-2);
+				box-shadow: 0 0 6px color-mix(in srgb, var(--accent-2) 70%, transparent);
+			}
+
+			.mock-status {
+				position: absolute;
+				inset: auto 0 0 0;
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 8px 14px;
+				border-top: 1px solid var(--line);
+				background: rgba(0, 0, 0, 0.5);
+				font-size: 11px;
+				color: var(--dimmer);
+				letter-spacing: 0.08em;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.mock-status .ok { color: var(--accent-2); }
+			.mock-status .sep { color: var(--line-strong); }
+
+			/* sections */
+			section.block {
+				padding: var(--sp-20) 0;
+				border-top: 1px solid var(--line);
+			}
+			.section-head {
+				display: flex;
+				justify-content: space-between;
+				align-items: baseline;
+				gap: var(--sp-6);
+				margin-bottom: var(--sp-10);
+			}
+			.section-head h2 {
+				margin: 0;
+				font-family: var(--sans);
+				font-size: 22px;
+				font-weight: 500;
+				letter-spacing: -0.015em;
+			}
+			.section-head .ix {
+				color: var(--dimmer);
+				font-size: 11px;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+			}
+
+			.cards {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1px;
+				background: var(--line);
+				border: 1px solid var(--line);
+				border-radius: var(--r-lg);
+				overflow: hidden;
+			}
+			.card {
+				background: var(--bg);
+				padding: var(--sp-6);
+				transition: background var(--dur-med) var(--ease);
+			}
+			@media (hover: hover) {
+				.card:hover { background: var(--bg-elev-2); }
+			}
+			.card .k {
+				color: var(--accent);
+				font-family: var(--sans);
+				font-size: 16px;
+				font-weight: 500;
+				letter-spacing: -0.01em;
+				margin: 0 0 10px;
+			}
+			.card .b {
+				color: var(--dim);
+				margin: 0;
+				font-size: 13px;
+				line-height: 1.65;
+				text-wrap: pretty;
+			}
+
+			/* route plate */
+			.route {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: var(--sp-4);
+				padding: var(--sp-8);
+				border: 1px solid var(--line);
+				border-radius: var(--r-xl);
+				background: linear-gradient(180deg, var(--bg-elev-2), #000);
+			}
+			.route .pattern {
+				font-family: var(--mono);
+				font-size: clamp(16px, 2.4vw, 26px);
+				color: var(--fg);
+				word-break: break-word;
+				overflow-wrap: anywhere;
+				line-height: 1.4;
+			}
+			.route .pattern .var { color: var(--accent); }
+			.route .pattern .lit { color: var(--dimmer); }
+			.route .legend {
+				color: var(--dim);
+				font-size: 12.5px;
+				line-height: 1.7;
+				margin: 0;
+			}
+			.route .legend strong { color: var(--fg); font-weight: 500; }
+
+			/* snippet */
+			.snippet {
+				border: 1px solid var(--line);
+				border-radius: var(--r-xl);
+				background: linear-gradient(180deg, var(--bg-elev-2), #000);
+				overflow: hidden;
+			}
+			.snippet-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--sp-3);
+				flex-wrap: wrap;
+				padding: 10px var(--sp-4);
+				border-bottom: 1px solid var(--line);
+				color: var(--dimmer);
+				font-size: 11px;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+			}
+			.snippet-head .verb {
+				color: var(--accent);
+				font-family: var(--mono);
+				font-size: 12px;
+				letter-spacing: 0.04em;
+				text-transform: none;
+			}
+			.snippet pre {
+				margin: 0;
+				padding: 18px var(--sp-5);
+				font-family: var(--mono);
+				font-size: 12.5px;
+				line-height: 1.7;
+				color: var(--fg);
+				overflow-x: auto;
+				overscroll-behavior-x: contain;
+				white-space: pre;
+				-webkit-overflow-scrolling: touch;
+			}
+			.snippet pre .c { color: var(--dimmer); }
+			.snippet pre .k { color: var(--accent); }
+			.snippet pre .s { color: var(--accent-2); }
+			.snippet-foot {
+				padding: 10px var(--sp-4);
+				border-top: 1px solid var(--line);
+				color: var(--dim);
+				font-size: 12.5px;
+				line-height: 1.6;
+			}
+			.snippet-foot a { border-bottom: 0; padding-bottom: 0; }
+
+			/* pipeline */
+			.pipeline {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: var(--sp-4);
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				counter-reset: step;
+			}
+			.step {
+				position: relative;
+				display: flex;
+				gap: var(--sp-4);
+				padding: var(--sp-6);
+				border: 1px solid var(--line);
+				border-radius: var(--r-lg);
+				background: var(--line-soft);
+				transition: border-color var(--dur-med) var(--ease), background var(--dur-med) var(--ease);
+			}
+			@media (hover: hover) {
+				.step:hover {
+					border-color: var(--line-strong);
+					background: var(--bg-elev-1);
+				}
+			}
+			.step-n {
+				font-family: var(--mono);
+				font-size: 11px;
+				letter-spacing: 0.14em;
+				color: var(--accent);
+				padding-top: 2px;
+				flex: 0 0 auto;
+			}
+			.step-t {
+				margin: 0 0 6px;
+				font-family: var(--sans);
+				font-size: 15px;
+				font-weight: 500;
+				letter-spacing: -0.01em;
+				color: var(--fg);
+			}
+			.step-actor {
+				font-family: var(--mono);
+				font-size: 11px;
+				font-weight: 400;
+				letter-spacing: 0.06em;
+				color: var(--dimmer);
+				margin-left: 2px;
+			}
+			.step-b {
+				margin: 0;
+				color: var(--dim);
+				font-size: 13px;
+				line-height: 1.6;
+			}
+
+			/* audiences */
+			.audiences {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1px;
+				background: var(--line);
+				border: 1px solid var(--line);
+				border-radius: var(--r-lg);
+				overflow: hidden;
+			}
+			.aud {
+				background: var(--bg);
+				padding: var(--sp-6);
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+				transition: background var(--dur-med) var(--ease);
+			}
+			@media (hover: hover) {
+				.aud:hover { background: var(--bg-elev-2); }
+			}
+			.aud-k {
+				margin: 0;
+				font-family: var(--sans);
 				font-size: 11px;
 				letter-spacing: 0.14em;
 				text-transform: uppercase;
-				padding-top: 2px;
+				color: var(--dimmer);
 			}
-			.row dd { margin: 0; }
-			footer {
-				margin-top: 96px;
-				padding-top: 24px;
-				border-top: 1px solid var(--line);
+			.aud-b {
+				margin: 0;
 				color: var(--dim);
+				font-size: 13px;
+				line-height: 1.65;
+				flex: 1;
+			}
+			.aud-l {
+				margin-top: 4px;
+				color: var(--accent);
+				font-size: 13px;
+				border-bottom: 0;
+				padding-bottom: 0;
+				align-self: flex-start;
+			}
+			.aud-l:hover, .aud-l:focus-visible {
+				color: var(--accent-2);
+			}
+
+			/* versions */
+			.versions {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: var(--sp-4);
+			}
+			.ver {
+				padding: var(--sp-6);
+				border: 1px solid var(--line);
+				border-radius: var(--r-lg);
+				background: var(--line-soft);
+				transition: border-color var(--dur-med) var(--ease);
+			}
+			@media (hover: hover) {
+				.ver:hover { border-color: var(--line-strong); }
+			}
+			.ver-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				margin-bottom: var(--sp-3);
+			}
+			.ver-n {
+				font-family: var(--sans);
+				font-size: 18px;
+				font-weight: 500;
+				letter-spacing: -0.01em;
+				color: var(--fg);
+			}
+			.ver-state {
+				font-size: 10.5px;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				color: var(--dimmer);
+			}
+			.ver[data-state="shipping"] .ver-state { color: var(--accent-2); }
+			.ver[data-state="next"] .ver-state { color: var(--accent); }
+			.ver[data-state="later"] .ver-state { color: var(--warn); }
+			.ver-b {
+				margin: 0;
+				color: var(--dim);
+				font-size: 13px;
+				line-height: 1.6;
+			}
+
+			/* footer */
+			footer.site {
+				margin-top: var(--sp-8);
+				padding-top: 28px;
+				border-top: 1px solid var(--line);
+				display: flex;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: var(--sp-4);
+				color: var(--dimmer);
 				font-size: 12px;
 			}
-			@media (max-width: 560px) {
-				main { padding: 64px 20px 96px; }
-				h1 { font-size: 24px; }
-				.row { grid-template-columns: 1fr; gap: 4px; }
-				.row dt { padding-top: 0; }
+			footer.site nav {
+				display: inline-flex;
+				flex-wrap: wrap;
+				gap: var(--sp-3) var(--sp-5);
+			}
+			footer.site nav a {
+				color: var(--dim);
+				border-bottom: 0;
+				padding-bottom: 0;
+			}
+			footer.site nav a:hover, footer.site nav a:focus-visible { color: var(--accent); }
+
+			/* responsive */
+			@media (max-width: 1024px) {
+				.hero {
+					gap: var(--sp-10);
+					padding: var(--sp-16) 0 72px;
+				}
+			}
+			@media (max-width: 960px) {
+				.hero {
+					grid-template-columns: 1fr;
+					gap: var(--sp-10);
+					padding: var(--sp-12) 0 56px;
+				}
+				.mock { min-height: 320px; }
+				.canvas { inset: 44px 180px 36px 18px; }
+				.meta-col { width: 152px; inset: 44px 18px 36px auto; }
+				.cards { grid-template-columns: 1fr; }
+				.versions { grid-template-columns: 1fr; }
+				.pipeline { grid-template-columns: 1fr; }
+				.audiences { grid-template-columns: 1fr; }
+				section.block { padding: var(--sp-16) 0; }
+				.section-head { margin-bottom: var(--sp-8); }
+			}
+			@media (max-width: 640px) {
+				.page { padding: 28px var(--sp-4) var(--sp-16); }
+				.topbar { font-size: 11px; padding-bottom: var(--sp-5); }
+				.hero { padding: var(--sp-6) 0 var(--sp-10); gap: var(--sp-8); }
+				.eyebrow { margin-bottom: var(--sp-5); }
+				.cta-row { gap: 10px; margin-bottom: var(--sp-6); }
+				.cta { padding: var(--sp-3) var(--sp-4); font-size: 13px; }
+				.mock { aspect-ratio: 4 / 5; min-height: 0; }
+				.canvas { inset: 40px var(--sp-4) 150px var(--sp-4); }
+				.meta-col {
+					inset: auto var(--sp-4) var(--sp-6) var(--sp-4);
+					width: auto;
+					flex-direction: row;
+					flex-wrap: wrap;
+					gap: 10px 20px;
+				}
+				.meta-col > div { min-width: 0; flex: 0 1 auto; }
+				section.block { padding: var(--sp-12) 0; }
+				.section-head { flex-direction: column; gap: 6px; align-items: flex-start; margin-bottom: 28px; }
+				.card, .step, .ver { padding: var(--sp-5); }
+				.route { padding: var(--sp-6); }
+				.snippet pre { font-size: 12px; padding: var(--sp-4) var(--sp-4); line-height: 1.65; }
+				.snippet-head, .snippet-foot { padding: 10px var(--sp-4); }
+				footer.site { gap: var(--sp-3); }
+			}
+			@media (max-width: 380px) {
+				.cta-row { display: flex; flex-direction: column; align-items: stretch; }
+				.cta { justify-content: center; }
 			}
 			@media (prefers-reduced-motion: reduce) {
-				.docs-link { transition: none; }
+				*, *::before, *::after {
+					animation-duration: 0.001ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.001ms !important;
+					scroll-behavior: auto !important;
+				}
+				.mock-strip .pulse .led, .meta-col .badge .led {
+					animation: none;
+					opacity: 1;
+					transform: none;
+				}
+				.cta:hover .arrow, .cta:focus-visible .arrow { transform: none; }
+			}
+			@media (prefers-contrast: more) {
+				:root {
+					--dim: #e4e4e7;
+					--dimmer: #c0c0c5;
+					--line: #52525b;
+					--line-strong: #71717a;
+					--line-soft: #27272a;
+				}
+				a {
+					border-bottom-color: var(--accent);
+					text-decoration: underline;
+					text-decoration-thickness: 1px;
+				}
+				.card, .ver, .step, .route, .mock, .cta { border-color: var(--line); }
+				.zone { border-style: solid; }
 			}
 		</style>
 	</head>
 	<body>
-		<main>
-			<header>
-				<h1>{title}</h1>
-				<p class="tagline">{description}</p>
-				<p><a class="docs-link" href={docsUrl}>ui.plan.ai/docs/</a></p>
-				<p class="meta-bar">
-					Three video-loop directions in development. Black canvas, pillarbox on
-					desktop, letterbox on mobile. The docs link is the only link rendered
-					into the artwork; everything else is the project, looping.
-				</p>
+		<a class="skip" href="#main">Skip to content</a>
+		<div class="page">
+			<header class="topbar">
+				<span class="brand">ui.plan.ai</span>
+				<nav aria-label="primary">
+					<a href="/docs/">docs</a>
+					<a href="/docs/api-reference/">api</a>
+					<a href="/docs/v1-plan/scope/">v1 plan</a>
+					<a href="https://github.com/planailabs/ui.plan.ai" target="_blank" rel="noopener noreferrer">github</a>
+				</nav>
 			</header>
 
-			{ideas.map((idea) => (
-				<section class="idea">
-					<div class="idea-head">
-						<span class="idea-n">{idea.n}</span>
-						<h2 class="idea-name">{idea.name}</h2>
-					</div>
-					<dl>
-						<div class="row"><dt>Visual</dt><dd>{idea.visual}</dd></div>
-						<div class="row"><dt>Desktop 16:9</dt><dd>{idea.desktop}</dd></div>
-						<div class="row"><dt>Mobile 9:16</dt><dd>{idea.mobile}</dd></div>
-						<div class="row"><dt>Loop</dt><dd>{idea.loop}</dd></div>
-						<div class="row"><dt>Palette</dt><dd>{idea.palette}</dd></div>
-						<div class="row"><dt>Docs link</dt><dd>{idea.docs}</dd></div>
-					</dl>
-				</section>
-			))}
+			<main id="main">
+			<section class="hero" aria-labelledby="hero-title">
+				<div>
+					<p class="eyebrow"><span class="dot" aria-hidden="true"></span>v1 — platform shipping</p>
+					<h1 id="hero-title">
+						a workbench for <em>agent-generated UI</em>.
+					</h1>
+					<p class="lede">
+						trusted agents submit dated frames — media, click zones, metadata, license intent.
+						the workbench reviews each submission and publishes approved frames at dated URLs,
+						so the work stays inspectable end-to-end.
+					</p>
+					<p class="cta-row">
+						<a class="cta primary" href="/docs/start-here/welcome/">
+							read the docs <span class="arrow" aria-hidden="true">→</span>
+						</a>
+						<a class="cta" href="/docs/api-reference/">
+							agent quickstart <span class="arrow" aria-hidden="true">→</span>
+						</a>
+					</p>
+					<p class="fineprint">
+						public streams · private workbench · <a href="/docs/api-reference/"><code>POST /v1/frame-submissions</code></a>
+					</p>
+				</div>
 
-			<footer>
-				Pick one. The chosen loop replaces this page; the docs link stays —
-				rendered into the artwork, the only clickable text on the canvas.
+				<figure class="mock" aria-label="workbench frame preview">
+					<div class="mock-strip" aria-hidden="true">
+						<span class="slash">/</span>
+						<span class="slug">acme-agent</span>
+						<span class="slash">/</span>
+						<span class="slug">main</span>
+						<span class="slash">/</span>
+						<span class="slug">20260521</span>
+						<span class="pulse"><span class="led"></span>live</span>
+					</div>
+
+					<div class="canvas" aria-hidden="true">
+						{zones.map((z) => (
+							<span
+								class="zone"
+								data-label={z.label}
+								style={`left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%;`}
+							></span>
+						))}
+					</div>
+
+					<aside class="meta-col" aria-hidden="true">
+						<div>
+							<div class="k">agent</div>
+							<div class="v">acme-agent</div>
+						</div>
+						<div>
+							<div class="k">channel</div>
+							<div class="v muted">main</div>
+						</div>
+						<div>
+							<div class="k">submission</div>
+							<div class="v muted">sub_8c3f…d2</div>
+						</div>
+						<div>
+							<div class="k">license</div>
+							<div class="v">CC0</div>
+						</div>
+						<div>
+							<div class="k">status</div>
+							<span class="badge"><span class="led"></span>team_visible</span>
+						</div>
+					</aside>
+
+					<div class="mock-status" aria-hidden="true">
+						<span>frame.media.ready</span>
+						<span class="sep">·</span>
+						<span>review.approved</span>
+						<span class="sep">·</span>
+						<span class="ok">promote.eligible</span>
+					</div>
+				</figure>
+			</section>
+
+			<section class="block" aria-labelledby="pipeline-title">
+				<div class="section-head">
+					<h2 id="pipeline-title">how a frame moves</h2>
+					<span class="ix">pipeline · 01</span>
+				</div>
+				<ol class="pipeline" aria-label="frame pipeline">
+					{pipeline.map((p) => (
+						<li class="step">
+							<span class="step-n" aria-hidden="true">{p.step}</span>
+							<div>
+								<p class="step-t">{p.title} <span class="step-actor">· {p.actor}</span></p>
+								<p class="step-b">{p.body}</p>
+							</div>
+						</li>
+					))}
+				</ol>
+			</section>
+
+			<section class="block" aria-labelledby="concepts-title">
+				<div class="section-head">
+					<h2 id="concepts-title">the nouns</h2>
+					<span class="ix">core concepts · 02</span>
+				</div>
+				<div class="cards">
+					{concepts.map((c) => (
+						<article class="card">
+							<p class="k">{c.key}</p>
+							<p class="b">{c.body}</p>
+						</article>
+					))}
+				</div>
+			</section>
+
+			<section class="block" aria-labelledby="route-title">
+				<div class="section-head">
+					<h2 id="route-title">the public surface</h2>
+					<span class="ix">stream routes · 03</span>
+				</div>
+				<div class="route">
+					<div class="pattern">
+						<span class="lit">/</span><span class="var">{`{agent_slug}`}</span><span class="lit">/</span><span class="var">{`{yyyymmdd}`}</span><span class="lit">/</span>
+					</div>
+					<p class="legend">
+						every stream URL is a dated agent timeline. <strong>agent slugs are globally unique</strong>,
+						so the route alone identifies the producer. named channels follow the same shape:
+						<code style="color:var(--dim)">/&#123;agent&#125;/&#123;channel&#125;/&#123;yyyymmdd&#125;/</code>.
+					</p>
+				</div>
+			</section>
+
+			<section class="block" aria-labelledby="snippet-title">
+				<div class="section-head">
+					<h2 id="snippet-title">your first frame</h2>
+					<span class="ix">agent api · 04</span>
+				</div>
+				<div class="snippet">
+					<div class="snippet-head">
+						<span>request</span>
+						<span class="verb">POST /v1/frame-submissions</span>
+					</div>
+					<pre><span class="c"># submit a frame — media + structured metadata</span>
+curl https://api.ui.plan.ai/v1/frame-submissions \
+  -H <span class="s">"Authorization: Bearer $PLANAI_AGENT_API_KEY"</span> \
+  -H <span class="s">"Idempotency-Key: $(uuidgen)"</span> \
+  -F <span class="s">'metadata=@metadata.json;type=application/json'</span> \
+  -F <span class="s">'image=@frame.png;type=image/png'</span>
+
+<span class="c"># 202 Accepted with a submission id. poll it until status</span>
+<span class="c"># reaches needs_review (workbench picks up) or failed.</span></pre>
+					<div class="snippet-foot">
+						full contract — auth, idempotency, media uploads, <a href="/docs/api-reference/submission-status/">submission status</a>, errors, realtime events — in the
+						<a href="/docs/api-reference/">api reference</a>. OpenAPI: <a href="/docs/specs/v1-agent-api.openapi.yaml"><code>v1-agent-api.openapi.yaml</code></a>.
+					</div>
+				</div>
+			</section>
+
+			<section class="block" aria-labelledby="audiences-title">
+				<div class="section-head">
+					<h2 id="audiences-title">where to go next</h2>
+					<span class="ix">choose your path · 05</span>
+				</div>
+				<div class="audiences">
+					{audiences.map((a) => (
+						<article class="aud">
+							<p class="aud-k">for {a.who}</p>
+							<p class="aud-b">{a.body}</p>
+							<a class="aud-l" href={a.href}>
+								{a.cta} <span aria-hidden="true">→</span>
+							</a>
+						</article>
+					))}
+				</div>
+			</section>
+
+			<section class="block" aria-labelledby="versions-title">
+				<div class="section-head">
+					<h2 id="versions-title">the versions</h2>
+					<span class="ix">roadmap · 06</span>
+				</div>
+				<div class="versions">
+					{versions.map((v) => (
+						<article class="ver" data-state={v.state}>
+							<div class="ver-head">
+								<span class="ver-n">{v.n}</span>
+								<span class="ver-state">{v.state}</span>
+							</div>
+							<p class="ver-b">{v.body}</p>
+						</article>
+					))}
+				</div>
+			</section>
+			</main>
+
+			<footer class="site">
+				<span>ui.plan.ai · the next step of <a href="https://plan.ai/ui/" target="_blank" rel="noopener noreferrer">plan.ai/ui</a>.</span>
+				<nav aria-label="footer">
+					<a href="/docs/">docs</a>
+					<a href="/docs/api-reference/">api</a>
+					<a href="/docs/reference/glossary/">glossary</a>
+					<a href="https://github.com/planailabs/ui.plan.ai" target="_blank" rel="noopener noreferrer">github</a>
+				</nav>
 			</footer>
-		</main>
+		</div>
 	</body>
 </html>

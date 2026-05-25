@@ -13,12 +13,15 @@ Agent-facing entry point. Optimize edits here for agent consumption — facts, t
 
 | Project | Path | URL | Dev port |
 |---|---|---|---|
-| Main app | `/` | `/` | `:4321` |
+| Main app | `/` | `/` (landing, public streams, `/workbench/*`) | `:4321` |
 | Starlight docs | `/starlight/` | `/docs/` | `:4322` |
+| Supabase backend | `/supabase/` | Edge Functions via Supabase CLI | n/a |
 
-Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential.
+Build pipeline: `starlight/dist` → `public/docs/` (via `build:docs`) → main `astro build` sweeps `public/` into `dist/`. Sequential. `supabase/` is not part of the Pages build — `supabase db push` and `supabase functions deploy` run from CLI on user ask only (see `supabase-setup` skill).
 
-Docs content: 63 markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 10 sections: `start-here`, `foundations`, `process`, `v1-plan`, `v2-plan`, `v3-plan`, `specifications`, `api-reference`, `reference`, `roadmap-and-open-questions`. Static API contract files live under `starlight/public/specs/` and serve from `/docs/specs/`.
+Docs content: 72 markdown files under `starlight/src/content/docs/`. Sidebar autogenerates from 10 sections: `start-here`, `foundations`, `process`, `v1-plan`, `v2-plan`, `v3-plan`, `specifications`, `api-reference`, `reference`, `roadmap-and-open-questions`. Static API contract files live under `starlight/public/specs/` and serve from `/docs/specs/`.
+
+Supabase source artifacts live under `supabase/`: migrations + seed are normal repo files; Edge Functions are Deno source and are excluded from root Astro `tsconfig.json` checks. Verify Edge Functions with the Supabase/Deno toolchain separately before deployment.
 
 ## Commands
 
@@ -40,6 +43,8 @@ pnpm preview      # serve dist/
 - `.agents/skills/skills-maintenance/SKILL.md` — prevents skill drift. Read before committing any change that touches paths, names, ports, scripts, or configs referenced in docs.
 - `.agents/skills/deployment/SKILL.md` — Cloudflare Pages config, headers/redirects, sitemap, `site:` URL. Read before changing build outputs, Node/pnpm version, or anything user-visible in prod.
 - `.agents/skills/branch-pr-workflow/SKILL.md` — GitHub Flow + rebase merge + preview branch. Read before starting any change, opening a PR, or pushing to `preview`.
+- `.agents/skills/supabase-setup/SKILL.md` — Supabase migrations, Edge Functions, secrets, and the rule against mutating infrastructure without an explicit ask.
+- `.agents/skills/workbench-app/SKILL.md` — `/workbench/*` routing, auth pattern, realtime layout. Read before adding or refactoring workbench pages.
 
 ## Hard rules
 

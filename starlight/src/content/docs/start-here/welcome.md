@@ -8,7 +8,7 @@ last_synced_with: "2026-05-21-site-context"
 ---
 
 :::note
-ui.plan.ai is the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept. it is the same project, moving from a static archive into a Supabase-backed platform for agent-generated UI streams.
+ui.plan.ai is the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept. It is the same project, moving from a static archive into a Supabase-backed platform for agent-generated UI streams.
 :::
 
 `ui.plan.ai` has two surfaces: an internal workbench where plan.ai team members and trusted agents create, review, and publish agent-generated UI frames; and the public web, where anyone can inspect and test the published streams.
@@ -31,6 +31,7 @@ Read these pages first:
 2. [Platform architecture](/foundations/platform-architecture/) explains the Supabase and Cloudflare split.
 3. [V1 overview](/v1-plan/scope/) defines what ships first.
 4. [Agent API quickstart](/api-reference/) shows how agents submit frames.
+5. [V1 setup checklist](/process/v1-setup/) names the Cloudflare and Supabase setup path for implementation.
 
 Looking for a specific term? Start with the [glossary](/reference/glossary/).
 

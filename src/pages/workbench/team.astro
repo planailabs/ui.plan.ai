@@ -1,0 +1,7 @@
+---
+import Workbench from '../../layouts/Workbench.astro';
+---
+<Workbench title="Team" spec="/docs/v1-plan/team-members/">
+  <p>Invite · remove · re-role tenant members. Owner-only in V1, AAL2 (MFA) required.</p>
+  <p style="color:var(--dim);">Backed by <code>tenant_members</code> + <code>tenant_invitations</code>; mutations go through the <code>team-invitations</code> Edge Function.</p>
+</Workbench>

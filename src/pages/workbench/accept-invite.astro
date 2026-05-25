@@ -1,0 +1,51 @@
+---
+import Workbench from '../../layouts/Workbench.astro';
+---
+<Workbench title="Accept invitation" spec="/docs/v1-plan/team-members/" guarded={false}>
+  <p>Sign in with the email this invitation was sent to, then accept.</p>
+  <p id="status" style="color:var(--dim);">Reading token from URL…</p>
+  <button id="accept" hidden style="padding:8px 16px;background:var(--accent-2);color:#000;border:0;cursor:pointer;">
+    Accept invitation
+  </button>
+  <script>
+    import { getBrowserClient } from '../../lib/supabase';
+    import { PUBLIC_SUPABASE_URL } from '../../lib/env';
+
+    const status = document.getElementById('status')!;
+    const button = document.getElementById('accept') as HTMLButtonElement;
+
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (!token) {
+      status.textContent = 'No invitation token in URL.';
+    } else {
+      const supabase = getBrowserClient();
+      if (!supabase || !PUBLIC_SUPABASE_URL) {
+        status.textContent = 'Supabase not configured on this build.';
+      } else {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) {
+          status.textContent = 'Sign in first, then return to this link.';
+          setTimeout(() => location.replace(`/workbench/login/?next=${encodeURIComponent(location.href)}`), 1500);
+        } else {
+          status.textContent = 'Ready to accept.';
+          button.hidden = false;
+          button.addEventListener('click', async () => {
+            status.textContent = 'Accepting…';
+            const res = await fetch(`${PUBLIC_SUPABASE_URL}/functions/v1/team-invitations`, {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                authorization: `Bearer ${data.session!.access_token}`,
+              },
+              body: JSON.stringify({ action: 'redeem', token }),
+            });
+            if (!res.ok) { status.textContent = `Error: ${res.status} ${await res.text()}`; return; }
+            status.textContent = 'Welcome to the team.';
+            setTimeout(() => location.replace('/workbench/inbox/'), 800);
+          });
+        }
+      }
+    }
+  </script>
+</Workbench>

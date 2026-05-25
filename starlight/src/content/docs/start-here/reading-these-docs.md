@@ -36,6 +36,10 @@ Read in this order:
 
 The OpenAPI source lives at [/specs/v1-agent-api.openapi.yaml](/specs/v1-agent-api.openapi.yaml). JSON schemas live under [/specs/schemas/](/specs/schemas/frame-submission-metadata.v1.schema.json).
 
+## Configuring Supabase & Cloudflare
+
+Setting up a Supabase project or a Cloudflare Pages/Images/Stream binding for V1? Start at [Upstream docs](/reference/upstream-docs/) for deep links to the current official pages, then read [Secrets & environments](/reference/secrets-and-environments/) for the env matrix and where each secret is bound.
+
 ## Source of truth
 
-When prose and machine-readable contracts disagree, the implementation must stop and reconcile the docs before shipping. V1 API behavior is specified by the OpenAPI file plus the API Reference pages.
+When prose and machine-readable contracts disagree, the implementation must stop and reconcile the docs before shipping. V1 API behavior is specified by the OpenAPI file plus the API Reference pages. For platform behavior (auth flow, RLS, signed URLs, Stream webhooks), the upstream Supabase/Cloudflare pages linked from [Upstream docs](/reference/upstream-docs/) are the source of truth, and this repo's pages describe **our** contract on top of them.

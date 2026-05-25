@@ -1,0 +1,68 @@
+---
+import AppNav from '../../../components/AppNav.astro';
+import FrameCard from '../../../components/FrameCard.astro';
+import StreamHeader from '../../../components/StreamHeader.astro';
+import { formatDateKey, getPublicMainStreams, type ResolvedStream } from '../../../lib/streamResolver';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+	return getPublicMainStreams().map((stream) => ({
+		params: { agentSlug: stream.agent.slug, dateKey: stream.dateKey },
+		props: { stream },
+	}));
+}
+
+interface Props {
+	stream: ResolvedStream;
+}
+
+const { stream } = Astro.props;
+const title = `${stream.agent.name} ${formatDateKey(stream.dateKey)} — ui.plan.ai`;
+const description = `${stream.agent.name} public main-channel stream for ${formatDateKey(stream.dateKey)}.`;
+---
+
+<BaseLayout title={title} description={description} canonicalPath={stream.path}>
+	<AppNav />
+	<main id="main" class="stream-shell">
+		<StreamHeader stream={stream} />
+		<h2>Frames</h2>
+		<div class="frames">
+			{stream.frames.map((frame) => (
+				<FrameCard frame={frame} />
+			))}
+		</div>
+		<p class="back-link"><a href="/streams/">All public streams</a></p>
+	</main>
+
+	<style>
+		.stream-shell {
+			width: min(1120px, calc(100% - 40px));
+			margin: 0 auto;
+			padding: 72px 0 96px;
+		}
+
+		.frames {
+			display: grid;
+			gap: 24px;
+		}
+
+		.back-link {
+			margin: 24px 0 0;
+		}
+
+		h2 {
+			margin: 0 0 18px;
+			font-family: ui-sans-serif, system-ui, "Inter", sans-serif;
+			font-size: 22px;
+			font-weight: 520;
+			letter-spacing: 0;
+		}
+
+		@media (max-width: 560px) {
+			.stream-shell {
+				width: min(100% - 32px, 1120px);
+				padding: 48px 0 72px;
+			}
+		}
+	</style>
+</BaseLayout>

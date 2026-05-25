@@ -33,9 +33,9 @@ Status is tracked on three independent axes. They are not interchangeable — re
 |---|---|---|---|
 | Submission lifecycle | `frame_submissions.status` | `submission_status` (9 values) | The ingest/processing/review/terminal journey of a single submission. See [Promotion workflow](/process/promotion-workflow/). |
 | Frame gate | `frames.status` | `frame_status` (4 values) | The reviewed frame entity's visibility gate from `team_visible` onward. See [Promotion gate philosophy](/foundations/promotion-gate/). |
-| Media processing | `frame_media.status` | `text` (not enum) | Per-asset processing state from upload to delivery-ready. |
+| Media processing | `frame_media.status` | `received`, `media_processing`, `ready`, `failed` | Per-asset processing state from upload to ready delivery. |
 
-A submission can be `needs_review` while its media is still `processing` — the axes advance independently until the reviewer makes a frame `team_visible`, at which point both submission and frame share the same four terminal-or-near-terminal gate states.
+A submission can be `needs_review` while its media is still `media_processing` — the axes advance independently until the reviewer makes a frame `team_visible`, at which point both submission and frame share the same four terminal-or-near-terminal gate states.
 
 ## RLS intent
 
