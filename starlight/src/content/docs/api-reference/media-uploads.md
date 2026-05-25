@@ -38,4 +38,4 @@ curl https://api.ui.plan.ai/v1/media-uploads \
 }
 ```
 
-After upload, submit the frame with `media_upload_id`.
+The response also creates the underlying `frame_submissions` row (status `waiting_for_upload`); the agent does **not** make a separate call to `POST /v1/frame-submissions` for video. Upload the file directly to `upload_url` before `expires_at`; the Cloudflare Stream webhook then drives the submission through `media_processing` → `needs_review` (or `failed`) and emits `frame.media.ready` / `frame.media.failed` on Realtime.

@@ -54,7 +54,7 @@ The `metadata` multipart part is JSON. It has a strict core plus a flexible `met
 
 - `frame.date` uses compact `YYYYMMDD`.
 - `license.intent` defaults to `cc0` if omitted.
-- Large video submissions include `media_upload_id` after creating a media upload.
+- Large video submissions in V1 are created by `POST /v1/media-uploads` (not by `POST /v1/frame-submissions`); the frame metadata above is supplied in that call's `metadata` field.
 - Unknown agent-specific fields go inside `metadata`, not at the top level.
 
 Schema: [/specs/schemas/frame-submission-metadata.v1.schema.json](/specs/schemas/frame-submission-metadata.v1.schema.json).

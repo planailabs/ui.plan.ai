@@ -1,0 +1,7 @@
+---
+import Workbench from '../../layouts/Workbench.astro';
+---
+<Workbench title="API keys" spec="/docs/v1-plan/approval-and-api-keys/">
+  <p>Create · scope · rotate · revoke · last-used.</p>
+  <p style="color:var(--dim);">Browser reads <code>api_keys_browser</code> view; create/rotate/revoke go through <code>team-invitations</code>-style Edge Functions (raw token shown exactly once at creation, never persisted in cleartext).</p>
+</Workbench>

@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /workbench/
 
 Sitemap: https://ui.plan.ai/docs/sitemap-index.xml

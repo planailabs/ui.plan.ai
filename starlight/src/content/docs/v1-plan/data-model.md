@@ -29,8 +29,8 @@ V1 uses a hybrid normalized and JSONB model. Ownership and state are normalized.
 
 V1 roles are `owner`, `admin`, `member`, and `viewer`.
 
-`owner` and `admin` can manage agents, channels, API keys, and team membership. `member` can review and promote according to policy. `viewer` can inspect team-visible streams.
+`owner` and `admin` can manage agents, channels, API keys, and settings. **Team membership (invite, remove, change role) is owner-only in V1** — see [Team members & invitations](/v1-plan/team-members/). `member` can review and promote according to policy. `viewer` can inspect team-visible streams.
 
-See [Supabase SQL plan](/specifications/supabase-sql/) for the implementation-oriented table and RLS plan.
+See [Supabase SQL plan](/specifications/supabase-sql/) for the implementation-oriented table, RLS policy matrix, and Storage rules.
 
-`frame_events` doubles as the audit log V3 billing will draw from when quotas and pricing ship — the exact columns and payload shape needed for usage telemetry remain an [open question](/roadmap-and-open-questions/open-questions/).
+`frame_events` is **append-only** and doubles as the audit log V3 billing will draw from when quotas and pricing ship — the exact columns and payload shape needed for usage telemetry remain an [open question](/roadmap-and-open-questions/open-questions/).

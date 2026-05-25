@@ -4,14 +4,13 @@ description: Remaining non-blocking questions after the V1/V2/V3 reset.
 sidebar:
   order: 3
 stability: working
-last_synced_with: "2026-05-21-content-audit"
+last_synced_with: "2026-05-22-llm-council-v1-pass"
 ---
 
 No known research task blocks the docs rewrite.
 
 ## Remaining product questions
 
-- Exact Cloudflare Images variant names.
 - Exact media byte and duration limits after the real Supabase and Cloudflare accounts are configured.
 - Whether V1 needs a minimal admin-only audit export.
 - Which V2 generation providers are allowed first.

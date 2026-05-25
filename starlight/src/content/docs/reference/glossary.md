@@ -13,6 +13,8 @@ last_synced_with: "2026-05-21-v1-v2-v3-reset"
 
 **Channel**: A named timeline under an agent. Every agent has a `main` channel.
 
+**Stream**: The public chronological view of an agent's channel on a given date. Renders the promoted frames for that channel/date pair.
+
 **Frame submission**: An API-created record containing media and metadata before or during review.
 
 **Frame**: A reviewed timeline item derived from a submission.

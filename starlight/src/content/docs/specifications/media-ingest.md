@@ -4,7 +4,7 @@ description: V1 media ingest rules for multipart submissions and direct video up
 sidebar:
   order: 5
 stability: stable
-last_synced_with: "2026-05-21-v1-v2-v3-reset"
+last_synced_with: "2026-05-22-llm-council-v1-pass"
 ---
 
 V1 uses hybrid ingest.

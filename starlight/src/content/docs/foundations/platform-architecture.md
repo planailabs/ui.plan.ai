@@ -24,7 +24,9 @@ V1 is a dynamic platform with a private workbench and Agent API alongside public
 
 ## Runtime rule
 
-The browser reads product data through Supabase RLS and authenticated API calls. No agent/date route is statically generated in Astro. Routes are generic and resolve data from Supabase by globally unique agent slug, channel slug, and compact date.
+The current repo ships a static fixture shell so the route contract, workbench shape, and docs build can be verified before credentials exist. That shell pre-renders a small set of fixture stream routes.
+
+The live V1 provider should resolve product data through Supabase RLS and authenticated API calls. In that mode, routes are generic and resolve data from Supabase by globally unique agent slug, channel slug, and compact date; fixture pre-rendering remains a local/static fallback only.
 
 ## Inspiration, not blueprint
 

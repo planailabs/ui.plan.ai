@@ -7,13 +7,14 @@ stability: stable
 last_synced_with: "2026-05-21-v1-v2-v3-reset"
 ---
 
-`POST /v1/frame-submissions` creates a frame submission.
+`POST /v1/frame-submissions` creates a frame submission for an image frame.
 
-The request must include `metadata` and one of:
+V1 scope on this endpoint:
 
-- `image` for the normal PNG/small-image path,
-- `video` only for configured small video,
-- `media_upload_id` inside metadata for large video that already has a direct upload session.
+- `image` (PNG, multipart) is the only supported media field.
+- For any video, use [`POST /v1/media-uploads`](/api-reference/media-uploads/) — that endpoint creates the submission as part of minting the direct-upload session. Posting `video` or a `media_upload_id` to `/v1/frame-submissions` is rejected with `415 unsupported_media_type` in V1; broader media modes are tracked for V2.
+
+The request must include a `metadata` JSON part and an `image` file part.
 
 ## Request
 
@@ -25,7 +26,7 @@ curl https://api.ui.plan.ai/v1/frame-submissions \
   -F 'image=@frame.png;type=image/png'
 ```
 
-For large video, first create a [media upload](/api-reference/media-uploads/) and include `media_upload_id` in metadata.
+For video, call [`POST /v1/media-uploads`](/api-reference/media-uploads/) instead — it creates the submission itself.
 
 ## Response
 

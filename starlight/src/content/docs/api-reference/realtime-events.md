@@ -7,7 +7,7 @@ stability: working
 last_synced_with: "2026-05-21-content-audit"
 ---
 
-The Agent API broadcasts state changes over Supabase Realtime. The workbench uses these events for live awareness; agents that want push-based updates can subscribe in place of polling [submission status](/api-reference/submission-status/).
+State changes are written to Supabase and broadcast over Supabase Realtime. The workbench uses these events for live awareness; agents that want push-based updates can subscribe in place of polling [submission status](/api-reference/submission-status/).
 
 ## Source
 
