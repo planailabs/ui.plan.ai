@@ -45,29 +45,40 @@ import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
   <script>
     import { sendEmailOtp, verifyEmailOtp, challengeMfa, verifyMfa } from '../../lib/auth-client';
 
-    const otpForm = document.getElementById('otp-form');
-    const verifyForm = document.getElementById('verify-form');
-    const mfaForm = document.getElementById('mfa-form');
+    const otpForm = document.getElementById('otp-form') as HTMLFormElement | null;
+    const verifyForm = document.getElementById('verify-form') as HTMLFormElement | null;
+    const mfaForm = document.getElementById('mfa-form') as HTMLFormElement | null;
     const otpMsg = document.getElementById('otp-msg');
     const verifyMsg = document.getElementById('verify-msg');
     const mfaMsg = document.getElementById('mfa-msg');
 
+    if (!otpForm || !verifyForm || !mfaForm || !otpMsg || !verifyMsg || !mfaMsg) {
+      throw new Error('Login page form elements missing');
+    }
+
+    type MfaChallenge = Awaited<ReturnType<typeof challengeMfa>>;
     let currentEmail = '';
-    let challenge = null;
+    let challenge: MfaChallenge = null;
+
+    const errMessage = (err: unknown): string =>
+      err instanceof Error ? err.message : String(err);
 
     otpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       otpMsg.textContent = 'Sending…';
       const fd = new FormData(otpForm);
       currentEmail = String(fd.get('email') ?? '');
-      const turnstile = (document.querySelector('[name="cf-turnstile-response"]')?.value) ?? '';
+      const turnstileEl = document.querySelector(
+        '[name="cf-turnstile-response"]'
+      ) as HTMLInputElement | null;
+      const turnstile = turnstileEl?.value ?? '';
       try {
         await sendEmailOtp(currentEmail, turnstile);
         otpMsg.textContent = 'Code sent. Check email.';
         otpForm.hidden = true;
         verifyForm.hidden = false;
       } catch (err) {
-        otpMsg.textContent = err.message ?? String(err);
+        otpMsg.textContent = errMessage(err);
       }
     });
 
@@ -82,7 +93,7 @@ import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
         verifyForm.hidden = true;
         mfaForm.hidden = false;
       } catch (err) {
-        verifyMsg.textContent = err.message ?? String(err);
+        verifyMsg.textContent = errMessage(err);
       }
     });
 
@@ -91,10 +102,11 @@ import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
       mfaMsg.textContent = 'Verifying…';
       const fd = new FormData(mfaForm);
       try {
+        if (!challenge) throw new Error('No active MFA challenge');
         await verifyMfa(challenge.factorId, challenge.challengeId, String(fd.get('code') ?? ''));
         window.location.replace('/workbench/inbox/');
       } catch (err) {
-        mfaMsg.textContent = err.message ?? String(err);
+        mfaMsg.textContent = errMessage(err);
       }
     });
   </script>

@@ -200,7 +200,6 @@ import Workbench from '../../layouts/Workbench.astro';
         onEvent: (row) => noteEvent(row.event_type),
       });
       // Surface subscription state.
-      // @ts-expect-error supabase-js does not type the system event well
       activeChannel.on('system', { event: '*' }, (s: any) => {
         if (s?.status === 'SUBSCRIBED' || s?.extension === 'postgres_changes') setRt('on', 'live');
         else if (s?.status === 'CHANNEL_ERROR' || s?.status === 'TIMED_OUT') setRt('err', s.status.toLowerCase());
