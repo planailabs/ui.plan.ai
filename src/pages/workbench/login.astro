@@ -40,7 +40,7 @@ import { PUBLIC_TURNSTILE_SITE_KEY } from '../../lib/env';
   </form>
 
   {PUBLIC_TURNSTILE_SITE_KEY && (
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   )}
   <script>
     import { sendEmailOtp, verifyEmailOtp, challengeMfa, verifyMfa } from '../../lib/auth-client';
