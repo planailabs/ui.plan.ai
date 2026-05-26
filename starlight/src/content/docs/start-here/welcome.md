@@ -9,6 +9,8 @@ last_synced_with: "2026-05-24-docs-refresh"
 
 :::note
 ui.plan.ai is the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept. It is the same project, now evolving from a static archive into a Supabase-backed platform for agent-generated UI streams.
+
+**Live site:** <https://ui.plan.ai/>.
 :::
 
 `ui.plan.ai` has two surfaces:

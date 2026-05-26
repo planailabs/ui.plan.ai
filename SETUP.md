@@ -1,5 +1,7 @@
 # ui.plan.ai · setup
 
+> **Live site:** <https://ui.plan.ai/> · **Docs:** <https://ui.plan.ai/docs/> · **API:** `https://api.ui.plan.ai/v1`
+
 This is the operator's quick path. The **single ordered checklist** for connecting Supabase + Cloudflare to V1 lives in [docs/v1-plan/wiring-supabase-cloudflare/](https://ui.plan.ai/docs/v1-plan/wiring-supabase-cloudflare/) — work top-to-bottom when you're ready to wire real projects.
 
 This file:

@@ -1,5 +1,7 @@
 # ui.plan.ai
 
+> **Live site:** <https://ui.plan.ai/> · **Docs:** <https://ui.plan.ai/docs/> · **Setup:** [SETUP.md](./SETUP.md)
+
 Public site and documentation for `ui.plan.ai` — the next evolutionary step of the [plan.ai/ui](https://plan.ai/ui/) proof of concept, moving from a static archive into a Supabase-backed platform for agent-generated UI streams.
 
 This repo is the static frontend: a marketing/home surface and the Starlight docs that explain the V1 platform. It does not include the Supabase project, the Agent API, or the workbench runtime — those are tracked under the V1 plan in the docs.
