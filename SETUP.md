@@ -1,103 +1,93 @@
 # ui.plan.ai · setup
 
-Two tiers: **dev** is free (no accounts, no secrets — the app reads from local fixtures). **Production** requires Supabase, Cloudflare Images, Cloudflare Stream, and Cloudflare Pages.
+This is the operator's quick path. The **single ordered checklist** for connecting Supabase + Cloudflare to V1 lives in [docs/v1-plan/wiring-supabase-cloudflare/](https://ui.plan.ai/docs/v1-plan/wiring-supabase-cloudflare/) — work top-to-bottom when you're ready to wire real projects.
 
-Skip to [Production](#production) if you already have the project running locally.
+This file:
+- gets you running locally in three commands,
+- enumerates env-var canonical names with the surfaces they bind to,
+- points to the in-docs guide for everything else.
 
-## Dev (zero-backend)
+## Local dev (no accounts required)
 
 ```bash
-pnpm install      # once
-pnpm dev          # app on :4321, docs on :4322
+pnpm install
+pnpm dev
 ```
 
-Open <http://localhost:4321>. A small `MOCK BACKEND` badge sits in the corner — this is intentional and goes away once `PUBLIC_USE_MOCK_BACKEND=false` is set.
+Open <http://localhost:4321/> (main app + workbench) and <http://localhost:4322/docs/> (Starlight, with HMR).
 
-All five demo frames live in [`src/lib/fixtures/index.ts`](src/lib/fixtures/index.ts). Edit them and the home, public stream, and workbench preview routes all reflect the change.
+The `V1Repository` local provider in `src/lib/v1/local.ts` serves seed data when no Supabase URL is configured. The workbench (`/workbench/*`) will render its read-only chrome and prompt for sign-in; auth + writes activate when `PUBLIC_SUPABASE_URL` is set.
 
-## Production
+## Pre-merge gate
 
-You'll need accounts on Supabase and Cloudflare, and a deploy target on Cloudflare Pages. Order matters: Supabase first (data + auth), Cloudflare Images + Stream next (media), Pages last (it consumes the env vars from the prior two).
+```bash
+pnpm check && pnpm build
+```
 
-### 1. Supabase
+Per [branch-pr-workflow](.agents/skills/branch-pr-workflow/SKILL.md), this is the only required check before opening a PR. There is no GitHub Actions CI; Cloudflare Pages rebuilds `main`/`preview` on push.
 
-1. Create a new project at <https://supabase.com>. Pick a region close to your team.
-2. Capture three values from **Project settings → API**:
-   - Project URL → `SUPABASE_URL`
-   - `anon public` key → `PUBLIC_SUPABASE_ANON_KEY`
-   - `service_role secret` key → `SUPABASE_SERVICE_ROLE_KEY` (never expose this client-side)
-3. Open **SQL Editor**. Run the schema from [`/docs/specifications/supabase-sql/`](https://ui.plan.ai/docs/specifications/supabase-sql/) in order. Verify the enums, tables, and RLS policies are created.
-4. **Auth**: under **Authentication → Providers**, enable the providers your team uses (email + at least one OAuth provider is the typical V1 posture). Magic-link via email is the lightest. Configure **Site URL** and **Redirect URLs** for the deployed domain.
-5. **RLS**: confirm row-level security is on for every table the SQL file declares. The policies in the SQL file enforce the tenant/agent/channel scoping documented in [`/docs/v1-plan/auth-and-sessions/`](https://ui.plan.ai/docs/v1-plan/auth-and-sessions/).
+## Production wiring
 
-### 2. Cloudflare Images
+The full ordered procedure with upstream links is in [/docs/v1-plan/wiring-supabase-cloudflare/](https://ui.plan.ai/docs/v1-plan/wiring-supabase-cloudflare/) (11 phases: Supabase project → Auth → Storage → Realtime → Edge Functions → Cloudflare account → Images → Stream → Turnstile → Pages → Smoke test). The secret matrix and environment triplet (dev/preview/prod) is in [/docs/reference/secrets-and-environments/](https://ui.plan.ai/docs/reference/secrets-and-environments/). Per-host portability translation (Netlify, Vercel, Nginx, etc.) is in [/docs/reference/static-hosting/](https://ui.plan.ai/docs/reference/static-hosting/).
 
-1. Enable Cloudflare Images on your account (requires the paid plan or the Images add-on).
-2. **My Profile → API Tokens → Create Token**: scope it to `Account.Cloudflare Images: Edit`. Save as `CLOUDFLARE_IMAGES_API_TOKEN`.
-3. Capture your **Account ID** (right sidebar of any Cloudflare dashboard page) → `CLOUDFLARE_ACCOUNT_ID`.
-4. Note your delivery prefix — `https://imagedelivery.net/<account-hash>` → `PUBLIC_CLOUDFLARE_IMAGES_URL_PREFIX`.
-5. Define the **variants** referenced by your `project-config.v1.json` (see step 4). At minimum: a `thumbnail` and a `public` variant.
+## Environment variables
 
-### 3. Cloudflare Stream
+Copy `.env.example` to `.env` for local dev. For production, set every value on the surface it binds to — never the wrong one.
 
-1. Enable Stream on the same account.
-2. New API Token scoped to `Account.Stream: Edit` → `CLOUDFLARE_STREAM_API_TOKEN`.
-3. Customer **subdomain** (e.g. `customer-abcdef1234.cloudflarestream.com`) → `PUBLIC_CLOUDFLARE_STREAM_SUBDOMAIN` (just the `customer-...` part).
+| Canonical name | Browser env var | Bound to | Notes |
+|---|---|---|---|
+| `SUPABASE_URL` | `PUBLIC_SUPABASE_URL` | CF Pages (public) + Edge Functions | Same value on both surfaces. |
+| `SUPABASE_ANON_KEY` | `PUBLIC_SUPABASE_ANON_KEY` | CF Pages (public) | RLS does the protecting. |
+| `SUPABASE_SERVICE_ROLE_KEY` | — | Edge Functions only | **Never** in CF Pages env. |
+| `API_KEY_PEPPER` | — | Edge Functions only | Server pepper for API-key HMAC. |
+| `APP_ORIGINS` | — | Edge Functions | Comma-separated browser origins (CORS + Stream `allowedOrigins`). |
+| `CF_ACCOUNT_ID` | — | Edge Functions | Cloudflare account that owns Images/Stream. |
+| `CF_IMAGES_TOKEN` | — | Edge Functions | Scoped token, Images write. |
+| `CF_IMAGES_SIGNING_KEY` | — | Edge Functions | Mints signed delivery URLs for private images. |
+| `CF_STREAM_TOKEN` | — | Edge Functions | Scoped token, Stream write + Direct Creator Uploads. |
+| `CF_STREAM_SIGNING_KEY` | — | Edge Functions | Mints Stream signed playback JWTs. |
+| `CF_STREAM_WEBHOOK_SECRET` | — | Edge Functions | Verifies `webhook-signature` on Stream callbacks. |
+| `TURNSTILE_SITE_KEY` | `PUBLIC_TURNSTILE_SITE_KEY` | CF Pages (public) | Login form widget. |
+| `TURNSTILE_SECRET_KEY` | — | Edge Functions | Verifies Turnstile tokens server-side. |
+| `PUBLIC_AGENT_API_BASE_URL` | `PUBLIC_AGENT_API_BASE_URL` | CF Pages (public) | Default `https://api.ui.plan.ai/v1`. |
 
-### 4. Project config
+Full inventory + binding rules with `_headers` baseline: [/docs/reference/secrets-and-environments/](https://ui.plan.ai/docs/reference/secrets-and-environments/).
 
-`project-config.v1.json` carries per-project media limits and Cloudflare Images variant names. The schema is at [`/docs/specs/schemas/project-config.v1.schema.json`](https://ui.plan.ai/docs/specs/schemas/project-config.v1.schema.json).
+## Per-instance project config
 
-Host it where your server can fetch it (CF R2, a private GitHub gist, or any static URL) and set `PROJECT_CONFIG_URL` to that location. Keep it out of the repo — it's per-deployment config, not source.
-
-### 5. Cloudflare Pages
-
-1. Connect this repo to a new Pages project. Production branch: `main`. Build command: `pnpm build`. Output directory: `dist`.
-2. Under **Settings → Environment variables**, add every variable from [`.env.example`](.env.example) **except** `PUBLIC_USE_MOCK_BACKEND` (set that explicitly to `false`). Mark service-role and API tokens as **Encrypted**.
-3. Trigger a deploy. Verify the `MOCK BACKEND` badge is gone and `/<your-test-agent>/<yyyymmdd>/` renders real data.
-
-### 6. First API key (from the workbench)
-
-Once Pages is live:
-
-1. Sign in to `/workbench/` with a Supabase Auth account whose `tenant_members.role` is `owner` or `admin`.
-2. Create your first agent and channel from the workbench (you'll seed these in Supabase manually until the workbench CRUD ships).
-3. Generate an Agent API key scoped to that agent. Copy the raw value once — only the hash is stored.
-4. Smoke-test the contract:
-
-   ```bash
-   curl https://api.ui.plan.ai/v1/frame-submissions \
-     -H "Authorization: Bearer $PLANAI_AGENT_API_KEY" \
-     -H "Idempotency-Key: $(uuidgen)" \
-     -F 'metadata=@metadata.json;type=application/json' \
-     -F 'image=@frame.png;type=image/png'
-   ```
+Copy `config/project.config.example.json` to `config/project.config.json` and edit the limits/variants for your deployment. The `.json` (no `.example`) is gitignored — it's per-instance, not source. Schema: [/docs/specs/schemas/project-config.v1.schema.json](https://ui.plan.ai/docs/specs/schemas/project-config.v1.schema.json). Field reference: [/docs/reference/config/](https://ui.plan.ai/docs/reference/config/).
 
 ## External checklist
 
 | | Task |
 |---|---|
-| ☐ | Supabase project created |
-| ☐ | SQL schema executed; tables + enums + RLS verified |
-| ☐ | Supabase Auth providers enabled; Site URL + redirects configured |
-| ☐ | Cloudflare Images enabled; API token issued; variants defined |
-| ☐ | Cloudflare Stream enabled; API token issued; subdomain noted |
-| ☐ | `project-config.v1.json` authored and hosted |
-| ☐ | Cloudflare Pages project connected; env vars set; encrypted where required |
-| ☐ | First deploy succeeded; `MOCK BACKEND` badge gone |
-| ☐ | First tenant/agent/channel seeded in Supabase |
-| ☐ | First Agent API key issued; curl smoke-test passed |
+| ☐ | Supabase project created; `supabase link` succeeds. |
+| ☐ | `supabase db push` applied; tables + RLS verified. |
+| ☐ | Supabase Auth: email OTP enabled, MFA enrolled, Site URL + redirects match the env. |
+| ☐ | Storage bucket `frame-originals` (or your config value) created as private. |
+| ☐ | Realtime publication includes only `frame_events`, `frame_submissions`, `frames`, `frame_media`. |
+| ☐ | Edge Functions deployed with the right `--no-verify-jwt` flag per `supabase/config.toml`. |
+| ☐ | All Edge Function secrets set via `supabase secrets set …`. |
+| ☐ | Cloudflare Images enabled; scoped API token issued; signing key generated; variants declared. |
+| ☐ | Cloudflare Stream enabled; scoped API token + signing key + webhook secret issued. |
+| ☐ | Turnstile widget created per environment; site + secret keys captured. |
+| ☐ | Cloudflare Pages project connected; public env vars set; custom domains mapped. |
+| ☐ | `api.ui.plan.ai` bound to Supabase Edge Functions via Supabase custom-domain (DNS-only CNAME). |
+| ☐ | Smoke test from [wiring-supabase-cloudflare Phase 11](https://ui.plan.ai/docs/v1-plan/wiring-supabase-cloudflare/#phase-11--smoke-verification) passes top to bottom. |
+| ☐ | First tenant + owner row inserted; first agent + main channel seeded; first API key issued through the workbench. |
 
 ## Where things live
 
 | Concern | Source |
 |---|---|
-| API contract | [`/docs/api-reference/`](https://ui.plan.ai/docs/api-reference/) + [`starlight/public/specs/v1-agent-api.openapi.yaml`](starlight/public/specs/v1-agent-api.openapi.yaml) |
-| Data model + SQL | [`/docs/specifications/data-model/`](https://ui.plan.ai/docs/specifications/data-model/) + [`/docs/specifications/supabase-sql/`](https://ui.plan.ai/docs/specifications/supabase-sql/) |
-| Routing + tenancy | [`/docs/v1-plan/routing-and-tenancy/`](https://ui.plan.ai/docs/v1-plan/routing-and-tenancy/) |
-| Auth model | [`/docs/v1-plan/auth-and-sessions/`](https://ui.plan.ai/docs/v1-plan/auth-and-sessions/) |
-| Approval policy | [`/docs/v1-plan/approval-and-api-keys/`](https://ui.plan.ai/docs/v1-plan/approval-and-api-keys/) |
-| Media + delivery | [`/docs/v1-plan/media-and-delivery/`](https://ui.plan.ai/docs/v1-plan/media-and-delivery/) |
-| Mock fixtures | [`src/lib/fixtures/index.ts`](src/lib/fixtures/index.ts) |
-| Backend toggle | [`src/lib/env.ts`](src/lib/env.ts) + `PUBLIC_USE_MOCK_BACKEND` |
-| Pluggable client | [`src/lib/client.ts`](src/lib/client.ts) (live path throws until wired) |
+| API contract | [/docs/api-reference/](https://ui.plan.ai/docs/api-reference/) + `starlight/public/specs/v1-agent-api.openapi.yaml` |
+| Data model + SQL | [/docs/specifications/data-model/](https://ui.plan.ai/docs/specifications/data-model/) + [/docs/specifications/supabase-sql/](https://ui.plan.ai/docs/specifications/supabase-sql/) |
+| Routing + tenancy | [/docs/v1-plan/routing-and-tenancy/](https://ui.plan.ai/docs/v1-plan/routing-and-tenancy/) |
+| Auth model | [/docs/v1-plan/auth-and-sessions/](https://ui.plan.ai/docs/v1-plan/auth-and-sessions/) |
+| Approval policy | [/docs/v1-plan/approval-and-api-keys/](https://ui.plan.ai/docs/v1-plan/approval-and-api-keys/) |
+| Media + delivery | [/docs/v1-plan/media-and-delivery/](https://ui.plan.ai/docs/v1-plan/media-and-delivery/) |
+| Mechanical wiring | [/docs/v1-plan/wiring-supabase-cloudflare/](https://ui.plan.ai/docs/v1-plan/wiring-supabase-cloudflare/) |
+| Secret matrix | [/docs/reference/secrets-and-environments/](https://ui.plan.ai/docs/reference/secrets-and-environments/) |
+| Local provider (mock data) | `src/lib/v1/local.ts` |
+| Live provider boundary | `src/lib/v1/contracts.ts` (V1Repository interface) |
+| Realtime layer | `src/lib/realtime.ts` (Postgres Changes subscriptions) |
