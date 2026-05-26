@@ -20,6 +20,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# per-instance project config (commit .example.json only)
+/config/project.config.json
+
 # macOS-specific files
 .DS_Store
 
