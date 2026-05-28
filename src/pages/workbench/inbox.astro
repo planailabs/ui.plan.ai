@@ -71,6 +71,7 @@ import Workbench from '../../layouts/Workbench.astro';
 
   <script>
     import { getBrowserClient } from '../../lib/supabase';
+    import { escapeHtml } from '../../lib/escapeHtml';
     import { listMyTenants, getActiveTenantId, setActiveTenantId } from '../../lib/tenant';
     import { subscribeInbox, type FrameSubmissionRow } from '../../lib/realtime';
 
@@ -91,7 +92,7 @@ import Workbench from '../../layouts/Workbench.astro';
       void boot();
     }
 
-    type AgentRow = { id: string; slug: string; display_name: string };
+    type AgentRow = { id: string; slug: string; name: string };
     type ChannelRow = { id: string; slug: string };
     const agents = new Map<string, AgentRow>();
     const channels = new Map<string, ChannelRow>();
@@ -129,12 +130,12 @@ import Workbench from '../../layouts/Workbench.astro';
         const agent = agents.get(r.agent_id);
         const channel = channels.get(r.channel_id);
         return `
-          <tr data-id="${r.id}">
-            <td>${fmtTime(r.updated_at)}</td>
-            <td>${agent ? `${agent.display_name} <span style="color:var(--dim)">(${agent.slug})</span>` : '<span style="color:var(--dim)">—</span>'}</td>
-            <td>${channel ? channel.slug : '<span style="color:var(--dim)">—</span>'}</td>
-            <td><span class="status-pill" data-s="${r.status}">${r.status}</span></td>
-            <td><a href="/workbench/frames/${r.id}/">${r.id.slice(0, 8)}…</a></td>
+          <tr data-id="${escapeHtml(r.id)}">
+            <td>${escapeHtml(fmtTime(r.updated_at))}</td>
+            <td>${agent ? `${escapeHtml(agent.name)} <span style="color:var(--dim)">(${escapeHtml(agent.slug)})</span>` : '<span style="color:var(--dim)">—</span>'}</td>
+            <td>${channel ? escapeHtml(channel.slug) : '<span style="color:var(--dim)">—</span>'}</td>
+            <td><span class="status-pill" data-s="${escapeHtml(r.status)}">${escapeHtml(r.status)}</span></td>
+            <td><a href="/workbench/frames/?id=${encodeURIComponent(r.id)}">${escapeHtml(r.id.slice(0, 8))}…</a></td>
           </tr>`;
       }).join('');
     }
@@ -148,7 +149,7 @@ import Workbench from '../../layouts/Workbench.astro';
 
     async function loadLookups(tenantId: string) {
       const [a, c] = await Promise.all([
-        supabase!.from('agents').select('id, slug, display_name').eq('tenant_id', tenantId),
+        supabase!.from('agents').select('id, slug, name').eq('tenant_id', tenantId),
         supabase!.from('agent_channels').select('id, slug').eq('tenant_id', tenantId),
       ]);
       agents.clear();

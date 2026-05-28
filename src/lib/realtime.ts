@@ -1,15 +1,9 @@
 import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
+import type { SubmissionStatus } from './v1/local';
 
-export type FrameSubmissionStatus =
-  | 'received'
-  | 'waiting_for_upload'
-  | 'media_processing'
-  | 'needs_review'
-  | 'team_visible'
-  | 'promotion_eligible'
-  | 'promoted'
-  | 'rejected'
-  | 'failed';
+// Single source of truth for the submission status union lives in v1/local.ts
+// (SUBMISSION_STATUSES). Re-exported here under the realtime-facing name.
+export type FrameSubmissionStatus = SubmissionStatus;
 
 export interface FrameSubmissionRow {
   id: string;

@@ -20,5 +20,3 @@ export {
 	type Frame,
 	type ResolvedStream,
 } from './v1/local';
-
-export const resolverMode = 'static-fixture';

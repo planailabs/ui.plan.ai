@@ -1,5 +1,3 @@
-import type { SubmitFrameInput, V1Repository } from './contracts';
-
 export const SUBMISSION_STATUSES = [
 	'received',
 	'waiting_for_upload',
@@ -461,42 +459,3 @@ export function getFrameContext(frame: Frame) {
 	}
 	return { agent, channel, tenant };
 }
-
-export const localV1Repository: V1Repository = {
-	listTenants: () => tenants,
-	listAgents: () => agents,
-	listChannels: (agentId?: string) => (agentId ? channels.filter((channel) => channel.agentId === agentId) : channels),
-	listFrames: () => frames,
-	listWorkbenchFrames: getWorkbenchFrames,
-	listPublicStreams: getAllPublicStreams,
-	resolvePublicStream,
-	submitFrame: (input: SubmitFrameInput) => {
-		const frame: Frame = {
-			id: `frame_local_${frames.length + 1}`,
-			tenantId: input.tenantId,
-			agentId: input.agentId,
-			channelId: input.channelId,
-			dateKey: input.dateKey,
-			title: input.title,
-			summary: input.summary,
-			altText: input.summary,
-			submissionStatus: 'received',
-			mediaStatus: 'received',
-			variant: 'review',
-			submittedAt: new Date().toISOString(),
-			license: { intent: 'unknown' },
-			decisionNotes: 'Local fixture submission only. Persistent storage is handled by the Supabase adapter.',
-			clickZones: [],
-			events: [
-				{
-					type: 'frame.submission.created',
-					actor: 'agent',
-					occurredAt: new Date().toISOString(),
-					summary: 'Accepted by the local fixture repository.',
-				},
-			],
-		};
-		frames.unshift(frame);
-		return frame;
-	},
-};
