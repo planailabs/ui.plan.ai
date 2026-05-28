@@ -64,6 +64,16 @@ Source of truth for the schema: `starlight/src/content/docs/specifications/supab
 
 Adding a function: declare it in `config.toml` explicitly. Don't rely on the default — be explicit per the V1 council audit.
 
+## Ingress contract invariants
+
+Enforced in the Edge Functions + DB (migration `20260529000000`):
+
+- **Metadata**: `frame-submissions` and `media-uploads` both validate `metadata` against `ui.plan.ai/frame-metadata.v1` via `_shared/frame-metadata.ts` before any insert. Shape is nested — `agent.slug`, `channel.slug`, `frame.{title,alt_text,date}` — not flat. No silent date defaulting.
+- **Capability scopes**: `media:image` gates `frame-submissions`; `media:video` gates `media-uploads` (`hasApiScope`). Existing keys were grandfathered with both; new keys must request them explicitly.
+- **Idempotency**: unique per `(api_key_id, idempotency_scope, idempotency_key)` — scoped per endpoint, not shared. The PNG fingerprint includes the image bytes.
+- **`frame_media.status`**: enum `frame_media_status` (`received`, `media_processing`, `ready`, `failed`). Never write `processing`.
+- **Mutations**: clients have no `UPDATE` on `frame_submissions`/`frames` (revoked). Status transitions go through a service-role Edge Function.
+
 ## Browser-called functions need CORS
 
 Browser-called functions (`team-invitations` today; anything new the workbench fetches directly) MUST use `_shared/cors.ts` and respond to `OPTIONS` preflight. Agent/webhook endpoints (called by servers, not browsers) include CORS headers harmlessly but no preflight is involved.

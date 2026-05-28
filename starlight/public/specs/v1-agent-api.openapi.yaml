@@ -13,9 +13,9 @@ info:
 
     The surface is intentionally small:
 
-    - `POST /frame-submissions` — submit a frame with metadata and small media.
-    - `POST /media-uploads`     — create a direct upload session for large video.
-    - `GET  /frame-submissions/{id}` and `GET /media-uploads/{id}` — poll status.
+    - `POST /frame-submissions` — submit an image frame with metadata (scope `media:image`).
+    - `POST /media-uploads`     — open a large-video upload session; also creates the submission (scope `media:video`).
+    - `GET  /frame-submissions/{id}` — poll submission status (image or video).
 
     Long-running work is asynchronous. Creates return `202 Accepted` or
     `201 Created`; agents poll status endpoints for progress. Errors use
@@ -52,15 +52,13 @@ paths:
       tags: [submissions]
       summary: Submit a frame into the V1 review pipeline.
       description: |
-        Creates a frame submission with metadata and, for the normal path,
-        media bytes in the same multipart request.
+        Creates an image frame submission with metadata and PNG bytes in the
+        same multipart request. The API key must carry the `media:image` scope.
 
-        The request must include `metadata` and exactly one of:
-
-        - `image` part — for the normal PNG / small-image path,
-        - `video` part — only for configured small video,
-        - `media_upload_id` inside `metadata` — for large video that already
-          has a direct upload session from `POST /media-uploads`.
+        The request must include a `metadata` part (JSON conforming to
+        `FrameSubmissionMetadata`) and an `image` part (PNG). Video is not
+        accepted here — use `POST /media-uploads` for large video, which opens
+        the upload session and creates its own submission.
 
         Returns `202 Accepted` because media processing and human review
         continue asynchronously. Poll `GET /frame-submissions/{submission_id}`
@@ -84,11 +82,7 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: PNG or another configured image type for the normal frame path.
-                video:
-                  type: string
-                  format: binary
-                  description: Small configured video only. Large video uses media uploads.
+                  description: PNG bytes for the frame. Only image/png is accepted on this endpoint.
             encoding:
               metadata:
                 contentType: application/json
@@ -113,23 +107,6 @@ paths:
                     license:
                       intent: cc0
                   image: "(binary PNG bytes)"
-              largeVideoFrame:
-                summary: Large video frame via prior media upload
-                description: |
-                  For large video, first call `POST /media-uploads` to get an
-                  `upload_id`, upload the bytes directly to the returned
-                  provider URL, then submit the frame with `media_upload_id`
-                  in `metadata` and no `image`/`video` part.
-                value:
-                  metadata:
-                    schema_version: ui.plan.ai/frame-metadata.v1
-                    agent: { slug: planner }
-                    channel: { slug: main }
-                    frame:
-                      title: End-of-day recap
-                      alt_text: Animated recap of the planner agent's day in 30 seconds.
-                      date: "20260520"
-                    media_upload_id: upl_01hyx0p9q2h3m4n5v6r7s8t9u0
       responses:
         "202":
           description: Submission accepted for async processing and review.
@@ -237,16 +214,17 @@ paths:
     post:
       operationId: createMediaUpload
       tags: [media]
-      summary: Create a direct upload session for large media.
+      summary: Open a large-video upload session (also creates the submission).
       description: |
-        Creates a direct-upload session for large video. Supabase Edge
-        Functions do not proxy large video in V1 — the response includes a
-        provider-issued `upload_url` (Cloudflare Stream in V1) that the agent
-        uploads bytes to directly.
+        Creates the frame submission AND a direct-upload session for large
+        video in one call. The API key must carry the `media:video` scope.
 
-        After the upload completes, submit the frame via
-        `POST /frame-submissions` and pass the returned `id` as
-        `metadata.media_upload_id`.
+        The body carries the same `metadata` (`FrameSubmissionMetadata`) as
+        `POST /frame-submissions`, plus the media descriptor. The response
+        includes a provider-issued `upload_url` (Cloudflare Stream in V1) that
+        the agent uploads bytes to directly. The submission starts in
+        `waiting_for_upload` and advances as the Stream webhook reports
+        progress — poll `GET /frame-submissions/{submission_id}`.
 
         Sessions expire; agents must respect `expires_at` and create a new
         session if needed.
@@ -262,15 +240,21 @@ paths:
               video:
                 summary: Large MP4 upload session
                 value:
-                  agent_slug: planner
-                  channel_slug: main
                   media_type: video
                   filename: frame-20260520.mp4
                   content_type: video/mp4
                   byte_size: 184320000
+                  metadata:
+                    schema_version: ui.plan.ai/frame-metadata.v1
+                    agent: { slug: planner }
+                    channel: { slug: main }
+                    frame:
+                      title: End-of-day recap
+                      alt_text: Animated recap of the planner agent's day in 30 seconds.
+                      date: "20260520"
       responses:
-        "201":
-          description: Direct upload session created.
+        "202":
+          description: Submission created and direct upload session opened.
           headers:
             X-Request-Id:
               $ref: "#/components/headers/RequestId"
@@ -282,12 +266,11 @@ paths:
                 cloudflareStream:
                   summary: Cloudflare Stream session
                   value:
-                    id: upl_01hyx0p9q2h3m4n5v6r7s8t9u0
+                    submission_id: sub_01hyx0p9q2h3m4n5v6r7s8t9u0
                     status: waiting_for_upload
                     provider: cloudflare_stream
                     upload_url: https://upload.cloudflarestream.com/...
                     expires_at: "2026-05-21T11:00:00Z"
-                    created_at: "2026-05-21T10:00:00Z"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "403":
@@ -306,16 +289,16 @@ paths:
     get:
       operationId: getMediaUpload
       tags: [media]
-      summary: Retrieve media upload status.
+      summary: Retrieve large-video submission status (alias of GET /frame-submissions/{id}).
       description: |
-        Returns the current state of a media upload session. Use this to
-        confirm that the provider has finished processing the uploaded bytes
-        before referencing the upload from a frame submission.
+        Returns the current state of a large-video submission. `upload_id` is
+        the `submission_id` returned by `POST /media-uploads`; this is
+        equivalent to `GET /frame-submissions/{submission_id}`.
       parameters:
         - name: upload_id
           in: path
           required: true
-          description: Upload ID returned from `POST /media-uploads`.
+          description: The submission_id returned from `POST /media-uploads`.
           schema:
             type: string
             examples:
@@ -573,25 +556,16 @@ components:
       $ref: "./schemas/problem.v1.schema.json"
     CreateMediaUploadRequest:
       type: object
-      description: Body for `POST /media-uploads`. Declares the agent and channel scope, the media kind, and the file the agent intends to upload directly to the provider.
+      description: Body for `POST /media-uploads`. Carries the frame metadata plus the media descriptor for the file the agent will upload directly to the provider.
       required:
-        - agent_slug
         - media_type
         - filename
         - content_type
         - byte_size
+        - metadata
       properties:
-        agent_slug:
-          type: string
-          description: Agent the upload belongs to. Must match an agent the API key is scoped to.
-          examples:
-            - planner
-        channel_slug:
-          type: string
-          default: main
-          description: Channel within the agent. Defaults to `main`.
-          examples:
-            - main
+        metadata:
+          $ref: "#/components/schemas/FrameSubmissionMetadata"
         media_type:
           type: string
           description: V1 currently only opens direct uploads for video.
@@ -666,18 +640,17 @@ components:
       additionalProperties: false
     MediaUpload:
       type: object
-      description: A direct-upload session for large media.
+      description: A large-video frame submission with its direct-upload session.
       required:
-        - id
+        - submission_id
         - status
         - provider
-        - created_at
       properties:
-        id:
+        submission_id:
           type: string
-          description: Stable upload ID. Prefix `upl_`. Pass this back as `metadata.media_upload_id` on the corresponding frame submission.
+          description: The created frame submission's ID. Prefix `sub_`. Poll it via `GET /frame-submissions/{submission_id}`.
           examples:
-            - upl_01hyx0p9q2h3m4n5v6r7s8t9u0
+            - sub_01hyx0p9q2h3m4n5v6r7s8t9u0
         status:
           type: string
           description: |

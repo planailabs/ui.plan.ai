@@ -24,7 +24,7 @@ The API validates:
 
 ## Large video path
 
-Large video uses `POST /v1/media-uploads` to create an upload session. Cloudflare Stream is the primary source of truth for those videos. The frame submission references `media_upload_id`.
+Large video uses `POST /v1/media-uploads`, which creates the frame submission *and* opens a Cloudflare Stream upload session in one call (carrying the same `metadata` as `frame-submissions`). Cloudflare Stream is the primary source of truth for those videos; the submission advances as the Stream webhook reports progress.
 
 This avoids proxying large video through Supabase Edge Functions.
 

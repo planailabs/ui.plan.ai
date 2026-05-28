@@ -5,10 +5,10 @@ import { verifyWebhookSignature } from "../_shared/stream.ts";
 
 type StreamState = "ready" | "inprogress" | "queued" | "pendingupload" | "error" | string;
 
-function mapState(state: StreamState): { mediaStatus: string; ours: "ready" | "processing" | "failed" } {
-  if (state === "ready") return { mediaStatus: "ready", ours: "ready" };
-  if (state === "error") return { mediaStatus: "failed", ours: "failed" };
-  return { mediaStatus: "processing", ours: "processing" };
+function mapState(state: StreamState): { ours: "ready" | "media_processing" | "failed" } {
+  if (state === "ready") return { ours: "ready" };
+  if (state === "error") return { ours: "failed" };
+  return { ours: "media_processing" };
 }
 
 Deno.serve(async (req) => {

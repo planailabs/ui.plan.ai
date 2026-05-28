@@ -30,6 +30,11 @@ export async function sha256Hex(data: string): Promise<string> {
   return bytesToHex(sig);
 }
 
+export async function sha256BytesHex(data: Uint8Array): Promise<string> {
+  const sig = await crypto.subtle.digest("SHA-256", data as BufferSource);
+  return bytesToHex(sig);
+}
+
 function sortKeys(input: unknown): unknown {
   if (Array.isArray(input)) return input.map(sortKeys);
   if (input && typeof input === "object") {

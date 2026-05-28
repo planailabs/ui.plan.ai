@@ -25,6 +25,7 @@ const supabaseMigrations = [
 	'20260522000000_init.sql',
 	'20260522000001_api_keys_view.sql',
 	'20260528000000_rls_hardening.sql',
+	'20260529000000_v1_contract_conformance.sql',
 ];
 
 export function GET() {

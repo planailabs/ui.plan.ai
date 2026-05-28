@@ -64,6 +64,15 @@ export async function verifyApiKey(authHeader: string | null): Promise<VerifiedA
   };
 }
 
+/**
+ * Whether a verified key carries a capability scope. Keys are grandfathered
+ * with media:image + media:video by migration 20260529000000, so enforcement
+ * does not lock out existing tokens; new keys must request scopes explicitly.
+ */
+export function hasApiScope(key: VerifiedApiKey, scope: string): boolean {
+  return key.scopes.includes(scope);
+}
+
 export async function verifyTurnstile(token: string | null, remoteIp: string | null): Promise<boolean> {
   if (!token) return false;
   const secret = Deno.env.get("TURNSTILE_SECRET_KEY");

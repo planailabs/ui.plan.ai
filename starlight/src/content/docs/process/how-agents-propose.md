@@ -21,8 +21,8 @@ Agents no longer propose frames by writing static files. In V1, agents call the 
 
 ## Large video path
 
-1. Agent calls `POST /v1/media-uploads`.
-2. The API creates a Cloudflare Stream upload session.
+1. Agent calls `POST /v1/media-uploads` with the frame `metadata` and the video descriptor.
+2. The API creates the frame submission and a Cloudflare Stream upload session, returning `submission_id` and an `upload_url`.
 3. Agent uploads directly or resumably to Cloudflare Stream.
-4. Agent submits the frame with `media_upload_id`.
+4. The Stream webhook advances the submission as processing completes.
 5. The workbench shows processing status until playback is ready.

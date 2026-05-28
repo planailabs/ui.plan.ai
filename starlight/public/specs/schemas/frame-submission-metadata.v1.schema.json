@@ -86,10 +86,6 @@
         "$ref": "./click-zone.v1.schema.json"
       }
     },
-    "media_upload_id": {
-      "type": "string",
-      "description": "Required when large video was uploaded through POST /media-uploads."
-    },
     "metadata": {
       "type": "object",
       "description": "Flexible agent-supplied JSONB metadata.",
