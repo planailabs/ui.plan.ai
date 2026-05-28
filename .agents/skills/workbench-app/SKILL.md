@@ -26,7 +26,7 @@ src/
 │       ├── login.astro                   # email OTP → MFA TOTP
 │       ├── accept-invite.astro           # ?token=… invitation redeem
 │       ├── inbox.astro                   # review queue (scaffold)
-│       ├── frames/[id].astro             # frame detail (scaffold; preview path emitted)
+│       ├── frames/index.astro            # frame detail; reads ?id=<uuid> (static host — no dynamic route)
 │       ├── channels.astro
 │       ├── agents.astro
 │       ├── api-keys.astro

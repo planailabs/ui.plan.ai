@@ -1,8 +1,5 @@
 ---
 import Workbench from '../../../layouts/Workbench.astro';
-export function getStaticPaths() {
-  return [{ params: { id: 'preview' } }];
-}
 ---
 <Workbench title="Frame detail" spec="/docs/v1-plan/workbench/">
   <p style="color:var(--dim);margin-top:0;">
@@ -52,10 +49,12 @@ export function getStaticPaths() {
     .event-row:last-child { border-bottom: 0; }
     .event-row .ts { color: var(--dim); }
     .event-row .name { color: var(--accent); }
+    .back { display: inline-block; margin-bottom: 12px; color: var(--accent); font-size: 12px; }
   </style>
 
   <script>
     import { getBrowserClient } from '../../../lib/supabase';
+    import { escapeHtml } from '../../../lib/escapeHtml';
     import {
       subscribeFrame,
       type FrameSubmissionRow,
@@ -63,7 +62,10 @@ export function getStaticPaths() {
       type FrameEventRow,
     } from '../../../lib/realtime';
 
-    const id = window.location.pathname.replace(/\/$/, '').split('/').pop() || '';
+    // Static host: this is a single prerendered page. The submission id arrives
+    // as ?id=<uuid> (the inbox links here) — arbitrary UUID paths cannot be
+    // statically generated. Empty/preview id renders the navigation hint.
+    const id = new URLSearchParams(window.location.search).get('id')?.trim() || '';
     const supabase = getBrowserClient();
     const summaryEl = document.getElementById('summary') as HTMLElement;
     const mediaEl = document.getElementById('media-list') as HTMLElement;
@@ -75,8 +77,8 @@ export function getStaticPaths() {
 
     if (!supabase) {
       summaryEl.textContent = 'Supabase env not configured — read-only build.';
-    } else if (id === 'preview') {
-      summaryEl.innerHTML = '<span class="dim">Static preview path. Navigate from the inbox to load a real submission.</span>';
+    } else if (!id || id === 'preview') {
+      summaryEl.innerHTML = '<span class="dim">No submission selected. Open one from the <a href="/workbench/inbox/" style="color:var(--accent)">inbox</a>.</span>';
     } else {
       void boot(id);
     }
@@ -103,14 +105,14 @@ export function getStaticPaths() {
       const s = submission;
       summaryEl.innerHTML = `
         <dl class="kv">
-          <dt>id</dt><dd>${s.id}</dd>
-          <dt>status</dt><dd><span class="status-pill" data-s="${s.status}">${s.status}</span></dd>
-          <dt>agent_id</dt><dd>${s.agent_id}</dd>
-          <dt>channel_id</dt><dd>${s.channel_id}</dd>
-          <dt>created_at</dt><dd>${fmtTime(s.created_at)}</dd>
-          <dt>updated_at</dt><dd>${fmtTime(s.updated_at)}</dd>
-          <dt>schema</dt><dd>${s.metadata_schema_version}</dd>
-          ${s.error ? `<dt>error</dt><dd style="color:#f87171">${JSON.stringify(s.error)}</dd>` : ''}
+          <dt>id</dt><dd>${escapeHtml(s.id)}</dd>
+          <dt>status</dt><dd><span class="status-pill" data-s="${escapeHtml(s.status)}">${escapeHtml(s.status)}</span></dd>
+          <dt>agent_id</dt><dd>${escapeHtml(s.agent_id)}</dd>
+          <dt>channel_id</dt><dd>${escapeHtml(s.channel_id)}</dd>
+          <dt>created_at</dt><dd>${escapeHtml(fmtTime(s.created_at))}</dd>
+          <dt>updated_at</dt><dd>${escapeHtml(fmtTime(s.updated_at))}</dd>
+          <dt>schema</dt><dd>${escapeHtml(s.metadata_schema_version)}</dd>
+          ${s.error ? `<dt>error</dt><dd style="color:#f87171">${escapeHtml(JSON.stringify(s.error))}</dd>` : ''}
         </dl>`;
       metaEl.textContent = JSON.stringify(s.metadata, null, 2);
     }
@@ -123,12 +125,12 @@ export function getStaticPaths() {
       mediaEl.innerHTML = [...media.values()].map((m) => `
         <div class="media-item">
           <dl class="kv">
-            <dt>kind</dt><dd>${m.kind}</dd>
-            <dt>status</dt><dd><span class="status-pill" data-s="${m.status}">${m.status}</span>${m.failure_reason ? ` <span style="color:#f87171">${m.failure_reason}</span>` : ''}</dd>
-            <dt>provider</dt><dd>${m.storage_provider}</dd>
-            <dt>storage_key</dt><dd>${m.storage_key}</dd>
-            ${m.delivery_id ? `<dt>delivery_id</dt><dd>${m.delivery_id}</dd>` : ''}
-            <dt>updated_at</dt><dd>${fmtTime(m.updated_at)}</dd>
+            <dt>kind</dt><dd>${escapeHtml(m.kind)}</dd>
+            <dt>status</dt><dd><span class="status-pill" data-s="${escapeHtml(m.status)}">${escapeHtml(m.status)}</span>${m.failure_reason ? ` <span style="color:#f87171">${escapeHtml(m.failure_reason)}</span>` : ''}</dd>
+            <dt>provider</dt><dd>${escapeHtml(m.storage_provider)}</dd>
+            <dt>storage_key</dt><dd>${escapeHtml(m.storage_key)}</dd>
+            ${m.delivery_id ? `<dt>delivery_id</dt><dd>${escapeHtml(m.delivery_id)}</dd>` : ''}
+            <dt>updated_at</dt><dd>${escapeHtml(fmtTime(m.updated_at))}</dd>
           </dl>
         </div>`).join('');
     }
@@ -140,9 +142,9 @@ export function getStaticPaths() {
       }
       eventsEl.innerHTML = events.slice(0, 100).map((e) => `
         <div class="event-row">
-          <span class="ts">${fmtTime(e.created_at)}</span>
-          <span class="name">${e.event_type}</span>
-          <span>${e.actor_type}${e.request_id ? ` · req <span class="dim">${e.request_id}</span>` : ''}</span>
+          <span class="ts">${escapeHtml(fmtTime(e.created_at))}</span>
+          <span class="name">${escapeHtml(e.event_type)}</span>
+          <span>${escapeHtml(e.actor_type)}${e.request_id ? ` · req <span class="dim">${escapeHtml(e.request_id)}</span>` : ''}</span>
         </div>`).join('');
     }
 
@@ -194,8 +196,8 @@ export function getStaticPaths() {
           renderEvents();
         },
       });
-      ch.on('system', { event: '*' }, (s: any) => {
-        if (s?.status === 'CHANNEL_ERROR' || s?.status === 'TIMED_OUT') setRt('err', s.status.toLowerCase());
+      ch.on('system', { event: '*' }, (sys: any) => {
+        if (sys?.status === 'CHANNEL_ERROR' || sys?.status === 'TIMED_OUT') setRt('err', sys.status.toLowerCase());
       });
       setTimeout(() => { if (rtDot.dataset.state === 'off') setRt('on', 'live'); }, 1200);
     }

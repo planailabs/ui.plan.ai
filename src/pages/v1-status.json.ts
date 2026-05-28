@@ -7,7 +7,6 @@ import {
 	channels,
 	frames,
 	getAllPublicStreams,
-	resolverMode,
 	tenants,
 } from '../lib/streamResolver';
 import { runtimeConfig } from '../lib/runtimeConfig';
@@ -25,13 +24,14 @@ const edgeFunctions = [
 const supabaseMigrations = [
 	'20260522000000_init.sql',
 	'20260522000001_api_keys_view.sql',
+	'20260528000000_rls_hardening.sql',
 ];
 
 export function GET() {
 	const publicStreams = getAllPublicStreams();
 	const body = {
 		name: 'ui.plan.ai v1 static shell',
-		mode: resolverMode,
+		mode: 'static-fixture',
 		status: 'ready-for-backend-wiring',
 		self: '/v1-status.json',
 		docs: '/docs/start-here/welcome/',
