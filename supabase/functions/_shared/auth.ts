@@ -37,12 +37,17 @@ export async function verifyApiKey(authHeader: string | null): Promise<VerifiedA
   const candidate = await hmacSha256Hex(pepper, raw);
   if (!timingSafeEqual(candidate, data.hash)) return null;
 
+  // Debounce last_used_at to at most once per minute (matches the documented
+  // contract in docs/v1-plan/approval-and-api-keys). The conditional filter
+  // makes the write a no-op when a recent timestamp already exists.
   queueMicrotask(async () => {
     try {
+      const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
       await supabase
         .from("api_keys")
         .update({ last_used_at: new Date().toISOString() })
-        .eq("id", data.id);
+        .eq("id", data.id)
+        .or(`last_used_at.is.null,last_used_at.lt.${oneMinuteAgo}`);
     } catch (_) {
       /* best-effort */
     }
