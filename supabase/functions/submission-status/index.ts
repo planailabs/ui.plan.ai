@@ -39,10 +39,18 @@ Deno.serve(async (req) => {
   const supabase = serviceClient();
   const { data, error } = await supabase
     .from("frame_submissions")
-    .select("id, tenant_id, status, created_at, updated_at, error")
+    .select("id, tenant_id, agent_id, channel_id, status, created_at, updated_at, error")
     .eq("id", id)
     .maybeSingle();
-  if (error || !data || data.tenant_id !== key.tenant_id) {
+  // Scope to the API key's binding: a key bound to an agent (or channel) may
+  // only read its own submissions, not any submission in the tenant. 404 (not
+  // 403) so a guessed id cannot confirm existence across scopes.
+  const outOfScope =
+    !data ||
+    data.tenant_id !== key.tenant_id ||
+    (key.agent_id !== null && data.agent_id !== key.agent_id) ||
+    (key.channel_id !== null && data.channel_id !== key.channel_id);
+  if (error || outOfScope) {
     return problem({
       status: 404, code: "not_found", title: "Submission not found",
       detail: "No submission with that id for this API key.",

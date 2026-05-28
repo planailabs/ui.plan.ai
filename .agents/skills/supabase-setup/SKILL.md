@@ -11,6 +11,21 @@ The `supabase/` directory is the source of truth for the V1 Supabase project (`u
 
 **Never run `supabase db push`, `supabase db reset`, `supabase functions deploy`, `supabase secrets set`, or `supabase link` without an explicit ask from the user.** These mutate live infrastructure. Suggest them; do not execute them.
 
+## Verification gap (read before changing migrations or functions)
+
+`pnpm check` + `pnpm build` — the only pre-merge gate — do **not** cover this directory. Edge Functions are Deno (excluded from the root `tsconfig`) and RLS is never executed locally by the gate. Real defects here (RLS recursion, over-permissive anon policies, unenforced API-key scopes) pass the gate silently and reach prod on the next deploy. Before changing a migration or function, verify the actual behavior against a real stack:
+
+```bash
+supabase start && supabase db reset           # apply migrations + seed locally (when the user asks)
+# then exercise the path with a real anon/authenticated token, not just types:
+#   - RLS: query the table as anon AND as a tenant member; confirm rows match intent
+#   - recursion: a SELECT that funnels through is_tenant_member() must not error
+#   - scopes: an agent-bound key must not read another agent's rows
+deno check supabase/functions/**/index.ts     # type-check the Deno side the gate skips
+```
+
+Membership helper functions that read `tenant_members` MUST be `security definer` (see the `is_aal2()` precedent) or they recurse against their own RLS policy.
+
 ## Layout
 
 ```
