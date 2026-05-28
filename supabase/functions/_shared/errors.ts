@@ -4,6 +4,7 @@ export type ProblemCode =
   | "forbidden"
   | "not_found"
   | "conflict"
+  | "idempotency_conflict"
   | "rate_limited"
   | "unsupported_media_type"
   | "payload_too_large"

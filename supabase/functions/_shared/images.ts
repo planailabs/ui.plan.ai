@@ -8,7 +8,7 @@ export async function uploadImage(
   if (!accountId || !token) throw new Error("images: CF_ACCOUNT_ID or CF_IMAGES_TOKEN not set");
 
   const form = new FormData();
-  form.append("file", new Blob([bytes]), filename);
+  form.append("file", new Blob([bytes as BlobPart]), filename);
   form.append("requireSignedURLs", "true");
   form.append("metadata", JSON.stringify(metadata));
 

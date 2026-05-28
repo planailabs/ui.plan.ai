@@ -12,6 +12,7 @@ The workbench is the authenticated operating surface for tenant members. It live
 - Every page uses `src/layouts/Workbench.astro` and passes a `spec` URL pointing at its source doc under `/docs/v1-plan/...`. The pill renders the link — keeps every screen one click from its source-of-truth contract.
 - Every page is guarded by default. Pass `guarded={false}` only on `login.astro` and `accept-invite.astro`.
 - Browser code never imports the service-role key. The browser uses anon key + RLS + Edge Functions. If you find yourself needing the service role from the browser, you need a new Edge Function instead — see `supabase-setup` skill.
+- Clients have **no `UPDATE`** on `frame_submissions`/`frames` — revoked at the DB (migration `20260529000000`). Frame status transitions (promote / reject / request-changes) MUST go through a service-role Edge Function. A client-side `.update()` will fail; build the function instead.
 - `<meta name="robots" content="noindex,nofollow">` is set by the layout. Don't override.
 - CF Pages serves `/workbench/*` with `Cache-Control: private, no-store` (see `public/_headers`). Don't add per-page caching.
 

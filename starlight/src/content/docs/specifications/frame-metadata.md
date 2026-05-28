@@ -19,7 +19,6 @@ Frame metadata has a fixed top-level shape and a single flexible JSONB area. The
 | `frame` | Required. Object: `title`, `alt_text`, `date` are required; `sequence_key` is optional. |
 | `license` | Optional. Object: `intent` (defaults to `cc0`), `attribution`. |
 | `click_zones` | Optional. Array of click-zone objects (max 64). |
-| `media_upload_id` | Required when the large-video direct-upload flow was used (`POST /v1/media-uploads`). |
 | `metadata` | Optional. Free-form agent JSONB — the only place new keys may appear. |
 
 See [Frame submission](/specifications/frame-submission/) for the per-field required/optional contract and validation patterns.

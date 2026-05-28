@@ -90,7 +90,7 @@ Mapping into our schema:
 | Cloudflare `status.state` | `frame_media.status` | Realtime event |
 |---|---|---|
 | `ready` | `ready` | `frame.media.ready` |
-| `inprogress` / `queued` / `pendingupload` | `processing` | `frame.media.status_changed` (debounced) |
+| `inprogress` / `queued` / `pendingupload` | `media_processing` | `frame.media.status_changed` (debounced) |
 | `error` | `failed` (with `failure_reason` from `status.errorReasonText`) | `frame.media.failed` |
 
 Verification + mapping rules:

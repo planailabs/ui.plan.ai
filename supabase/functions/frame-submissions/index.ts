@@ -1,24 +1,14 @@
 import { preflight, corsHeaders } from "../_shared/cors.ts";
 import { problem, ok, requestId } from "../_shared/errors.ts";
-import { verifyApiKey } from "../_shared/auth.ts";
+import { verifyApiKey, hasApiScope } from "../_shared/auth.ts";
 import { serviceClient } from "../_shared/supabase.ts";
 import { appendEvent } from "../_shared/events.ts";
 import { consume } from "../_shared/rate-limit.ts";
 import { uploadImage } from "../_shared/images.ts";
-import { canonicalFingerprint } from "../_shared/hash.ts";
+import { canonicalFingerprint, sha256BytesHex } from "../_shared/hash.ts";
+import { validateFrameMetadata } from "../_shared/frame-metadata.ts";
 
 const MAX_MULTIPART_BYTES = 25 * 1024 * 1024;
-
-function deriveDateKey(metadata: Record<string, unknown>): string {
-  const fromMeta = (metadata.date ?? (metadata.frame as Record<string, unknown> | undefined)?.date) as
-    | string | undefined;
-  if (fromMeta && /^[0-9]{8}$/.test(fromMeta)) return fromMeta;
-  const now = new Date();
-  const y = now.getUTCFullYear().toString();
-  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(now.getUTCDate()).padStart(2, "0");
-  return `${y}${m}${d}`;
-}
 
 Deno.serve(async (req) => {
   const pre = preflight(req);
@@ -40,6 +30,12 @@ Deno.serve(async (req) => {
     return problem({
       status: 401, code: "unauthorized", title: "Invalid or missing API key",
       detail: "Provide a Bearer pai_* key.", requestId: rid, cors,
+    });
+  }
+  if (!hasApiScope(key, "media:image")) {
+    return problem({
+      status: 403, code: "forbidden", title: "Missing scope",
+      detail: "This API key lacks the required media:image scope.", requestId: rid, cors,
     });
   }
 
@@ -123,6 +119,19 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Validate against ui.plan.ai/frame-metadata.v1 before anything is stored.
+  // This replaces the previous silent date coercion and the flat agent_slug /
+  // channel_slug reads (the schema is nested: agent.slug, channel.slug).
+  const validation = validateFrameMetadata(metadata);
+  if (!validation.ok) {
+    return problem({
+      status: 422, code: "validation_failed", title: "Invalid frame metadata",
+      detail: "metadata does not satisfy ui.plan.ai/frame-metadata.v1.",
+      requestId: rid, cors, extra: { errors: validation.errors },
+    });
+  }
+  const meta = validation.value;
+
   const fileBytes = new Uint8Array(await file.arrayBuffer());
   if (fileBytes.byteLength > MAX_MULTIPART_BYTES) {
     return problem({
@@ -133,6 +142,7 @@ Deno.serve(async (req) => {
   }
   const fileFingerprint = await canonicalFingerprint({
     name: file.name, type: file.type, size: fileBytes.byteLength,
+    sha256: await sha256BytesHex(fileBytes),
   });
   const requestFingerprint = await canonicalFingerprint({
     metadata, file: fileFingerprint,
@@ -144,13 +154,14 @@ Deno.serve(async (req) => {
     .from("frame_submissions")
     .select("id, status, created_at, agent_id, channel_id, metadata")
     .eq("api_key_id", key.id)
+    .eq("idempotency_scope", "frame-submissions")
     .eq("idempotency_key", idempotencyKey)
     .maybeSingle();
   if (existing) {
     const existingFp = (existing.metadata as Record<string, unknown> | null)?._idempotency_fp as string | undefined;
     if (existingFp && existingFp !== requestFingerprint) {
       return problem({
-        status: 409, code: "conflict", title: "idempotency_conflict",
+        status: 409, code: "idempotency_conflict", title: "idempotency_conflict",
         detail: "Idempotency-Key reused with different request parameters.",
         requestId: rid, cors,
       });
@@ -161,7 +172,7 @@ Deno.serve(async (req) => {
     return ok({
       id: existing.id, status: existing.status,
       agent_slug: ag?.slug ?? null, channel_slug: ch?.slug ?? null,
-      date: storedDate ?? deriveDateKey(metadata), created_at: existing.created_at,
+      date: storedDate ?? meta.dateKey, created_at: existing.created_at,
       idempotent: true,
     }, rid, cors, 202);
   }
@@ -174,18 +185,17 @@ Deno.serve(async (req) => {
       detail: "This API key has no usable agent binding.", requestId: rid, cors,
     });
   }
-  const metaAgentSlug = metadata.agent_slug as string | undefined;
-  if (metaAgentSlug && metaAgentSlug !== agentRow.slug) {
+  if (meta.agentSlug !== agentRow.slug) {
     return problem({
       status: 403, code: "forbidden", title: "Agent mismatch",
-      detail: "metadata.agent_slug does not match the agent this API key is bound to.",
+      detail: "metadata.agent.slug does not match the agent this API key is bound to.",
       requestId: rid, cors,
     });
   }
 
   let channelId = key.channel_id;
   let channelSlug: string | null = null;
-  const metaChannelSlug = metadata.channel_slug as string | undefined;
+  const metaChannelSlug = (metadata.channel as Record<string, unknown> | undefined)?.slug as string | undefined;
   if (metaChannelSlug) {
     const { data: chanBySlug } = await supabase
       .from("agent_channels").select("id, slug, tenant_id")
@@ -193,7 +203,7 @@ Deno.serve(async (req) => {
     if (!chanBySlug || chanBySlug.tenant_id !== key.tenant_id) {
       return problem({
         status: 403, code: "forbidden", title: "Channel mismatch",
-        detail: "metadata.channel_slug does not belong to this agent/tenant.",
+        detail: "metadata.channel.slug does not belong to this agent/tenant.",
         requestId: rid, cors,
       });
     }
@@ -203,7 +213,7 @@ Deno.serve(async (req) => {
   if (!channelId) {
     return problem({
       status: 400, code: "validation_failed", title: "channel required",
-      detail: "metadata.channel_slug required when API key is not channel-scoped.",
+      detail: "metadata.channel.slug required when API key is not channel-scoped.",
       requestId: rid, cors,
     });
   }
@@ -212,7 +222,7 @@ Deno.serve(async (req) => {
     channelSlug = chan?.slug ?? null;
   }
 
-  const dateKey = deriveDateKey(metadata);
+  const dateKey = meta.dateKey;
 
   const { data: sub, error: subErr } = await supabase
     .from("frame_submissions").insert({
@@ -221,8 +231,9 @@ Deno.serve(async (req) => {
       channel_id: channelId,
       api_key_id: key.id,
       idempotency_key: idempotencyKey,
+      idempotency_scope: "frame-submissions",
       status: "received",
-      metadata_schema_version: (metadata.metadata_schema_version as string | undefined) ?? "2026-05-22",
+      metadata_schema_version: meta.schemaVersion,
       metadata: (() => {
         const safe: Record<string, unknown> = { ...metadata };
         delete safe._idempotency_fp;
@@ -234,7 +245,7 @@ Deno.serve(async (req) => {
   if (subErr || !sub) {
     if ((subErr as { code?: string }).code === "23505") {
       return problem({
-        status: 409, code: "conflict", title: "idempotency_conflict",
+        status: 409, code: "idempotency_conflict", title: "idempotency_conflict",
         detail: "Idempotency-Key reused with different parameters.",
         requestId: rid, cors,
       });
@@ -283,7 +294,7 @@ Deno.serve(async (req) => {
     storage_provider: "supabase_storage",
     storage_key: storagePath,
     delivery_id: imageId,
-    status: imageId ? "ready" : "processing",
+    status: imageId ? "ready" : "media_processing",
     metadata: {},
   });
 
